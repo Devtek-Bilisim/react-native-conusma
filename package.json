@@ -1,0 +1,27 @@
+{
+  "name": "react-native-conusma",
+  "version": "1.0.0",
+  "description": "wwww.conusma.com",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Devtek-Bilisim/react-native-conusma.git"
+  },
+  "keywords": [
+    "conusma",
+    "react"
+  ],
+  "author": "Devtek",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Devtek-Bilisim/react-native-conusma/issues"
+  },
+  "homepage": "https://github.com/Devtek-Bilisim/react-native-conusma#readme",
+  "devDependencies": {
+    "@types/node": "^15.6.1",
+    "typescript": "^3.9.9"
+  }
+}
