@@ -1,15 +1,7 @@
 import React, { Component } from 'react';
-
-import {
-  View,
-  Platform,
-  TextInput
-} from 'react-native';
-
-export default class ConusmaClient {
+export default class Conusma extends Component  {
 
   public enableAudioVideo() {
-	  return "Hello World";
+	  return "I AM WORK";
   }
 }
- 
