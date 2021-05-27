@@ -1,15 +1,15 @@
+import React, { Component } from 'react';
 
-class Conusma extends Component{
+import {
+  View,
+  Platform,
+  TextInput
+} from 'react-native';
 
- constructor(){
+export default class ConusmaClient {
 
- }
-
- public Test()
-{
-	return "Merhaba Ben Yeni Npm";
+  public enableAudioVideo() {
+	  return "Hello World";
+  }
 }
-}
-export default Conusma;
-
  
