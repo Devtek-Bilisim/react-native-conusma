@@ -1,15 +1,7 @@
+import React, { Component } from 'react';
+export default class Conusma extends Component  {
 
-class Conusma extends Component{
-
- constructor(){
-
- }
-
- public Test()
-{
-	return "Merhaba Ben Yeni Npm";
+  public enableAudioVideo() {
+	  return "I AM WORK";
+  }
 }
-}
-export default Conusma;
-
- 
