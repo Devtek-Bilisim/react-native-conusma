@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-export default class Conusma extends Component  {
 
+export default class Conusma  {
+ constructor(){}
   public enableAudioVideo() {
 	  return "I AM WORK";
   }
