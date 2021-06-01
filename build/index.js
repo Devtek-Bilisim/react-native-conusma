@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,12 +54,27 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+var mediaServerClient = __importStar(require("mediasoup-client"));
 var react_native_webrtc_1 = require("react-native-webrtc");
+var socket_io_1 = __importDefault(require("socket.io-client/dist/socket.io"));
+var app_service_1 = require("./app.service");
+var MediaServer = /** @class */ (function () {
+    function MediaServer() {
+        this.Id = 0;
+        this.socket = null;
+        this.mediaServerDevice = null;
+    }
+    return MediaServer;
+}());
+;
 var Conusma = /** @class */ (function () {
     function Conusma(appId, parameters) {
-        this.appId = appId;
-        this.apiUrl = parameters.apiUrl;
+        this.mediaServerList = [];
+        this.appService = new app_service_1.AppService(appId, { apiUrl: parameters.apiUrl });
     }
     Conusma.prototype.open = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -58,28 +92,21 @@ var Conusma = /** @class */ (function () {
             });
         });
     };
+    Conusma.prototype.close = function (state) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/];
+            });
+        });
+    };
     Conusma.prototype.getMediaServer = function (meetingUserId) {
         return __awaiter(this, void 0, void 0, function () {
-            var response, json;
+            var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Login/UserLogin", {
-                            method: 'POST',
-                            headers: {
-                                Accept: 'application/json',
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                userkey: 'hd',
-                                password: '123',
-                                deviceId: 'string',
-                            })
-                        })];
+                    case 0: return [4 /*yield*/, this.appService.getMediaServer(meetingUserId)];
                     case 1:
                         response = _a.sent();
-                        return [4 /*yield*/, response.json()];
-                    case 2:
-                        json = _a.sent();
                         return [2 /*return*/];
                 }
             });
@@ -87,7 +114,86 @@ var Conusma = /** @class */ (function () {
     };
     Conusma.prototype.createClient = function (mediaServer) {
         return __awaiter(this, void 0, void 0, function () {
+            var mediaServerElement;
+            var _this = this;
             return __generator(this, function (_a) {
+                mediaServerElement = this.mediaServerList.find(function (ms) { return ms.Id == mediaServer.Id; });
+                if (mediaServerElement == null) {
+                    mediaServerElement = new MediaServer();
+                    mediaServerElement.Id = mediaServer.Id;
+                    mediaServerElement.socket = socket_io_1.default.connect(mediaServer.ConnectionDnsAddress + ":" + mediaServer.Port);
+                    this.mediaServerList.push(mediaServerElement);
+                }
+                this.mediaServerSocket = mediaServerElement.socket;
+                this.mediaServerSocket.on('disconnect', function () { return __awaiter(_this, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, this.close(false)];
+                            case 1:
+                                _a.sent();
+                                return [4 /*yield*/, this.open()];
+                            case 2:
+                                _a.sent();
+                                return [2 /*return*/];
+                        }
+                    });
+                }); });
+                this.mediaServerSocket.on('WhoAreYou', function () { return __awaiter(_this, void 0, void 0, function () {
+                    var userInfoData, setUserInfo, routerRtpCapabilities, handlerName;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
+                                return [4 /*yield*/, this.signal('UserInfo', userInfoData, this.mediaServerSocket)];
+                            case 1:
+                                setUserInfo = _a.sent();
+                                return [4 /*yield*/, this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket)];
+                            case 2:
+                                routerRtpCapabilities = _a.sent();
+                                handlerName = mediaServerClient.detectDevice();
+                                if (handlerName) {
+                                    console.log("detected handler: %s", handlerName);
+                                }
+                                else {
+                                    console.error("no suitable handler found for current device");
+                                }
+                                this.mediaServerDevice = new mediaServerClient.Device({
+                                    handlerName: handlerName
+                                });
+                                mediaServerElement.mediaServerDevice = this.mediaServerDevice;
+                                return [4 /*yield*/, this.mediaServerDevice.load({ routerRtpCapabilities: routerRtpCapabilities })];
+                            case 3:
+                                _a.sent();
+                                this.createProducerTransport();
+                                return [2 /*return*/];
+                        }
+                    });
+                }); });
+                return [2 /*return*/];
+            });
+        });
+    };
+    Conusma.prototype.createProducerTransport = function () {
+    };
+    Conusma.prototype.signal = function (type, data, mediaServerSocket) {
+        if (data === void 0) { data = null; }
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (mediaServerSocket != null) {
+                    return [2 /*return*/, new Promise(function (resolve, reject) {
+                            mediaServerSocket.emit(type, data, function (err, response) {
+                                if (!err) {
+                                    resolve(response);
+                                }
+                                else {
+                                    reject(err);
+                                }
+                            });
+                        })];
+                }
+                else {
+                    console.error("no socket connection " + type);
+                }
                 return [2 /*return*/];
             });
         });
@@ -102,7 +208,6 @@ var Conusma = /** @class */ (function () {
                         return [4 /*yield*/, react_native_webrtc_1.mediaDevices.enumerateDevices()];
                     case 1:
                         devices = _a.sent();
-                        console.log("Get Devices :" + JSON.stringify(devices));
                         facing = isFrontCamera ? 'front' : 'environment';
                         videoSourceId = devices.find(function (device) { return device.kind === 'videoinput' && device.facing === facing; });
                         facingMode = isFrontCamera ? 'user' : 'environment';
