@@ -1,4 +1,8 @@
 export default class Conusma {
     constructor();
-    enableAudioVideo(): string;
+    MeetingUser: any;
+    open(): Promise<void>;
+    private getMediaServer;
+    private createClient;
+    enableAudioVideo(): Promise<any>;
 }
