@@ -8,15 +8,35 @@ import {
   MediaStreamConstraints,
 } from 'react-native-webrtc';
 export default class Conusma  {
- constructor(){}
- public MeetingUser:any;
+  private appId:string;
+  private apiUrl:string;
+
+  public meetingUser:any;
+
+  constructor(appId:string, parameters:{ apiUrl: string}){
+    this.appId = appId;
+    this.apiUrl = parameters.apiUrl;
+  }
+ 
   public async open() {
-    const mediaServer:any = await this.getMediaServer(this.MeetingUser.Id);
+    const mediaServer:any = await this.getMediaServer(this.meetingUser.Id);
     await this.createClient(mediaServer);
   }
 
   private async getMediaServer(meetingUserId:string) {
-
+    var response = await fetch(this.apiUrl + "/Login/UserLogin", {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userkey: 'hd',
+          password: '123',
+          deviceId: 'string',
+        })
+      });
+      let json = await response.json();
   }
 
   private async createClient(mediaServer:any) {
