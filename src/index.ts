@@ -5,7 +5,7 @@ import {
   RTCView,
   mediaDevices,
   MediaStream,
-  MediaStreamConstraints,
+  MediaStreamConstraints
 } from 'react-native-webrtc';
 export default class Conusma  {
  constructor(){}
@@ -25,8 +25,9 @@ export default class Conusma  {
   public async enableAudioVideo() {
 
     const isFrontCamera = true;
+       
     const devices = await mediaDevices.enumerateDevices();
-
+    console.log("Get Devices :"+JSON.stringify(devices));
     const facing = isFrontCamera ? 'front' : 'environment';
     const videoSourceId = devices.find(
       (device: any) => device.kind === 'videoinput' && device.facing === facing,
