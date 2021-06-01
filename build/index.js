@@ -38,14 +38,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var react_native_webrtc_1 = require("react-native-webrtc");
 var Conusma = /** @class */ (function () {
-    function Conusma() {
+    function Conusma(appId, parameters) {
+        this.appId = appId;
+        this.apiUrl = parameters.apiUrl;
     }
     Conusma.prototype.open = function () {
         return __awaiter(this, void 0, void 0, function () {
             var mediaServer;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getMediaServer(this.MeetingUser.Id)];
+                    case 0: return [4 /*yield*/, this.getMediaServer(this.meetingUser.Id)];
                     case 1:
                         mediaServer = _a.sent();
                         return [4 /*yield*/, this.createClient(mediaServer)];
@@ -58,8 +60,28 @@ var Conusma = /** @class */ (function () {
     };
     Conusma.prototype.getMediaServer = function (meetingUserId) {
         return __awaiter(this, void 0, void 0, function () {
+            var response, json;
             return __generator(this, function (_a) {
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Login/UserLogin", {
+                            method: 'POST',
+                            headers: {
+                                Accept: 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                userkey: 'hd',
+                                password: '123',
+                                deviceId: 'string',
+                            })
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2:
+                        json = _a.sent();
+                        return [2 /*return*/];
+                }
             });
         });
     };

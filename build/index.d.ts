@@ -1,6 +1,10 @@
 export default class Conusma {
-    constructor();
-    MeetingUser: any;
+    private appId;
+    private apiUrl;
+    meetingUser: any;
+    constructor(appId: string, parameters: {
+        apiUrl: string;
+    });
     open(): Promise<void>;
     private getMediaServer;
     private createClient;
