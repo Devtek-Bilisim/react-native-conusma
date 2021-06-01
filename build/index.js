@@ -80,6 +80,7 @@ var Conusma = /** @class */ (function () {
                         return [4 /*yield*/, react_native_webrtc_1.mediaDevices.enumerateDevices()];
                     case 1:
                         devices = _a.sent();
+                        console.log("Get Devices :" + JSON.stringify(devices));
                         facing = isFrontCamera ? 'front' : 'environment';
                         videoSourceId = devices.find(function (device) { return device.kind === 'videoinput' && device.facing === facing; });
                         facingMode = isFrontCamera ? 'user' : 'environment';
