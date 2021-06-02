@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AppService } from './app.service';
-import { User } from './User';
+import { User } from './user';
 
 export default class Conusma {
 
@@ -9,12 +9,12 @@ export default class Conusma {
   constructor(appId: string, parameters: { apiUrl: string }) {
     this.appService = new AppService(appId, { apiUrl: parameters.apiUrl, deviceId: 'hdpc' });
   }
-  public async CreateUser() {
+  public async createUser() {
     var user: User = new User(this.appService);
-    await user.Create();
+    await user.create();
     return user;
   }
-  public async CreateGuestUser() {
+  public async createGuestUser() {
 
   }
 

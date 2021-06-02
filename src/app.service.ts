@@ -16,12 +16,12 @@ export class AppService {
     public getJwtToken():string {
         return this.token;
     }
-    public async CreateUserWithDeviceID() {
+    public async createUserWithDeviceId() {
       var response = await fetch(this.apiUrl + "/User/AddUserWithAppCode", {
           method: 'POST',
           headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
+            accept: 'application/json',
+            'content-type': 'application/json',
           }
          ,
           body: JSON.stringify({
@@ -35,8 +35,8 @@ export class AppService {
         var response = await fetch(this.apiUrl + "/Live/GetMediaServer/"+meetingUserId, {
             method: 'POST',
             headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
+              accept: 'application/json',
+              'content-type': 'application/json',
               'Token': this.token
             }
           });

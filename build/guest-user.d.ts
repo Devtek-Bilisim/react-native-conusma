@@ -1,5 +1,5 @@
 import { AppService } from "./app.service";
-export declare class GusetUser {
+export declare class GuestUser {
     private appService;
     constructor(_appService: AppService);
 }

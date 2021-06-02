@@ -3,8 +3,8 @@ export declare class UserModel {
     SurName: string;
     UserName: string;
     Token: string;
-    EMail: string;
-    EMailVerifi: boolean;
+    Email: string;
+    EmailVerified: boolean;
     PhoneNumber: string;
     Address1: string;
     Address2: string;

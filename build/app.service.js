@@ -50,7 +50,7 @@ var AppService = /** @class */ (function () {
     AppService.prototype.getJwtToken = function () {
         return this.token;
     };
-    AppService.prototype.CreateUserWithDeviceID = function () {
+    AppService.prototype.createUserWithDeviceID = function () {
         return __awaiter(this, void 0, void 0, function () {
             var response;
             return __generator(this, function (_a) {
@@ -58,7 +58,7 @@ var AppService = /** @class */ (function () {
                     case 0: return [4 /*yield*/, fetch(this.apiUrl + "/User/AddUserWithAppCode", {
                             method: 'POST',
                             headers: {
-                                Accept: 'application/json',
+                                accept: 'application/json',
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
@@ -82,7 +82,7 @@ var AppService = /** @class */ (function () {
                     case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/GetMediaServer/" + meetingUserId, {
                             method: 'POST',
                             headers: {
-                                Accept: 'application/json',
+                                accept: 'application/json',
                                 'Content-Type': 'application/json',
                                 'Token': this.token
                             }

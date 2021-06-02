@@ -37,35 +37,36 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
-var MeetingModel_1 = require("./Models/MeetingModel");
+var meeting_model_1 = require("./Models/meeting-model");
 var User = /** @class */ (function () {
     function User(_appService) {
         this.appService = _appService;
     }
-    User.prototype.Create = function () {
+    User.prototype.create = function () {
         return __awaiter(this, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.appService.CreateUserWithDeviceID()];
+                    case 0: return [4 /*yield*/, this.appService.createUserWithDeviceID()];
                     case 1:
                         result = _a.sent();
+                        console.log(JSON.stringify(result));
                         return [2 /*return*/];
                 }
             });
         });
     };
-    User.prototype.GetMeetings = function () {
+    User.prototype.getMeetings = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Array()];
             });
         });
     };
-    User.prototype.GetProfileMeeting = function () {
+    User.prototype.getProfileMeeting = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, new MeetingModel_1.MeetingModel()];
+                return [2 /*return*/, new meeting_model_1.MeetingModel()];
             });
         });
     };

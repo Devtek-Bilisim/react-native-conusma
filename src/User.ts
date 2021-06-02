@@ -1,5 +1,5 @@
 import { AppService } from "./app.service";
-import { MeetingModel } from "./Models/MeetingModel";
+import { MeetingModel } from "./Models/meeting-model";
 
 export class User {
   
@@ -8,16 +8,16 @@ export class User {
         this.appService = _appService;
        
     }
-    public async Create()
+    public async create()
     {
-        var result = await this.appService.CreateUserWithDeviceID();
+        var result = await this.appService.createUserWithDeviceId();
         console.log(JSON.stringify(result));
     }
-    public async GetMeetings()
+    public async getMeetings()
     {
             return new Array<MeetingModel>();
     }
-    public async GetProfileMeeting()
+    public async getProfileMeeting()
     {
             return new MeetingModel();
     }
