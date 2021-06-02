@@ -21,6 +21,10 @@ export default class Conusma  {
   private mediaServerList:Array<MediaServer> = [];
   private mediaServerSocket:any;
   private mediaServerDevice:any;
+  private mediaServerClient:any;
+  private hasCamera:boolean = false;
+  private hasMicrophone:boolean = false;
+  private isScreenShare:boolean = false;
   constructor(appId:string, parameters:{ apiUrl: string}){
     this.appService = new AppService(appId, { apiUrl: parameters.apiUrl});
   }
@@ -29,9 +33,11 @@ export default class Conusma  {
     const mediaServer:any = await this.getMediaServer(this.meetingUser.Id);
     await this.createClient(mediaServer);
   }
+
   public async close(state:boolean) {
 
   }
+
   private async getMediaServer(meetingUserId:string) {
     var response = await this.appService.getMediaServer(meetingUserId);
   }
@@ -66,15 +72,94 @@ export default class Conusma  {
         });
         mediaServerElement.mediaServerDevice = this.mediaServerDevice;
         await this.mediaServerDevice.load({ routerRtpCapabilities });
-        
-        this.createProducerTransport();
     });
   }
 
-  private createProducerTransport() {
+  private async createProducerTransport(localStream:MediaStream) {
+      try {
+          if (this.mediaServerClient != null) {
+              await this.close(false);
+              await this.open();
+          }
+          else {
+              var transportOptions: any = await this.signal('createProducerTransport', {}, this.mediaServerSocket);
+              this.mediaServerClient = new Object();
+              this.mediaServerClient.transportId = transportOptions.id;
+              this.mediaServerClient.transport = await this.mediaServerDevice.createSendTransport(transportOptions);
+              this.mediaServerClient.transport.on('connect', async ({ dtlsParameters }:any, callback:any, errback:any) => {
+                  let error = await this.signal('connectProducerTransport', {
+                      transportId: transportOptions.id,
+                      dtlsParameters
+                  }, this.mediaServerSocket);
+                  callback();
+              });
+              this.mediaServerClient.transport.on('produce', async ({ kind, rtpParameters, appData }:any,
+                  callback:any, errback:any) => {
+                  let paused = false;
+                  paused = false;
+                  let id = await this.signal('produce', {
+                      transportId: this.mediaServerClient.transportId,
+                      kind,
+                      rtpParameters,
+                      paused,
+                      appData
+                  }, this.mediaServerSocket);
+                  callback(id)
+              });
+              if (this.hasCamera || this.isScreenShare) {
+                  await this.createProducer(localStream, 'video');
+              }
+              if (this.hasMicrophone) {
+                  await this.createProducer(localStream, 'audio');
+              }
 
+              this.mediaServerClient.Camera = this.hasCamera;
+              this.mediaServerClient.Mic = this.hasMicrophone;
+              this.mediaServerClient.Stream = localStream;
+              this.mediaServerClient.MeetingUserId = this.meetingUser.Id;
+              this.mediaServerClient.RemoteStream = null;
+          }
+      } catch (error) {
+          console.error("createProducerTransport error. " + error);
+          await this.close(false);
+          await this.open();
+      }
   }
+  private async createProducer(localStream:MediaStream, kind:string) {
+    try {
+        if (kind == 'video') {
+            const videoTrack = localStream.getVideoTracks()[0];
+            this.mediaServerClient.VideoProducer = await this.mediaServerClient.transport.produce({
+                track: videoTrack,
+                encodings: [
+                    { maxBitrate: 500000 },
+                    { maxBitrate: 1000000 },
+                    { maxBitrate: 2000000 }
+                ],
+                codecOptions:
+                {
+                    videoGoogleStartBitrate: 1000
+                },
+                appData: { mediaTag: 'video' }
+            });
+        }
+        else if (kind == 'audio') {
+            this.mediaServerClient.AudioProducer = await this.mediaServerClient.transport.produce({
+                track: localStream.getAudioTracks()[0],
+                appData: { mediaTag: 'audio' }
+            });
+            let aparameters = this.mediaServerClient.AudioProducer.rtpSender.getParameters();
+            if (!aparameters.encodings) {
+                aparameters.encodings = [{}];
+            }
+            aparameters.encodings[0].maxBitrate = 50 * 1000;
+            await this.mediaServerClient.AudioProducer.rtpSender.setParameters(aparameters);
+        }
 
+    } catch (error) {
+        console.error("createProducer error. " + error);
+    }
+}
   private async signal(type: string, data:any = null, mediaServerSocket:any): Promise<any> {
     if (mediaServerSocket != null) {
         return new Promise((resolve, reject) => {
@@ -113,6 +198,7 @@ export default class Conusma  {
       },
     };
     const newStream:any = await mediaDevices.getUserMedia(constraints);
+    await this.createProducerTransport(newStream);
 	  return newStream;
   }
 }
