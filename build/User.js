@@ -36,34 +36,39 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var app_service_1 = require("./app.service");
-var User_1 = require("./User");
-var Conusma = /** @class */ (function () {
-    function Conusma(appId, parameters) {
-        this.appService = new app_service_1.AppService(appId, { apiUrl: parameters.apiUrl, deviceId: 'hdpc' });
+exports.User = void 0;
+var MeetingModel_1 = require("./Models/MeetingModel");
+var User = /** @class */ (function () {
+    function User(_appService) {
+        this.appService = _appService;
     }
-    Conusma.prototype.CreateUser = function () {
+    User.prototype.Create = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var user;
+            var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        user = new User_1.User(this.appService);
-                        return [4 /*yield*/, user.Create()];
+                    case 0: return [4 /*yield*/, this.appService.CreateUserWithDeviceID()];
                     case 1:
-                        _a.sent();
-                        return [2 /*return*/, user];
+                        result = _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });
     };
-    Conusma.prototype.CreateGuestUser = function () {
+    User.prototype.GetMeetings = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/];
+                return [2 /*return*/, new Array()];
             });
         });
     };
-    return Conusma;
+    User.prototype.GetProfileMeeting = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new MeetingModel_1.MeetingModel()];
+            });
+        });
+    };
+    return User;
 }());
-exports.default = Conusma;
+exports.User = User;

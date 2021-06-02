@@ -42,12 +42,37 @@ var AppService = /** @class */ (function () {
         this.appId = appId;
         this.apiUrl = parameters.apiUrl;
         this.token = "";
+        this.deviceId = parameters.deviceId;
     }
     AppService.prototype.setJwtToken = function (token) {
         this.token = token;
     };
     AppService.prototype.getJwtToken = function () {
         return this.token;
+    };
+    AppService.prototype.CreateUserWithDeviceID = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/User/AddUserWithAppCode", {
+                            method: 'POST',
+                            headers: {
+                                Accept: 'application/json',
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                appCode: this.appId,
+                                deviceCode: this.deviceId,
+                            })
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
     };
     AppService.prototype.getMediaServer = function (meetingUserId) {
         return __awaiter(this, void 0, void 0, function () {
