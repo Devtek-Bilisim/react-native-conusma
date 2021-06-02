@@ -14,7 +14,9 @@ class MediaServer {
   socket: any = null;
   mediaServerDevice:any = null;
 };
+export type MediaServerConnectionReadyObserver = () => void;
 export default class Conusma  {
+  private observers: MediaServerConnectionReadyObserver[] = [];
 
   private appService:AppService;
   public meetingUser:any;
@@ -29,7 +31,19 @@ export default class Conusma  {
     this.appService = new AppService(appId, { apiUrl: parameters.apiUrl});
   }
  
-  public async open() {
+  public attach(observer:MediaServerConnectionReadyObserver) {
+    this.observers.push(observer);
+  }
+
+  public detach(observerToRemove:MediaServerConnectionReadyObserver) {
+    this.observers = this.observers.filter(observer => observerToRemove !== observer);
+  }
+
+  private notify() {
+    this.observers.forEach(observer => observer());
+  }
+
+  public async open(state:boolean = false) {
     const mediaServer:any = await this.getMediaServer(this.meetingUser.Id);
     await this.createClient(mediaServer);
   }
@@ -72,6 +86,7 @@ export default class Conusma  {
         });
         mediaServerElement.mediaServerDevice = this.mediaServerDevice;
         await this.mediaServerDevice.load({ routerRtpCapabilities });
+        this.notify();
     });
   }
 
