@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AppService } from './app.service';
 import { User } from './User';
+import { ConusmaException } from './Exceptions/conusma-exception';
 
 export default class Conusma {
 
@@ -10,9 +11,13 @@ export default class Conusma {
     this.appService = new AppService(appId, { apiUrl: parameters.apiUrl, deviceId: 'hdpc' ,version:'1.0.0'});
   }
   public async createUser() {
-    var user: User = new User(this.appService);
-    await user.create();
-    return user;
+    try {
+      var user: User = new User(this.appService);
+      await user.create();
+      return user;
+    } catch (error) {
+      throw new ConusmaException("createUser","User cannot be created.", error);
+    }
   }
   public async createGuestUser() {
 

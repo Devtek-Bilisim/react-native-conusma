@@ -23,7 +23,6 @@ export class AppService {
         return this.token;
     }
     public async createUserWithDeviceId() {
-      try {
         var response = await fetch(this.apiUrl + "/User/AddUserWithAppCode", {
           method: 'POST',
           headers: {
@@ -40,9 +39,6 @@ export class AppService {
           throw new ConusmaRestApiException(response.status,await response.text());
         }
         return await response.json();
-      } catch (error) {
-        throw new ConusmaException("Api Request","createUserWithDeviceId Rest Api Error",error);
-      }
   }
     public async getMediaServer(meetingUserId:string) {
         var response = await fetch(this.apiUrl + "/Live/GetMediaServer/"+meetingUserId, {
