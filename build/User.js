@@ -47,7 +47,7 @@ var User = /** @class */ (function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.appService.createUserWithDeviceID()];
+                    case 0: return [4 /*yield*/, this.appService.createUserWithDeviceId()];
                     case 1:
                         result = _a.sent();
                         console.log(JSON.stringify(result));

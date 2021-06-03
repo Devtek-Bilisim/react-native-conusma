@@ -50,7 +50,7 @@ var AppService = /** @class */ (function () {
     AppService.prototype.getJwtToken = function () {
         return this.token;
     };
-    AppService.prototype.createUserWithDeviceID = function () {
+    AppService.prototype.createUserWithDeviceId = function () {
         return __awaiter(this, void 0, void 0, function () {
             var response;
             return __generator(this, function (_a) {
@@ -59,7 +59,7 @@ var AppService = /** @class */ (function () {
                             method: 'POST',
                             headers: {
                                 accept: 'application/json',
-                                'Content-Type': 'application/json',
+                                'content-type': 'application/json',
                             },
                             body: JSON.stringify({
                                 appCode: this.appId,
@@ -83,7 +83,7 @@ var AppService = /** @class */ (function () {
                             method: 'POST',
                             headers: {
                                 accept: 'application/json',
-                                'Content-Type': 'application/json',
+                                'content-type': 'application/json',
                                 'Token': this.token
                             }
                         })];

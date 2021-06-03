@@ -9,6 +9,6 @@ export declare class AppService {
     });
     setJwtToken(token: string): void;
     getJwtToken(): string;
-    createUserWithDeviceID(): Promise<any>;
+    createUserWithDeviceId(): Promise<any>;
     getMediaServer(meetingUserId: string): Promise<any>;
 }

@@ -22,8 +22,7 @@ export class AppService {
           headers: {
             accept: 'application/json',
             'content-type': 'application/json',
-          }
-         ,
+          },
           body: JSON.stringify({
             appCode: this.appId,
             deviceCode: this.deviceId,
@@ -42,4 +41,45 @@ export class AppService {
           });
           return await response.json();
     }
+
+    public async isApproved(meetingUserId:string)
+    {
+      var response = await fetch(this.apiUrl + "/Live/IsItApproved/"+meetingUserId, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          'Token': this.token
+        }
+      });
+      return await response.json();
+    }
+
+    public async getMeetings() {
+      var response = await fetch(this.apiUrl + "/Meeting/GetMeetings", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          'Token': this.token
+        }
+      });
+      return await response.json();
+    }
+
+    public async joinMeeting(meetingId:number) {
+      var response = await fetch(this.apiUrl + "/Meeting/JoinMeeting", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          'Token': this.token
+        },
+        body: JSON.stringify({
+          meetingId: meetingId,
+        })
+      });
+      return await response.json();
+    }
+  
 }
