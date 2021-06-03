@@ -475,5 +475,15 @@ export class AppService {
       });
       return await response.json();
     }
-  
+    public async getTimezones() {
+      var response = await fetch(this.apiUrl + "/Tool/GetTimeZone", {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        }
+      });
+      return await response.json();
+    }
 }
