@@ -1,16 +1,19 @@
+import { ConusmaException } from "./Exceptions/conusma-exception";
+import { ConusmaRestApiException } from "./Exceptions/conusma-restapi-exception";
+
 export class AppService {
     private appId:string;
     private apiUrl:string;
     private token:string;
     private deviceId:string;
     private version:string = "1.0.0";
-
     constructor(appId:string, parameters:{apiUrl: string, deviceId:string, version:string}) {
       this.appId = appId;
       this.apiUrl = parameters.apiUrl;
       this.token = "";
       this.deviceId = parameters.deviceId;
       this.version = parameters.version;
+
     }
     public setJwtToken(token:string) {
         this.token = token;
@@ -20,7 +23,8 @@ export class AppService {
         return this.token;
     }
     public async createUserWithDeviceId() {
-      var response = await fetch(this.apiUrl + "/User/AddUserWithAppCode", {
+      try {
+        var response = await fetch(this.apiUrl + "/User/AddUserWithAppCode", {
           method: 'POST',
           headers: {
             accept: 'application/json',
@@ -31,7 +35,14 @@ export class AppService {
             deviceCode: this.deviceId,
           })
         });
+        if(!response.ok)
+        {
+          throw new ConusmaRestApiException(response.status,await response.text());
+        }
         return await response.json();
+      } catch (error) {
+        throw new ConusmaException("Api Request","createUserWithDeviceId Rest Api Error",error);
+      }
   }
     public async getMediaServer(meetingUserId:string) {
         var response = await fetch(this.apiUrl + "/Live/GetMediaServer/"+meetingUserId, {

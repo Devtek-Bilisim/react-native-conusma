@@ -10,8 +10,12 @@ export class User {
     }
     public async create()
     {
-        var result = await this.appService.createUserWithDeviceId();
-        console.log(JSON.stringify(result));
+        try {
+            var result = await this.appService.createUserWithDeviceId();
+            console.log(JSON.stringify(result));
+        } catch (error) {
+            throw error;
+        }
     }
     public async getMeetings()
     {

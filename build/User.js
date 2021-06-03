@@ -44,14 +44,20 @@ var User = /** @class */ (function () {
     }
     User.prototype.create = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var result;
+            var result, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.appService.createUserWithDeviceId()];
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.appService.createUserWithDeviceId()];
                     case 1:
                         result = _a.sent();
                         console.log(JSON.stringify(result));
-                        return [2 /*return*/];
+                        return [3 /*break*/, 3];
+                    case 2:
+                        error_1 = _a.sent();
+                        throw error_1;
+                    case 3: return [2 /*return*/];
                 }
             });
         });

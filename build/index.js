@@ -37,10 +37,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var app_service_1 = require("./app.service");
-var user_1 = require("./user");
+var User_1 = require("./User");
 var Conusma = /** @class */ (function () {
     function Conusma(appId, parameters) {
-        this.appService = new app_service_1.AppService(appId, { apiUrl: parameters.apiUrl, deviceId: 'hdpc' });
+        this.appService = new app_service_1.AppService(appId, { apiUrl: parameters.apiUrl, deviceId: 'hdpc', version: '1.0.0' });
     }
     Conusma.prototype.createUser = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -48,7 +48,7 @@ var Conusma = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        user = new user_1.User(this.appService);
+                        user = new User_1.User(this.appService);
                         return [4 /*yield*/, user.create()];
                     case 1:
                         _a.sent();

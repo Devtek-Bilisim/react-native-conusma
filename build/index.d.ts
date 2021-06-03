@@ -1,4 +1,4 @@
-import { User } from './user';
+import { User } from './User';
 export default class Conusma {
     private appService;
     constructor(appId: string, parameters: {
