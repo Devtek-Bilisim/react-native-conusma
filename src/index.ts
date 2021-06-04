@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { AppService } from './app.service';
-import { User } from './User';
 import { ConusmaException } from './Exceptions/conusma-exception';
 import { GuestUser } from './guest-user';
 import DeviceInfo from 'react-native-device-info';
+import { User } from './user';
 
 export default class Conusma {
 
