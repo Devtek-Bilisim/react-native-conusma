@@ -37,7 +37,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppService = void 0;
-var conusma_exception_1 = require("./Exceptions/conusma-exception");
 var conusma_restapi_exception_1 = require("./Exceptions/conusma-restapi-exception");
 var AppService = /** @class */ (function () {
     function AppService(appId, parameters) {
@@ -56,22 +55,20 @@ var AppService = /** @class */ (function () {
     };
     AppService.prototype.createUserWithDeviceId = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var response, _a, _b, error_1;
+            var response, _a, _b;
             return __generator(this, function (_c) {
                 switch (_c.label) {
-                    case 0:
-                        _c.trys.push([0, 5, , 6]);
-                        return [4 /*yield*/, fetch(this.apiUrl + "/User/AddUserWithAppCode", {
-                                method: 'POST',
-                                headers: {
-                                    accept: 'application/json',
-                                    'content-type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    appCode: this.appId,
-                                    deviceCode: this.deviceId,
-                                })
-                            })];
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/User/AddUserWithAppCode", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                appCode: this.appId,
+                                deviceCode: this.deviceId,
+                            })
+                        })];
                     case 1:
                         response = _c.sent();
                         if (!!response.ok) return [3 /*break*/, 3];
@@ -81,10 +78,6 @@ var AppService = /** @class */ (function () {
                     case 2: throw new (_a.apply(conusma_restapi_exception_1.ConusmaRestApiException, _b.concat([_c.sent()])))();
                     case 3: return [4 /*yield*/, response.json()];
                     case 4: return [2 /*return*/, _c.sent()];
-                    case 5:
-                        error_1 = _c.sent();
-                        throw new conusma_exception_1.ConusmaException("Api Request", "createUserWithDeviceId Rest Api Error", error_1);
-                    case 6: return [2 /*return*/];
                 }
             });
         });
@@ -133,9 +126,9 @@ var AppService = /** @class */ (function () {
     };
     AppService.prototype.getMeetings = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var response, _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Meeting/GetMeetings", {
                             method: 'GET',
                             headers: {
@@ -145,9 +138,14 @@ var AppService = /** @class */ (function () {
                             }
                         })];
                     case 1:
-                        response = _a.sent();
-                        return [4 /*yield*/, response.json()];
-                    case 2: return [2 /*return*/, _a.sent()];
+                        response = _c.sent();
+                        if (!!response.ok) return [3 /*break*/, 3];
+                        _a = conusma_restapi_exception_1.ConusmaRestApiException.bind;
+                        _b = [void 0, response.status];
+                        return [4 /*yield*/, response.text()];
+                    case 2: throw new (_a.apply(conusma_restapi_exception_1.ConusmaRestApiException, _b.concat([_c.sent()])))();
+                    case 3: return [4 /*yield*/, response.json()];
+                    case 4: return [2 /*return*/, _c.sent()];
                 }
             });
         });
@@ -378,9 +376,9 @@ var AppService = /** @class */ (function () {
     };
     AppService.prototype.createPublicUser = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var response, _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Login/PublicUserCreate", {
                             method: 'POST',
                             headers: {
@@ -389,9 +387,14 @@ var AppService = /** @class */ (function () {
                             }
                         })];
                     case 1:
-                        response = _a.sent();
-                        return [4 /*yield*/, response.json()];
-                    case 2: return [2 /*return*/, _a.sent()];
+                        response = _c.sent();
+                        if (!!response.ok) return [3 /*break*/, 3];
+                        _a = conusma_restapi_exception_1.ConusmaRestApiException.bind;
+                        _b = [void 0, response.status];
+                        return [4 /*yield*/, response.text()];
+                    case 2: throw new (_a.apply(conusma_restapi_exception_1.ConusmaRestApiException, _b.concat([_c.sent()])))();
+                    case 3: return [4 /*yield*/, response.json()];
+                    case 4: return [2 /*return*/, _c.sent()];
                 }
             });
         });
@@ -807,6 +810,27 @@ var AppService = /** @class */ (function () {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, fetch(this.apiUrl + "/User/SendEmailVerification", {
                             method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            }
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.getTimezones = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Tool/GetTimeZone", {
+                            method: 'GET',
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',

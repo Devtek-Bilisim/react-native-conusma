@@ -38,29 +38,49 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var app_service_1 = require("./app.service");
 var User_1 = require("./User");
+var conusma_exception_1 = require("./Exceptions/conusma-exception");
+var guest_user_1 = require("./guest-user");
 var Conusma = /** @class */ (function () {
     function Conusma(appId, parameters) {
-        this.appService = new app_service_1.AppService(appId, { apiUrl: parameters.apiUrl, deviceId: 'hdpc', version: '1.0.0' });
+        this.appService = new app_service_1.AppService(appId, { apiUrl: parameters.apiUrl, deviceId: "hdpc", version: '1.0.0' });
     }
     Conusma.prototype.createUser = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var user;
+            var user, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        _a.trys.push([0, 2, , 3]);
                         user = new User_1.User(this.appService);
                         return [4 /*yield*/, user.create()];
                     case 1:
                         _a.sent();
                         return [2 /*return*/, user];
+                    case 2:
+                        error_1 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("createUser", "User cannot be created.", error_1);
+                    case 3: return [2 /*return*/];
                 }
             });
         });
     };
     Conusma.prototype.createGuestUser = function () {
         return __awaiter(this, void 0, void 0, function () {
+            var user, error_2;
             return __generator(this, function (_a) {
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        user = new guest_user_1.GuestUser(this.appService);
+                        return [4 /*yield*/, user.create()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, user];
+                    case 2:
+                        error_2 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("createGuestUser", "GuestUser cannot be created.", error_2);
+                    case 3: return [2 /*return*/];
+                }
             });
         });
     };

@@ -1,9 +1,10 @@
 import { User } from './User';
+import { GuestUser } from './guest-user';
 export default class Conusma {
     private appService;
     constructor(appId: string, parameters: {
         apiUrl: string;
     });
     createUser(): Promise<User>;
-    createGuestUser(): Promise<void>;
+    createGuestUser(): Promise<GuestUser>;
 }
