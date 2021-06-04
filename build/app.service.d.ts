@@ -44,4 +44,5 @@ export declare class AppService {
     joinMeeting(data: any): Promise<any>;
     controlInviteCode(): Promise<any>;
     sendEmailVerification(): Promise<any>;
+    getTimezones(): Promise<any>;
 }

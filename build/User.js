@@ -37,42 +37,64 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
-var meeting_model_1 = require("./Models/meeting-model");
+var conusma_exception_1 = require("./Exceptions/conusma-exception");
+var user_model_1 = require("./Models/user-model");
 var User = /** @class */ (function () {
     function User(_appService) {
+        this.userInfo = new user_model_1.UserModel();
         this.appService = _appService;
     }
     User.prototype.create = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var result, error_1;
+            var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.appService.createUserWithDeviceId()];
+                    case 0: return [4 /*yield*/, this.appService.createUserWithDeviceId()];
                     case 1:
                         result = _a.sent();
-                        console.log(JSON.stringify(result));
-                        return [3 /*break*/, 3];
-                    case 2:
-                        error_1 = _a.sent();
-                        throw error_1;
-                    case 3: return [2 /*return*/];
+                        this.userInfo = result;
+                        this.appService.setJwtToken(this.userInfo.Token);
+                        return [2 /*return*/];
                 }
             });
         });
     };
     User.prototype.getMeetings = function () {
         return __awaiter(this, void 0, void 0, function () {
+            var meetings, error_1;
             return __generator(this, function (_a) {
-                return [2 /*return*/, new Array()];
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.appService.getMeetings()];
+                    case 1:
+                        meetings = _a.sent();
+                        return [2 /*return*/, meetings];
+                    case 2:
+                        error_1 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("getMeetings", "Meeting list cannot be received.", error_1);
+                    case 3: return [2 /*return*/];
+                }
             });
         });
     };
     User.prototype.getProfileMeeting = function () {
         return __awaiter(this, void 0, void 0, function () {
+            var meetings, profileMeeting, error_2;
             return __generator(this, function (_a) {
-                return [2 /*return*/, new meeting_model_1.MeetingModel()];
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.appService.getMeetings()];
+                    case 1:
+                        meetings = _a.sent();
+                        profileMeeting = meetings.find(function (us) { return us.ProfileMeeting; });
+                        return [2 /*return*/, profileMeeting];
+                    case 2:
+                        error_2 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("getProfileMeeting", "Profile Meeting cannot be received.", error_2);
+                    case 3: return [2 /*return*/];
+                }
             });
         });
     };
