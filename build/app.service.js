@@ -738,11 +738,11 @@ var AppService = /** @class */ (function () {
             });
         });
     };
-    AppService.prototype.isMeetingValid = function (data) {
+    AppService.prototype.isMeetingValid = function (meetingId, password) {
         return __awaiter(this, void 0, void 0, function () {
-            var response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var response, _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Meeting/MeetingIsValid", {
                             method: 'POST',
                             headers: {
@@ -750,21 +750,29 @@ var AppService = /** @class */ (function () {
                                 'content-type': 'application/json',
                                 Token: this.token
                             },
-                            body: JSON.stringify(data)
+                            body: JSON.stringify({
+                                meetingId: meetingId,
+                                password: password
+                            })
                         })];
                     case 1:
-                        response = _a.sent();
-                        return [4 /*yield*/, response.json()];
-                    case 2: return [2 /*return*/, _a.sent()];
+                        response = _c.sent();
+                        if (!!response.ok) return [3 /*break*/, 3];
+                        _a = conusma_restapi_exception_1.ConusmaRestApiException.bind;
+                        _b = [void 0, response.status];
+                        return [4 /*yield*/, response.text()];
+                    case 2: throw new (_a.apply(conusma_restapi_exception_1.ConusmaRestApiException, _b.concat([_c.sent()])))();
+                    case 3: return [4 /*yield*/, response.json()];
+                    case 4: return [2 /*return*/, _c.sent()];
                 }
             });
         });
     };
-    AppService.prototype.joinMeeting = function (data) {
+    AppService.prototype.joinMeeting = function (meetingId, password, meetingFullName) {
         return __awaiter(this, void 0, void 0, function () {
-            var response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var response, _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Meeting/JoinMeeting", {
                             method: 'POST',
                             headers: {
@@ -772,22 +780,31 @@ var AppService = /** @class */ (function () {
                                 'content-type': 'application/json',
                                 Token: this.token
                             },
-                            body: JSON.stringify(data)
+                            body: JSON.stringify({
+                                meetingId: meetingId,
+                                password: password,
+                                meetingFullName: meetingFullName
+                            })
                         })];
                     case 1:
-                        response = _a.sent();
-                        return [4 /*yield*/, response.json()];
-                    case 2: return [2 /*return*/, _a.sent()];
+                        response = _c.sent();
+                        if (!!response.ok) return [3 /*break*/, 3];
+                        _a = conusma_restapi_exception_1.ConusmaRestApiException.bind;
+                        _b = [void 0, response.status];
+                        return [4 /*yield*/, response.text()];
+                    case 2: throw new (_a.apply(conusma_restapi_exception_1.ConusmaRestApiException, _b.concat([_c.sent()])))();
+                    case 3: return [4 /*yield*/, response.json()];
+                    case 4: return [2 /*return*/, _c.sent()];
                 }
             });
         });
     };
-    AppService.prototype.controlInviteCode = function () {
+    AppService.prototype.controlInviteCode = function (code) {
         return __awaiter(this, void 0, void 0, function () {
-            var response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Meeting/InviteCodeControl", {
+            var response, _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Meeting/InviteCodeControl/" + code, {
                             method: 'GET',
                             headers: {
                                 accept: 'application/json',
@@ -796,9 +813,14 @@ var AppService = /** @class */ (function () {
                             }
                         })];
                     case 1:
-                        response = _a.sent();
-                        return [4 /*yield*/, response.json()];
-                    case 2: return [2 /*return*/, _a.sent()];
+                        response = _c.sent();
+                        if (!!response.ok) return [3 /*break*/, 3];
+                        _a = conusma_restapi_exception_1.ConusmaRestApiException.bind;
+                        _b = [void 0, response.status];
+                        return [4 /*yield*/, response.text()];
+                    case 2: throw new (_a.apply(conusma_restapi_exception_1.ConusmaRestApiException, _b.concat([_c.sent()])))();
+                    case 3: return [4 /*yield*/, response.json()];
+                    case 4: return [2 /*return*/, _c.sent()];
                 }
             });
         });
@@ -836,6 +858,466 @@ var AppService = /** @class */ (function () {
                                 'content-type': 'application/json',
                                 Token: this.token
                             }
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.isMeetingOwner = function (meetingUserId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/IsMeetingOwner/" + meetingUserId, {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            }
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.getMediaServerById = function (meetingUserId, mediaServerId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/GetMediaServer/" + meetingUserId + "/" + mediaServerId, {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            }
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.connectMeeting = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/Connect", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.updateMeetingUser = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/UpdateMeetingUser", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.getMeetingUserList = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/GetMeetingUserList", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.getLiveMeetingInfo = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/GetMeetingInfo", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.getMyMeetingUser = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/GetMyMeetingUser", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.getLiveUpdateMeetingFeatures = function (meetingUserId, data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/UpdateMeetingFeatures/" + meetingUserId, {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.makeHost = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/MakeHost", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.reactions = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/Reactions", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.raiseYourHand = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/RaiseYourHand", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.raiseYourHandDown = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/RaiseYourHandDown", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.muteMeetingUser = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/MuteMeetingUser", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.approveUser = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/UserApprove", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.liveClose = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/Close", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.liveMeetingCloseAll = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/MeetingCloseAllUser", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.removeUser = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/RemoveUser", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.sendChatMessage = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/SendChatMessage", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.getApprovedUserList = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/GetApprovedUserList", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.getChatMessages = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/GetChatMessages", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
+                        })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    AppService.prototype.getOldChatMessages = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Live/GetOldChatMessages", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: this.token
+                            },
+                            body: JSON.stringify(data)
                         })];
                     case 1:
                         response = _a.sent();

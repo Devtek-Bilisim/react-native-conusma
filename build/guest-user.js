@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GuestUser = void 0;
+var conusma_exception_1 = require("./Exceptions/conusma-exception");
 var guset_user_model_1 = require("./Models/guset-user-model");
 var GuestUser = /** @class */ (function () {
     function GuestUser(_appService) {
@@ -54,6 +55,56 @@ var GuestUser = /** @class */ (function () {
                         this.userInfo = result;
                         this.appService.setJwtToken(this.userInfo.Token);
                         return [2 /*return*/];
+                }
+            });
+        });
+    };
+    GuestUser.prototype.joinMeetingByInviteCode = function (inviteCode, meetingName) {
+        if (meetingName === void 0) { meetingName = 'Guest'; }
+        return __awaiter(this, void 0, void 0, function () {
+            var resultcode, meeting, result, meetingUser, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, this.appService.controlInviteCode(inviteCode)];
+                    case 1:
+                        resultcode = _a.sent();
+                        meeting = resultcode;
+                        return [4 /*yield*/, this.appService.joinMeeting(meeting.MeetingId, meeting.Password, meetingName)];
+                    case 2:
+                        result = _a.sent();
+                        meetingUser = result;
+                        return [2 /*return*/, meetingUser];
+                    case 3:
+                        error_1 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("joinMeeting", "failed to join the meeting", error_1);
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    GuestUser.prototype.joinMeeting = function (meetingId, meetingPassword, meetingName) {
+        if (meetingName === void 0) { meetingName = 'Guest'; }
+        return __awaiter(this, void 0, void 0, function () {
+            var resultcode, meeting, result, meetingUser, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, this.appService.isMeetingValid(meetingId, meetingPassword)];
+                    case 1:
+                        resultcode = _a.sent();
+                        meeting = resultcode;
+                        return [4 /*yield*/, this.appService.joinMeeting(meeting.MeetingId, meeting.Password, meetingName)];
+                    case 2:
+                        result = _a.sent();
+                        meetingUser = result;
+                        return [2 /*return*/, meetingUser];
+                    case 3:
+                        error_2 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("joinMeeting", "failed to join the meeting", error_2);
+                    case 4: return [2 /*return*/];
                 }
             });
         });

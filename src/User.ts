@@ -1,6 +1,7 @@
 import { AppService } from "./app.service";
 import { ConusmaException } from "./Exceptions/conusma-exception";
 import { MeetingModel } from "./Models/meeting-model";
+import { MeetingUserModel } from "./Models/meeting-user-model";
 import { UserModel } from "./Models/user-model";
 
 export class User {
@@ -35,6 +36,16 @@ export class User {
             return profileMeeting;
           } catch (error) {
             throw new ConusmaException("getProfileMeeting","Profile Meeting cannot be received.", error);
+          }
+    }
+    public async joinMeeting(meeting:MeetingModel,meetingName:string='User')
+    {
+        try {
+            var result = await this.appService.joinMeeting(meeting.MeetingId,meeting.Password,meetingName);
+            var meetingUser:MeetingUserModel = result;
+            return meetingUser;
+          } catch (error) {
+            throw new ConusmaException("joinMeeting","Failed to join the meeting", error);
           }
     }
 

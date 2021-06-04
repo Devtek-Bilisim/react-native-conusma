@@ -98,6 +98,27 @@ var User = /** @class */ (function () {
             });
         });
     };
+    User.prototype.joinMeeting = function (meeting, meetingName) {
+        if (meetingName === void 0) { meetingName = 'User'; }
+        return __awaiter(this, void 0, void 0, function () {
+            var result, meetingUser, error_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.appService.joinMeeting(meeting.MeetingId, meeting.Password, meetingName)];
+                    case 1:
+                        result = _a.sent();
+                        meetingUser = result;
+                        return [2 /*return*/, meetingUser];
+                    case 2:
+                        error_3 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("joinMeeting", "Failed to join the meeting", error_3);
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
     return User;
 }());
 exports.User = User;
