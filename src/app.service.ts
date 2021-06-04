@@ -1,4 +1,3 @@
-import { ConusmaException } from "./Exceptions/conusma-exception";
 import { ConusmaRestApiException } from "./Exceptions/conusma-restapi-exception";
 
 export class AppService {
