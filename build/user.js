@@ -36,20 +36,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GuestUser = void 0;
+exports.User = void 0;
 var conusma_exception_1 = require("./Exceptions/conusma-exception");
-var guest_user_model_1 = require("./Models/guest-user-model");
-var GuestUser = /** @class */ (function () {
-    function GuestUser(_appService) {
-        this.userInfo = new guest_user_model_1.GuestUserModel();
+var user_model_1 = require("./Models/user-model");
+var User = /** @class */ (function () {
+    function User(_appService) {
+        this.userInfo = new user_model_1.UserModel();
         this.appService = _appService;
     }
-    GuestUser.prototype.create = function () {
+    User.prototype.create = function () {
         return __awaiter(this, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.appService.createPublicUser()];
+                    case 0: return [4 /*yield*/, this.appService.createUserWithDeviceId()];
                     case 1:
                         result = _a.sent();
                         this.userInfo = result;
@@ -59,56 +59,66 @@ var GuestUser = /** @class */ (function () {
             });
         });
     };
-    GuestUser.prototype.joinMeetingByInviteCode = function (inviteCode, meetingName) {
-        if (meetingName === void 0) { meetingName = 'Guest'; }
+    User.prototype.getMeetings = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var resultcode, meeting, result, meetingUser, error_1;
+            var meetings, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 3, , 4]);
-                        return [4 /*yield*/, this.appService.controlInviteCode(inviteCode)];
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.appService.getMeetings()];
                     case 1:
-                        resultcode = _a.sent();
-                        meeting = resultcode;
-                        return [4 /*yield*/, this.appService.joinMeeting(meeting.MeetingId, meeting.Password, meetingName)];
+                        meetings = _a.sent();
+                        return [2 /*return*/, meetings];
                     case 2:
-                        result = _a.sent();
-                        meetingUser = result;
-                        return [2 /*return*/, meetingUser];
-                    case 3:
                         error_1 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("joinMeeting", "failed to join the meeting", error_1);
-                    case 4: return [2 /*return*/];
+                        throw new conusma_exception_1.ConusmaException("getMeetings", "Meeting list cannot be received.", error_1);
+                    case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    GuestUser.prototype.joinMeeting = function (meetingId, meetingPassword, meetingName) {
-        if (meetingName === void 0) { meetingName = 'Guest'; }
+    User.prototype.getProfileMeeting = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var resultcode, meeting, result, meetingUser, error_2;
+            var meetings, profileMeeting, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 3, , 4]);
-                        return [4 /*yield*/, this.appService.isMeetingValid(meetingId, meetingPassword)];
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.appService.getMeetings()];
                     case 1:
-                        resultcode = _a.sent();
-                        meeting = resultcode;
-                        return [4 /*yield*/, this.appService.joinMeeting(meeting.MeetingId, meeting.Password, meetingName)];
+                        meetings = _a.sent();
+                        profileMeeting = meetings.find(function (us) { return us.ProfileMeeting; });
+                        return [2 /*return*/, profileMeeting];
                     case 2:
-                        result = _a.sent();
-                        meetingUser = result;
-                        return [2 /*return*/, meetingUser];
-                    case 3:
                         error_2 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("joinMeeting", "failed to join the meeting", error_2);
-                    case 4: return [2 /*return*/];
+                        throw new conusma_exception_1.ConusmaException("getProfileMeeting", "Profile Meeting cannot be received.", error_2);
+                    case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    return GuestUser;
+    User.prototype.joinMeeting = function (meeting, meetingName) {
+        if (meetingName === void 0) { meetingName = 'User'; }
+        return __awaiter(this, void 0, void 0, function () {
+            var result, meetingUser, error_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.appService.joinMeeting(meeting.MeetingId, meeting.Password, meetingName)];
+                    case 1:
+                        result = _a.sent();
+                        meetingUser = result;
+                        return [2 /*return*/, meetingUser];
+                    case 2:
+                        error_3 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("joinMeeting", "Failed to join the meeting", error_3);
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    return User;
 }());
-exports.GuestUser = GuestUser;
+exports.User = User;

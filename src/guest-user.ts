@@ -1,12 +1,9 @@
 import { AppService } from "./app.service";
-<<<<<<< HEAD
 import { ConusmaException } from "./Exceptions/conusma-exception";
-import { GuestUserModel } from "./Models/guset-user-model";
+import { GuestUserModel } from "./Models/guest-user-model";
 import { MeetingModel } from "./Models/meeting-model";
 import { MeetingUserModel } from "./Models/meeting-user-model";
-=======
-import { GuestUserModel } from "./Models/guest-user-model";
->>>>>>> e93bec7bf5044db4383b84a424aa8ede71e9da2b
+
 
 export class GuestUser {
     private appService:AppService;

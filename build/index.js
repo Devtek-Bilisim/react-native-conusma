@@ -35,80 +35,60 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GuestUser = void 0;
+var app_service_1 = require("./app.service");
 var conusma_exception_1 = require("./Exceptions/conusma-exception");
-var guest_user_model_1 = require("./Models/guest-user-model");
-var GuestUser = /** @class */ (function () {
-    function GuestUser(_appService) {
-        this.userInfo = new guest_user_model_1.GuestUserModel();
-        this.appService = _appService;
+var guest_user_1 = require("./guest-user");
+var react_native_device_info_1 = __importDefault(require("react-native-device-info"));
+var user_1 = require("./user");
+var Conusma = /** @class */ (function () {
+    function Conusma(appId, parameters) {
+        var deviceId = react_native_device_info_1.default.getUniqueId();
+        this.appService = new app_service_1.AppService(appId, { apiUrl: parameters.apiUrl, deviceId: deviceId, version: '1.0.0' });
     }
-    GuestUser.prototype.create = function () {
+    Conusma.prototype.createUser = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.appService.createPublicUser()];
-                    case 1:
-                        result = _a.sent();
-                        this.userInfo = result;
-                        this.appService.setJwtToken(this.userInfo.Token);
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    GuestUser.prototype.joinMeetingByInviteCode = function (inviteCode, meetingName) {
-        if (meetingName === void 0) { meetingName = 'Guest'; }
-        return __awaiter(this, void 0, void 0, function () {
-            var resultcode, meeting, result, meetingUser, error_1;
+            var user, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 3, , 4]);
-                        return [4 /*yield*/, this.appService.controlInviteCode(inviteCode)];
+                        _a.trys.push([0, 2, , 3]);
+                        user = new user_1.User(this.appService);
+                        return [4 /*yield*/, user.create()];
                     case 1:
-                        resultcode = _a.sent();
-                        meeting = resultcode;
-                        return [4 /*yield*/, this.appService.joinMeeting(meeting.MeetingId, meeting.Password, meetingName)];
+                        _a.sent();
+                        return [2 /*return*/, user];
                     case 2:
-                        result = _a.sent();
-                        meetingUser = result;
-                        return [2 /*return*/, meetingUser];
-                    case 3:
                         error_1 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("joinMeeting", "failed to join the meeting", error_1);
-                    case 4: return [2 /*return*/];
+                        throw new conusma_exception_1.ConusmaException("createUser", "User cannot be created.", error_1);
+                    case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    GuestUser.prototype.joinMeeting = function (meetingId, meetingPassword, meetingName) {
-        if (meetingName === void 0) { meetingName = 'Guest'; }
+    Conusma.prototype.createGuestUser = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var resultcode, meeting, result, meetingUser, error_2;
+            var user, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 3, , 4]);
-                        return [4 /*yield*/, this.appService.isMeetingValid(meetingId, meetingPassword)];
+                        _a.trys.push([0, 2, , 3]);
+                        user = new guest_user_1.GuestUser(this.appService);
+                        return [4 /*yield*/, user.create()];
                     case 1:
-                        resultcode = _a.sent();
-                        meeting = resultcode;
-                        return [4 /*yield*/, this.appService.joinMeeting(meeting.MeetingId, meeting.Password, meetingName)];
+                        _a.sent();
+                        return [2 /*return*/, user];
                     case 2:
-                        result = _a.sent();
-                        meetingUser = result;
-                        return [2 /*return*/, meetingUser];
-                    case 3:
                         error_2 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("joinMeeting", "failed to join the meeting", error_2);
-                    case 4: return [2 /*return*/];
+                        throw new conusma_exception_1.ConusmaException("createGuestUser", "GuestUser cannot be created.", error_2);
+                    case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    return GuestUser;
+    return Conusma;
 }());
-exports.GuestUser = GuestUser;
+exports.default = Conusma;

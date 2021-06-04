@@ -1,5 +1,5 @@
 import { AppService } from "./app.service";
-import { GuestUserModel } from "./Models/guset-user-model";
+import { GuestUserModel } from "./Models/guest-user-model";
 import { MeetingUserModel } from "./Models/meeting-user-model";
 export declare class GuestUser {
     private appService;
