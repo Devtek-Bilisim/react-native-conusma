@@ -3,13 +3,14 @@ import { AppService } from './app.service';
 import { User } from './User';
 import { ConusmaException } from './Exceptions/conusma-exception';
 import { GuestUser } from './guest-user';
+import DeviceInfo from 'react-native-device-info';
 
 export default class Conusma {
 
   private appService: AppService;
-
   constructor(appId: string, parameters: { apiUrl: string }) {
-    this.appService = new AppService(appId, { apiUrl: parameters.apiUrl, deviceId: "hdpc" ,version:'1.0.0'});
+    var deviceId =  DeviceInfo.getUniqueId();
+    this.appService = new AppService(appId, { apiUrl: parameters.apiUrl,deviceId:deviceId, version:'1.0.0'});
   }
   public async createUser() {
     try {

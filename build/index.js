@@ -35,14 +35,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var app_service_1 = require("./app.service");
 var User_1 = require("./User");
 var conusma_exception_1 = require("./Exceptions/conusma-exception");
 var guest_user_1 = require("./guest-user");
+var react_native_device_info_1 = __importDefault(require("react-native-device-info"));
 var Conusma = /** @class */ (function () {
     function Conusma(appId, parameters) {
-        this.appService = new app_service_1.AppService(appId, { apiUrl: parameters.apiUrl, deviceId: "hdpc", version: '1.0.0' });
+        var deviceId = react_native_device_info_1.default.getUniqueId();
+        this.appService = new app_service_1.AppService(appId, { apiUrl: parameters.apiUrl, deviceId: deviceId, version: '1.0.0' });
     }
     Conusma.prototype.createUser = function () {
         return __awaiter(this, void 0, void 0, function () {
