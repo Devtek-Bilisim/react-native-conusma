@@ -493,4 +493,275 @@ export class AppService {
       });
       return await response.json();
     }
+
+    public async isMeetingOwner(meetingUserId:string) {
+      var response = await fetch(this.apiUrl + "/Live/IsMeetingOwner/"+meetingUserId, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        }
+      });
+      return await response.json();
+    }
+
+    public async getMediaServerById(meetingUserId:string, mediaServerId: string) {
+      var response = await fetch(this.apiUrl + "/Live/GetMediaServer/"+meetingUserId+"/"+mediaServerId, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        }
+      });
+      return await response.json();
+    }
+    
+    public async connectMeeting(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/Connect", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+    
+    public async updateMeetingUser(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/UpdateMeetingUser", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+
+    public async getMeetingUserList(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/GetMeetingUserList", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+    
+    public async getLiveMeetingInfo(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/GetMeetingInfo", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+  
+    public async getMyMeetingUser(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/GetMyMeetingUser", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+   
+    public async getLiveUpdateMeetingFeatures(meetingUserId:string, data:any) {
+      var response = await fetch(this.apiUrl + "/Live/UpdateMeetingFeatures/"+meetingUserId, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+  
+    public async makeHost(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/MakeHost", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+
+    public async reactions(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/Reactions", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+      
+    public async raiseYourHand(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/RaiseYourHand", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+    
+    public async raiseYourHandDown(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/RaiseYourHandDown", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+
+    public async muteMeetingUser(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/MuteMeetingUser", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+    
+    public async approveUser(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/UserApprove", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+    
+    public async liveClose(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/Close", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+    
+    public async liveMeetingCloseAll(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/MeetingCloseAllUser", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+  
+    public async removeUser(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/RemoveUser", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+   
+    public async sendChatMessage(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/SendChatMessage", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+
+    public async getApprovedUserList(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/GetApprovedUserList", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+
+    public async getChatMessages(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/GetChatMessages", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
+   
+    public async getOldChatMessages(data:any) {
+      var response = await fetch(this.apiUrl + "/Live/GetOldChatMessages", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: this.token
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    }
 }
