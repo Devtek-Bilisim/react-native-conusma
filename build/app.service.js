@@ -401,9 +401,9 @@ var AppService = /** @class */ (function () {
     };
     AppService.prototype.createMeeting = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var response, _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Meeting/CreateNewMeeting", {
                             method: 'POST',
                             headers: {
@@ -413,9 +413,14 @@ var AppService = /** @class */ (function () {
                             }
                         })];
                     case 1:
-                        response = _a.sent();
-                        return [4 /*yield*/, response.json()];
-                    case 2: return [2 /*return*/, _a.sent()];
+                        response = _c.sent();
+                        if (!!response.ok) return [3 /*break*/, 3];
+                        _a = conusma_restapi_exception_1.ConusmaRestApiException.bind;
+                        _b = [void 0, response.status];
+                        return [4 /*yield*/, response.text()];
+                    case 2: throw new (_a.apply(conusma_restapi_exception_1.ConusmaRestApiException, _b.concat([_c.sent()])))();
+                    case 3: return [4 /*yield*/, response.json()];
+                    case 4: return [2 /*return*/, _c.sent()];
                 }
             });
         });

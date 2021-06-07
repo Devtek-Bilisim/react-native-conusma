@@ -234,6 +234,9 @@ export class AppService {
         Token: this.token
       }
     });
+    if (!response.ok) {
+      throw new ConusmaRestApiException(response.status, await response.text());
+    }
     return await response.json();
   }
 

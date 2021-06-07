@@ -59,9 +59,28 @@ var User = /** @class */ (function () {
             });
         });
     };
+    User.prototype.createMeeting = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var meeting, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.appService.createMeeting()];
+                    case 1:
+                        meeting = _a.sent();
+                        return [2 /*return*/, meeting];
+                    case 2:
+                        error_1 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("createMeeting", "Meeting cannot be created.", error_1);
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
     User.prototype.getMeetings = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var meetings, error_1;
+            var meetings, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -71,8 +90,8 @@ var User = /** @class */ (function () {
                         meetings = _a.sent();
                         return [2 /*return*/, meetings];
                     case 2:
-                        error_1 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("getMeetings", "Meeting list cannot be received.", error_1);
+                        error_2 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("getMeetings", "Meeting list cannot be received.", error_2);
                     case 3: return [2 /*return*/];
                 }
             });
@@ -80,7 +99,7 @@ var User = /** @class */ (function () {
     };
     User.prototype.getProfileMeeting = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var meetings, profileMeeting, error_2;
+            var meetings, profileMeeting, error_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -91,8 +110,8 @@ var User = /** @class */ (function () {
                         profileMeeting = meetings.find(function (us) { return us.ProfileMeeting; });
                         return [2 /*return*/, profileMeeting];
                     case 2:
-                        error_2 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("getProfileMeeting", "Profile Meeting cannot be received.", error_2);
+                        error_3 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("getProfileMeeting", "Profile Meeting cannot be received.", error_3);
                     case 3: return [2 /*return*/];
                 }
             });
@@ -101,7 +120,7 @@ var User = /** @class */ (function () {
     User.prototype.joinMeeting = function (meeting, meetingName) {
         if (meetingName === void 0) { meetingName = 'User'; }
         return __awaiter(this, void 0, void 0, function () {
-            var result, meetingUser, error_3;
+            var result, meetingUser, error_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -112,8 +131,8 @@ var User = /** @class */ (function () {
                         meetingUser = result;
                         return [2 /*return*/, meetingUser];
                     case 2:
-                        error_3 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("joinMeeting", "Failed to join the meeting", error_3);
+                        error_4 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("joinMeeting", "Failed to join the meeting", error_4);
                     case 3: return [2 /*return*/];
                 }
             });
