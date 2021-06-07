@@ -11,6 +11,7 @@ export default class Conusma {
   constructor(appId: string, parameters: { apiUrl: string }) {
     var deviceId =  DeviceInfo.getUniqueId();
     this.appService = new AppService(appId, { apiUrl: parameters.apiUrl,deviceId:deviceId, version:'1.0.0'});
+
   }
   public async createUser() {
     try {
