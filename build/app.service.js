@@ -374,27 +374,46 @@ var AppService = /** @class */ (function () {
             });
         });
     };
-    AppService.prototype.createPublicUser = function () {
+    AppService.prototype.createPublicUser = function (Token) {
+        if (Token === void 0) { Token = ""; }
         return __awaiter(this, void 0, void 0, function () {
-            var response, _a, _b;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0: return [4 /*yield*/, fetch(this.apiUrl + "/Login/PublicUserCreate", {
-                            method: 'POST',
-                            headers: {
-                                accept: 'application/json',
-                                'content-type': 'application/json'
-                            }
-                        })];
+            var response, _a, _b, response, _c, _d;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
+                    case 0:
+                        if (!(Token == "")) return [3 /*break*/, 4];
+                        return [4 /*yield*/, fetch(this.apiUrl + "/Login/PublicUserCreate", {
+                                method: 'POST',
+                                headers: {
+                                    accept: 'application/json',
+                                    'content-type': 'application/json'
+                                }
+                            })];
                     case 1:
-                        response = _c.sent();
+                        response = _e.sent();
                         if (!!response.ok) return [3 /*break*/, 3];
                         _a = conusma_restapi_exception_1.ConusmaRestApiException.bind;
                         _b = [void 0, response.status];
                         return [4 /*yield*/, response.text()];
-                    case 2: throw new (_a.apply(conusma_restapi_exception_1.ConusmaRestApiException, _b.concat([_c.sent()])))();
-                    case 3: return [4 /*yield*/, response.json()];
-                    case 4: return [2 /*return*/, _c.sent()];
+                    case 2: throw new (_a.apply(conusma_restapi_exception_1.ConusmaRestApiException, _b.concat([_e.sent()])))();
+                    case 3: return [3 /*break*/, 7];
+                    case 4: return [4 /*yield*/, fetch(this.apiUrl + "/Login/PublicUserCreate", {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                Token: Token
+                            }
+                        })];
+                    case 5:
+                        response = _e.sent();
+                        if (!!response.ok) return [3 /*break*/, 7];
+                        _c = conusma_restapi_exception_1.ConusmaRestApiException.bind;
+                        _d = [void 0, response.status];
+                        return [4 /*yield*/, response.text()];
+                    case 6: throw new (_c.apply(conusma_restapi_exception_1.ConusmaRestApiException, _d.concat([_e.sent()])))();
+                    case 7: return [4 /*yield*/, response.json()];
+                    case 8: return [2 /*return*/, _e.sent()];
                 }
             });
         });
