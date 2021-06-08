@@ -4,6 +4,10 @@ import {
   mediaDevices,
 } from 'react-native-webrtc';
 import io from 'socket.io-client/dist/socket.io';
+import { MeetingUserModel } from "./Models/meeting-user-model";
+import { MeetingModel } from "./Models/meeting-model";
+import { ParticipantModel } from "./Models/participant-model";
+import { ConusmaException } from "./Exceptions/conusma-exception";
 class MediaServer {
   Id: number = 0;
   socket: any = null;
@@ -11,10 +15,13 @@ class MediaServer {
 };
 export type MediaServerConnectionReadyObserver = () => void;
 export class Meeting {
+    public meetingUser:MeetingUserModel;
+    public activeMeeting:MeetingModel;
+    
     private observers: MediaServerConnectionReadyObserver[] = [];
 
     private appService:AppService;
-    public meetingUser:any;
+    
     private mediaServerList:Array<MediaServer> = [];
     private mediaServerSocket:any;
     private mediaServerDevice:any;
@@ -24,6 +31,8 @@ export class Meeting {
     private isScreenShare:boolean = false;
     constructor(appService:AppService){
         this.appService = appService;
+        this.meetingUser = new MeetingUserModel();
+        this.activeMeeting = new MeetingModel();
     }
     
     public attach(observer:MediaServerConnectionReadyObserver) {
@@ -210,5 +219,138 @@ export class Meeting {
         const newStream:any = await mediaDevices.getUserMedia(constraints);
         await this.createProducerTransport(newStream);
         return newStream;
+    }
+
+    public async consume(participant:ParticipantModel) {
+
+    }
+
+    private async createConsumerTransport(user:MeetingUserModel) {
+        var targetMediaServerClient:MediaServer = <MediaServer>this.mediaServerList.find((ms:any) => ms.Id == user.MediaServerId);
+
+        if (targetMediaServerClient == null) {
+            targetMediaServerClient = new MediaServer();
+
+            var mediaServerInfo:any = await this.appService.getMediaServerById(this.meetingUser.Id, user.MediaServerId);
+            if (mediaServerInfo == null) {
+                throw new ConusmaException("createConsumerTransport", "Media server not found. (" + user.MediaServerId + ")");
+            }
+
+            targetMediaServerClient.Id = mediaServerInfo.Id;
+            targetMediaServerClient.socket = io.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
+
+            var userInfoData:any = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken()};
+            let setUserInfo = await this.signal("UserInfo", userInfoData, targetMediaServerClient.socket);
+            let routerRtpCapabilities = await this.signal("getRouterRtpCapabilities", null, targetMediaServerClient.socket);
+            const handlerName = mediaServerClient.detectDevice();
+            if (handlerName) {
+                console.log("detected handler: %s", handlerName);
+            } else {
+                console.error("no suitable handler found for current device");
+            }
+            targetMediaServerClient.mediaServerDevice = new mediaServerClient.Device({
+                handlerName: handlerName
+            });
+            this.mediaServerList.push(targetMediaServerClient);
+            return await this.createConsumerChildFunction(targetMediaServerClient, user);
+        }  else {
+            return await this.createConsumerChildFunction(targetMediaServerClient, user);
+        }
+    }
+
+    private async createConsumerChildFunction(targetMediaServerClient:MediaServer, user:MeetingUserModel) {
+        if (targetMediaServerClient != null && targetMediaServerClient.socket != null) {
+            var consumerTransport: any = new Object();
+            consumerTransport.MediaServer = targetMediaServerClient;
+            consumerTransport.MeetingUserId = user.Id;
+            var transportOptions = await this.signal("createConsumerTransport", { MeetingUserId: user.Id }, targetMediaServerClient.socket);
+            consumerTransport.MediaServerSocketId = user.MediaServerSocketId;
+            consumerTransport.transportId = transportOptions.Id;
+            consumerTransport.transport = await targetMediaServerClient.mediaServerDevice.createRecvTransport(transportOptions.transportOptions);
+            consumerTransport.transport.on("connect", async ( {dtlsParameters}:any, callback:any, errback:any) => {
+                this.signal("connectConsumerTransport", { consumerTransportId: consumerTransport.transportId, dtlsParameters: dtlsParameters }, targetMediaServerClient.socket)
+                .then(callback)
+                .catch(errback);
+            });
+            
+            consumerTransport.RemoteStream = new MediaStream();
+            consumerTransport.Camera = user.Camera;
+            consumerTransport.Mic = user.Mic;
+            consumerTransport.ShareScreen = user.ShareScreen;
+            if (user.Camera || user.ShareScreen) {
+                await this.addConsumer(consumerTransport, "video");
+                await this.pauseConsumer(consumerTransport, "video");
+            }
+
+            if (user.Mic) {
+                await this.addConsumer(consumerTransport, "audio");
+            }
+        }
+    }
+
+    private async addConsumer(consumerTransport:any, kind:string) {
+        if (consumerTransport != null) {
+            if (kind == "video") {
+                consumerTransport.videoConsumer = await this.consumeTransport(consumerTransport, "video");
+                this.resumeConsumer(consumerTransport, "video");
+                consumerTransport.RemoteStream.addTrack(consumerTransport.videoConsumer.track);
+            } else {
+                consumerTransport.audioConsumer = await this.consumeTransport(consumerTransport, "audio");
+                this.resumeConsumer(consumerTransport, "audio");
+                consumerTransport.RemoteStream.addTrack(consumerTransport.audioConsumer.track);
+                consumerTransport.audioConsumer.resume();
+            }
+        }
+    }
+
+    private async consumeTransport(consumerTransport:any, trackKind: string) {
+        const { rtpCapabilities } = this.mediaServerDevice;
+        const data = await this.signal("consume", { consumerTransportId: consumerTransport.transportId, rtpCapabilities: rtpCapabilities, kind: trackKind }, consumerTransport.MediaServer.socket)
+        .catch(err => {
+            throw new ConusmaException("consumeTransport", "Consume error: " + err)
+        });
+        const {
+            producerId,
+            id,
+            kind,
+            rtpParameters,
+        } = data;
+        let codecOptions = {};
+        const consumer = await consumerTransport.transport.consume({
+            id,
+            producerId,
+            kind,
+            rtpParameters,
+            codecOptions,
+        });
+        return consumer;
+    }
+
+    private async resumeConsumer(consumerTransport:any, kind:string) {
+        this.signal('resume', { consumerTransportId: consumerTransport.transportId, kind: kind }, consumerTransport.MediaServer.socket);
+    }
+    private async pauseConsumer(consumerTransport:any, kind:string) {
+        try {
+            if (consumerTransport != null && consumerTransport.videoConsumer != null) {
+                if (kind == 'video') {
+                    await this.signal('pause', {
+                        kind: 'video',
+                        consumerTransportId: consumerTransport.transportId
+                    }, consumerTransport.MediaServer.socket);
+                    await consumerTransport.videoConsumer.pause();;
+                    consumerTransport.RStream.removeTrack(consumerTransport.videoConsumer.track);
+                }
+                else if (kind == 'audio' && consumerTransport.audioConsumer != null) {
+                    await this.signal('pause', {
+                        kind: 'audio',
+                        consumerTransportId: consumerTransport.transportId
+                    }, consumerTransport.MediaServer.socket);
+                    await consumerTransport.audioConsumer.pause();
+                    consumerTransport.RStream.removeTrack(consumerTransport.audioConsumer.track);
+                }
+            }
+        } catch (error) {
+
+        }
     }
 }

@@ -525,7 +525,7 @@ export class AppService {
     return await response.json();
   }
 
-  public async getMediaServerById(meetingUserId: string, mediaServerId: string) {
+  public async getMediaServerById(meetingUserId: string, mediaServerId: number) {
     var response = await fetch(this.apiUrl + "/Live/GetMediaServer/" + meetingUserId + "/" + mediaServerId, {
       method: 'POST',
       headers: {
