@@ -1,8 +1,10 @@
 import { AppService } from "./app.service";
 import { MeetingUserModel } from "./Models/meeting-user-model";
+import { ConusmaWorker } from "./conusma-worker";
 export declare type MediaServerConnectionReadyObserver = () => void;
 export declare class Meeting {
     meetingUser: MeetingUserModel;
+    conusmaWorker: ConusmaWorker;
     private observers;
     private appService;
     private mediaServerList;

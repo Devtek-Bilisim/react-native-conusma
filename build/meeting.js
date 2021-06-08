@@ -63,6 +63,7 @@ var mediaServerClient = __importStar(require("mediasoup-client"));
 var react_native_webrtc_1 = require("react-native-webrtc");
 var socket_io_1 = __importDefault(require("socket.io-client/dist/socket.io"));
 var conusma_exception_1 = require("./Exceptions/conusma-exception");
+var conusma_worker_1 = require("./conusma-worker");
 var MediaServer = /** @class */ (function () {
     function MediaServer() {
         this.Id = 0;
@@ -81,6 +82,8 @@ var Meeting = /** @class */ (function () {
         this.isScreenShare = false;
         this.appService = appService;
         this.meetingUser = meetingUser;
+        this.conusmaWorker = new conusma_worker_1.ConusmaWorker(this.appService, this.meetingUser);
+        console.log("Create Worker");
     }
     Meeting.prototype.attach = function (observer) {
         this.observers.push(observer);
@@ -94,17 +97,19 @@ var Meeting = /** @class */ (function () {
     Meeting.prototype.open = function (state) {
         if (state === void 0) { state = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var mediaServer;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getMediaServer(this.meetingUser.Id)];
-                    case 1:
-                        mediaServer = _a.sent();
-                        return [4 /*yield*/, this.createClient(mediaServer)];
-                    case 2:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
+                this.conusmaWorker.start();
+                this.conusmaWorker.meetingWorkerEvent.on('meetingUsers', function () {
+                    console.log("Meeting User Bilgileri Değişti.");
+                });
+                this.conusmaWorker.meetingWorkerEvent.on('chatUpdates', function () {
+                    console.log("Chat de değişiklik var");
+                });
+                this.conusmaWorker.meetingWorkerEvent.on('meetingUpdate', function () {
+                    console.log("toplantı bilgileri güncellendi");
+                });
+                console.log("start Worker");
+                return [2 /*return*/];
             });
         });
     };
