@@ -1,5 +1,6 @@
 import { AppService } from "./app.service";
 import { ConusmaException } from "./Exceptions/conusma-exception";
+import { Meeting } from "./meeting";
 import { MeetingModel } from "./Models/meeting-model";
 import { MeetingUserModel } from "./Models/meeting-user-model";
 import { UserModel } from "./Models/user-model";
@@ -18,6 +19,16 @@ export class User {
         var result = await this.appService.createUserWithDeviceId();
         this.userInfo = result;
         this.appService.setJwtToken(this.userInfo.Token);
+    }
+    public async createMeeting()
+    {
+      try {
+        var meeting:Meeting = await this.appService.createMeeting();
+        return meeting;
+      } catch (error) {
+        throw new ConusmaException("createMeeting","Meeting cannot be created.", error);
+      }
+       
     }
     public async getMeetings()
     {

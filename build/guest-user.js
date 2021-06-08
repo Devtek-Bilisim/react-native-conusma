@@ -35,10 +35,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GuestUser = void 0;
 var conusma_exception_1 = require("./Exceptions/conusma-exception");
 var guest_user_model_1 = require("./Models/guest-user-model");
+var async_storage_1 = __importDefault(require("@react-native-async-storage/async-storage"));
 var GuestUser = /** @class */ (function () {
     function GuestUser(_appService) {
         this.userInfo = new guest_user_model_1.GuestUserModel();
@@ -46,15 +50,32 @@ var GuestUser = /** @class */ (function () {
     }
     GuestUser.prototype.create = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var result;
+            var token, result, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.appService.createPublicUser()];
+                    case 0: return [4 /*yield*/, async_storage_1.default.getItem('conusmaGuestToken')];
                     case 1:
+                        token = _a.sent();
+                        if (!(token != undefined && token != null)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.appService.createPublicUser(token)];
+                    case 2:
                         result = _a.sent();
                         this.userInfo = result;
                         this.appService.setJwtToken(this.userInfo.Token);
-                        return [2 /*return*/];
+                        return [4 /*yield*/, async_storage_1.default.setItem('conusmaGuestToken', this.userInfo.Token)];
+                    case 3:
+                        _a.sent();
+                        return [3 /*break*/, 7];
+                    case 4: return [4 /*yield*/, this.appService.createPublicUser()];
+                    case 5:
+                        result = _a.sent();
+                        this.userInfo = result;
+                        this.appService.setJwtToken(this.userInfo.Token);
+                        return [4 /*yield*/, async_storage_1.default.setItem('conusmaGuestToken', this.userInfo.Token)];
+                    case 6:
+                        _a.sent();
+                        _a.label = 7;
+                    case 7: return [2 /*return*/];
                 }
             });
         });

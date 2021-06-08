@@ -211,17 +211,35 @@ export class AppService {
     return await response.json();
   }
 
-  public async createPublicUser() {
-    var response = await fetch(this.apiUrl + "/Login/PublicUserCreate", {
-      method: 'POST',
-      headers: {
-        accept: 'application/json',
-        'content-type': 'application/json'
+  public async createPublicUser(Token:string="") {
+    if(Token == "")
+    {
+      var response = await fetch(this.apiUrl + "/Login/PublicUserCreate", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json'
+        }
+      });
+      if (!response.ok) {
+        throw new ConusmaRestApiException(response.status, await response.text());
       }
-    });
-    if (!response.ok) {
-      throw new ConusmaRestApiException(response.status, await response.text());
     }
+    else
+    {
+      var response = await fetch(this.apiUrl + "/Login/PublicUserCreate", {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Token: Token
+        }
+      });
+      if (!response.ok) {
+        throw new ConusmaRestApiException(response.status, await response.text());
+      }
+    }
+    
     return await response.json();
   }
 
@@ -234,6 +252,9 @@ export class AppService {
         Token: this.token
       }
     });
+    if (!response.ok) {
+      throw new ConusmaRestApiException(response.status, await response.text());
+    }
     return await response.json();
   }
 

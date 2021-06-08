@@ -25,7 +25,7 @@ export declare class AppService {
     forgotPassword(data: any): Promise<any>;
     controlForgotPasswordCode(data: any): Promise<any>;
     changePassword(data: any): Promise<any>;
-    createPublicUser(): Promise<any>;
+    createPublicUser(Token?: string): Promise<any>;
     createMeeting(): Promise<any>;
     createSchedule(data: any): Promise<any>;
     updateSchedule(data: any): Promise<any>;
