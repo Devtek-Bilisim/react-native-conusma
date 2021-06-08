@@ -16,7 +16,7 @@ class MediaServer {
 export type MediaServerConnectionReadyObserver = () => void;
 export class Meeting {
     public meetingUser:MeetingUserModel;
-    public activeMeeting:MeetingModel;
+
     
     private observers: MediaServerConnectionReadyObserver[] = [];
 
@@ -29,10 +29,9 @@ export class Meeting {
     private hasCamera:boolean = false;
     private hasMicrophone:boolean = false;
     private isScreenShare:boolean = false;
-    constructor(appService:AppService){
+    constructor(meetingUser:MeetingUserModel, appService:AppService){
         this.appService = appService;
-        this.meetingUser = new MeetingUserModel();
-        this.activeMeeting = new MeetingModel();
+        this.meetingUser = meetingUser;
     }
     
     public attach(observer:MediaServerConnectionReadyObserver) {
@@ -221,8 +220,8 @@ export class Meeting {
         return newStream;
     }
 
-    public async consume(participant:ParticipantModel) {
-
+    public async consume(producerUser:MeetingUserModel) {
+        return await this.createConsumerTransport(producerUser);
     }
 
     private async createConsumerTransport(user:MeetingUserModel) {

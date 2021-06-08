@@ -31,5 +31,4 @@ export default class Conusma {
       throw new ConusmaException("createGuestUser","GuestUser cannot be created.", error);
     }
   }
-
 }

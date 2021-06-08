@@ -1,0 +1,34 @@
+import { AppService } from "./app.service";
+import { MeetingUserModel } from "./Models/meeting-user-model";
+export declare type MediaServerConnectionReadyObserver = () => void;
+export declare class Meeting {
+    meetingUser: MeetingUserModel;
+    private observers;
+    private appService;
+    private mediaServerList;
+    private mediaServerSocket;
+    private mediaServerDevice;
+    private mediaServerClient;
+    private hasCamera;
+    private hasMicrophone;
+    private isScreenShare;
+    constructor(meetingUser: MeetingUserModel, appService: AppService);
+    attach(observer: MediaServerConnectionReadyObserver): void;
+    detach(observerToRemove: MediaServerConnectionReadyObserver): void;
+    private notify;
+    open(state?: boolean): Promise<void>;
+    close(state: boolean): Promise<void>;
+    private getMediaServer;
+    private createClient;
+    private createProducerTransport;
+    private createProducer;
+    private signal;
+    enableAudioVideo(): Promise<any>;
+    consume(producerUser: MeetingUserModel): Promise<void>;
+    private createConsumerTransport;
+    private createConsumerChildFunction;
+    private addConsumer;
+    private consumeTransport;
+    private resumeConsumer;
+    private pauseConsumer;
+}

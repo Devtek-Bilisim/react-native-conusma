@@ -54,7 +54,8 @@ export class User {
         try {
             var result = await this.appService.joinMeeting(meeting.MeetingId,meeting.Password,meetingName);
             var meetingUser:MeetingUserModel = result;
-            return meetingUser;
+            var activeMeeting = new Meeting(meetingUser, this.appService);
+            return activeMeeting;
           } catch (error) {
             throw new ConusmaException("joinMeeting","Failed to join the meeting", error);
           }

@@ -4,6 +4,7 @@ import { GuestUserModel } from "./Models/guest-user-model";
 import { MeetingModel } from "./Models/meeting-model";
 import { MeetingUserModel } from "./Models/meeting-user-model";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Meeting } from "./meeting";
 
 export class GuestUser {
   private appService: AppService;
@@ -34,7 +35,8 @@ export class GuestUser {
       var meeting: MeetingModel = resultcode;
       var result = await this.appService.joinMeeting(meeting.MeetingId, meeting.Password, meetingName);
       var meetingUser: MeetingUserModel = result;
-      return meetingUser;
+      var activeMeeting = new Meeting(meetingUser, this.appService);
+      return activeMeeting;
     } catch (error) {
       throw new ConusmaException("joinMeeting", "failed to join the meeting", error);
     }
@@ -45,7 +47,8 @@ export class GuestUser {
       var meeting: MeetingModel = resultcode;
       var result = await this.appService.joinMeeting(meeting.MeetingId, meeting.Password, meetingName);
       var meetingUser: MeetingUserModel = result;
-      return meetingUser;
+      var activeMeeting = new Meeting(meetingUser, this.appService);
+      return activeMeeting;
     } catch (error) {
       throw new ConusmaException("joinMeeting", "failed to join the meeting", error);
     }
