@@ -8,16 +8,18 @@ import { MeetingUserModel } from "./Models/meeting-user-model";
 import { MeetingModel } from "./Models/meeting-model";
 import { ParticipantModel } from "./Models/participant-model";
 import { ConusmaException } from "./Exceptions/conusma-exception";
+import { ConusmaWorker } from "./conusma-worker";
 class MediaServer {
   Id: number = 0;
   socket: any = null;
   mediaServerDevice:any = null;
 };
+
 export type MediaServerConnectionReadyObserver = () => void;
 export class Meeting {
     public meetingUser:MeetingUserModel;
 
-    
+    public conusmaWorker:ConusmaWorker;
     private observers: MediaServerConnectionReadyObserver[] = [];
 
     private appService:AppService;
@@ -32,6 +34,7 @@ export class Meeting {
     constructor(meetingUser:MeetingUserModel, appService:AppService){
         this.appService = appService;
         this.meetingUser = meetingUser;
+        this.conusmaWorker = new ConusmaWorker(this.appService,this.meetingUser);
     }
     
     public attach(observer:MediaServerConnectionReadyObserver) {
@@ -47,8 +50,20 @@ export class Meeting {
     }
 
     public async open(state:boolean = false) {
+        this.conusmaWorker.start();
+        this.conusmaWorker.meetingWorkerEvent.on('meetingUsers',()=>{
+            console.log("Meeting User Bilgileri Değişti.");
+        });
+        this.conusmaWorker.meetingWorkerEvent.on('chatUpdates',()=>{
+            console.log("Chat de değişiklik var");
+
+        });
+        this.conusmaWorker.meetingWorkerEvent.on('meetingUpdate',()=>{
+            console.log("toplantı bilgileri güncellendi");
+        });
         const mediaServer:any = await this.getMediaServer(this.meetingUser.Id);
         await this.createClient(mediaServer);
+        
     }
 
     public async close(state:boolean) {

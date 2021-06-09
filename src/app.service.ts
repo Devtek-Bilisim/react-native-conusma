@@ -804,4 +804,34 @@ export class AppService {
     });
     return await response.json();
   }
+  public async IAmHere(_meetingUserId: string) {
+    var response = await fetch(this.apiUrl + "/Live/IAmHere", {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'Token': this.token
+      },
+      body: JSON.stringify({meetingUserId:_meetingUserId})
+    });
+    if (!response.ok) {
+      throw new ConusmaRestApiException(response.status, await response.text());
+    }
+    return await response.json();
+  }
+  public async GetMeetingEvents(_meetingUserId: string) {
+    var response = await fetch(this.apiUrl + "/Live/GetMeetingEvents", {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'Token': this.token
+      },
+      body: JSON.stringify({meetingUserId:_meetingUserId})
+    });
+    if (!response.ok) {
+      throw new ConusmaRestApiException(response.status, await response.text());
+    }
+    return await response.json();
+  }
 }
