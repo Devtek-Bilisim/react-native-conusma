@@ -1351,7 +1351,7 @@ var AppService = /** @class */ (function () {
             });
         });
     };
-    AppService.prototype.IAmHere = function (_meetingUserId) {
+    AppService.prototype.iAmHere = function (_meetingUserId) {
         return __awaiter(this, void 0, void 0, function () {
             var response, _a, _b;
             return __generator(this, function (_c) {
@@ -1378,7 +1378,7 @@ var AppService = /** @class */ (function () {
             });
         });
     };
-    AppService.prototype.GetMeetingEvents = function (_meetingUserId) {
+    AppService.prototype.getMeetingEvents = function (_meetingUserId) {
         return __awaiter(this, void 0, void 0, function () {
             var response, _a, _b;
             return __generator(this, function (_c) {

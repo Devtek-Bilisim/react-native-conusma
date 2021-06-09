@@ -1,7 +1,7 @@
 import { AppService } from "./app.service";
 import * as mediaServerClient from 'mediasoup-client';
 import {
-  mediaDevices,
+  mediaDevices, registerGlobals
 } from 'react-native-webrtc';
 import io from 'socket.io-client/dist/socket.io';
 import { MeetingUserModel } from "./Models/meeting-user-model";
@@ -32,6 +32,7 @@ export class Meeting {
     private hasMicrophone:boolean = false;
     private isScreenShare:boolean = false;
     constructor(meetingUser:MeetingUserModel, appService:AppService){
+        registerGlobals();
         this.appService = appService;
         this.meetingUser = meetingUser;
         this.conusmaWorker = new ConusmaWorker(this.appService,this.meetingUser);
@@ -49,27 +50,52 @@ export class Meeting {
         this.observers.forEach(observer => observer());
     }
 
-    public async open(state:boolean = false) {
+    public async open() {
         this.conusmaWorker.start();
         this.conusmaWorker.meetingWorkerEvent.on('meetingUsers',()=>{
-            console.log("Meeting User Bilgileri Değişti.");
+            console.log("Meeting user updated.");
         });
         this.conusmaWorker.meetingWorkerEvent.on('chatUpdates',()=>{
-            console.log("Chat de değişiklik var");
-
+            console.log("Chat updated.");
         });
         this.conusmaWorker.meetingWorkerEvent.on('meetingUpdate',()=>{
-            console.log("toplantı bilgileri güncellendi");
+            console.log("Meeting updated.");
         });
         const mediaServer:any = await this.getMediaServer(this.meetingUser.Id);
         await this.createClient(mediaServer);
         
     }
 
-    public async close(state:boolean) {
+    public async close(sendCloseRequest:boolean = false) {
+        if (sendCloseRequest) {
+            var closeData = { 'MeetingUserId': this.meetingUser.Id };
+            this.appService.liveClose(closeData);
+        }
 
+        if (this.conusmaWorker != null) {
+            this.conusmaWorker.terminate();
+        }
+
+        if (this.mediaServerClient != null) {
+            if (this.mediaServerClient.transport) this.mediaServerClient.transport.close();
+            if (this.mediaServerClient.VideoProducer) this.mediaServerClient.VideoProducer.close();
+            if (this.mediaServerClient.AudioProducer) this.mediaServerClient.AudioProducer.close();
+            this.mediaServerClient = null;
+        }
+
+        this.mediaServerList.forEach(element => {
+            if(element != null)
+            {
+                element.socket.close();
+            }
+        });
+        if (this.mediaServerSocket != null) {
+            this.mediaServerSocket.close();
+            this.mediaServerSocket = null;
+        }
+        this.mediaServerList = [];
     }
-
+    
     private async getMediaServer(meetingUserId:string) {
         var response = await this.appService.getMediaServer(meetingUserId);
     }
@@ -230,9 +256,9 @@ export class Meeting {
             optional: videoSourceId ? [{sourceId: videoSourceId}] : [],
         },
         };
-        const newStream:any = await mediaDevices.getUserMedia(constraints);
+        const newStream:MediaStream = await mediaDevices.getUserMedia(constraints);
         await this.createProducerTransport(newStream);
-        return newStream;
+        return newStream;   
     }
 
     public async consume(producerUser:MeetingUserModel) {

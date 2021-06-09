@@ -59,7 +59,7 @@ var ConusmaWorker = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.appService.GetMeetingEvents(this.meetingUser.Id)];
+                        return [4 /*yield*/, this.appService.getMeetingEvents(this.meetingUser.Id)];
                     case 1:
                         events = _a.sent();
                         eventData = events;
@@ -91,7 +91,7 @@ var ConusmaWorker = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.appService.IAmHere(this.meetingUser.Id)];
+                        return [4 /*yield*/, this.appService.iAmHere(this.meetingUser.Id)];
                     case 1:
                         _a.sent();
                         return [3 /*break*/, 3];

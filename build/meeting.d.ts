@@ -18,14 +18,14 @@ export declare class Meeting {
     attach(observer: MediaServerConnectionReadyObserver): void;
     detach(observerToRemove: MediaServerConnectionReadyObserver): void;
     private notify;
-    open(state?: boolean): Promise<void>;
-    close(state: boolean): Promise<void>;
+    open(): Promise<void>;
+    close(sendCloseRequest?: boolean): Promise<void>;
     private getMediaServer;
     private createClient;
     private createProducerTransport;
     private createProducer;
     private signal;
-    enableAudioVideo(): Promise<any>;
+    enableAudioVideo(): Promise<MediaStream>;
     consume(producerUser: MeetingUserModel): Promise<void>;
     private createConsumerTransport;
     private createConsumerChildFunction;

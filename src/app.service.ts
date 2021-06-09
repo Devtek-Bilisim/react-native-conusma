@@ -804,7 +804,7 @@ export class AppService {
     });
     return await response.json();
   }
-  public async IAmHere(_meetingUserId: string) {
+  public async iAmHere(_meetingUserId: string) {
     var response = await fetch(this.apiUrl + "/Live/IAmHere", {
       method: 'POST',
       headers: {
@@ -819,7 +819,7 @@ export class AppService {
     }
     return await response.json();
   }
-  public async GetMeetingEvents(_meetingUserId: string) {
+  public async getMeetingEvents(_meetingUserId: string) {
     var response = await fetch(this.apiUrl + "/Live/GetMeetingEvents", {
       method: 'POST',
       headers: {

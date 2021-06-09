@@ -80,10 +80,10 @@ var Meeting = /** @class */ (function () {
         this.hasCamera = false;
         this.hasMicrophone = false;
         this.isScreenShare = false;
+        react_native_webrtc_1.registerGlobals();
         this.appService = appService;
         this.meetingUser = meetingUser;
         this.conusmaWorker = new conusma_worker_1.ConusmaWorker(this.appService, this.meetingUser);
-        console.log("Create Worker");
     }
     Meeting.prototype.attach = function (observer) {
         this.observers.push(observer);
@@ -94,28 +94,64 @@ var Meeting = /** @class */ (function () {
     Meeting.prototype.notify = function () {
         this.observers.forEach(function (observer) { return observer(); });
     };
-    Meeting.prototype.open = function (state) {
-        if (state === void 0) { state = false; }
+    Meeting.prototype.open = function () {
         return __awaiter(this, void 0, void 0, function () {
+            var mediaServer;
             return __generator(this, function (_a) {
-                this.conusmaWorker.start();
-                this.conusmaWorker.meetingWorkerEvent.on('meetingUsers', function () {
-                    console.log("Meeting User Bilgileri Değişti.");
-                });
-                this.conusmaWorker.meetingWorkerEvent.on('chatUpdates', function () {
-                    console.log("Chat de değişiklik var");
-                });
-                this.conusmaWorker.meetingWorkerEvent.on('meetingUpdate', function () {
-                    console.log("toplantı bilgileri güncellendi");
-                });
-                console.log("start Worker");
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0:
+                        this.conusmaWorker.start();
+                        this.conusmaWorker.meetingWorkerEvent.on('meetingUsers', function () {
+                            console.log("Meeting user updated.");
+                        });
+                        this.conusmaWorker.meetingWorkerEvent.on('chatUpdates', function () {
+                            console.log("Chat updated.");
+                        });
+                        this.conusmaWorker.meetingWorkerEvent.on('meetingUpdate', function () {
+                            console.log("Meeting updated.");
+                        });
+                        return [4 /*yield*/, this.getMediaServer(this.meetingUser.Id)];
+                    case 1:
+                        mediaServer = _a.sent();
+                        return [4 /*yield*/, this.createClient(mediaServer)];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
             });
         });
     };
-    Meeting.prototype.close = function (state) {
+    Meeting.prototype.close = function (sendCloseRequest) {
+        if (sendCloseRequest === void 0) { sendCloseRequest = false; }
         return __awaiter(this, void 0, void 0, function () {
+            var closeData;
             return __generator(this, function (_a) {
+                if (sendCloseRequest) {
+                    closeData = { 'MeetingUserId': this.meetingUser.Id };
+                    this.appService.liveClose(closeData);
+                }
+                if (this.conusmaWorker != null) {
+                    this.conusmaWorker.terminate();
+                }
+                if (this.mediaServerClient != null) {
+                    if (this.mediaServerClient.transport)
+                        this.mediaServerClient.transport.close();
+                    if (this.mediaServerClient.VideoProducer)
+                        this.mediaServerClient.VideoProducer.close();
+                    if (this.mediaServerClient.AudioProducer)
+                        this.mediaServerClient.AudioProducer.close();
+                    this.mediaServerClient = null;
+                }
+                this.mediaServerList.forEach(function (element) {
+                    if (element != null) {
+                        element.socket.close();
+                    }
+                });
+                if (this.mediaServerSocket != null) {
+                    this.mediaServerSocket.close();
+                    this.mediaServerSocket = null;
+                }
+                this.mediaServerList = [];
                 return [2 /*return*/];
             });
         });
@@ -552,7 +588,7 @@ var Meeting = /** @class */ (function () {
                         rtpCapabilities = this.mediaServerDevice.rtpCapabilities;
                         return [4 /*yield*/, this.signal("consume", { consumerTransportId: consumerTransport.transportId, rtpCapabilities: rtpCapabilities, kind: trackKind }, consumerTransport.MediaServer.socket)
                                 .catch(function (err) {
-                                throw new conusma_exception_1.ConusmaException("consumeTransport", "Consume error: " + err);
+                                throw new conusma_exception_1.ConusmaException("consumeTransport", "Consume error.", err);
                             })];
                     case 1:
                         data = _a.sent();

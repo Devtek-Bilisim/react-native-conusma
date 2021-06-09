@@ -19,7 +19,7 @@ export class ConusmaWorker {
     private meetingChangeEventInterval: number = 0;
     private async controlMeetingEvent() {
         try {
-            var events = await this.appService.GetMeetingEvents(this.meetingUser.Id);
+            var events = await this.appService.getMeetingEvents(this.meetingUser.Id);
             var eventData: { 'MeetingUsers': '', 'ChatUpdates': '', 'MeetingUpdate': '' } = events;
             if (eventData.MeetingUsers != this.saveEventData.MeetingUsers) {
                 this.saveEventData.MeetingUsers = eventData.MeetingUsers;
@@ -39,7 +39,7 @@ export class ConusmaWorker {
     }
     private async iAmHere() {
         try {
-            await this.appService.IAmHere(this.meetingUser.Id);
+            await this.appService.iAmHere(this.meetingUser.Id);
 
         } catch (error) {
 

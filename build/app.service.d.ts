@@ -66,6 +66,6 @@ export declare class AppService {
     getApprovedUserList(data: any): Promise<any>;
     getChatMessages(data: any): Promise<any>;
     getOldChatMessages(data: any): Promise<any>;
-    IAmHere(_meetingUserId: string): Promise<any>;
-    GetMeetingEvents(_meetingUserId: string): Promise<any>;
+    iAmHere(_meetingUserId: string): Promise<any>;
+    getMeetingEvents(_meetingUserId: string): Promise<any>;
 }
