@@ -50,10 +50,10 @@ export class Meeting {
         this.observers.forEach(observer => observer());
     }
 
-    public async open() {
+    public async open(localStream:MediaStream) {
         this.conusmaWorker.start();
         this.conusmaWorker.meetingWorkerEvent.on('meetingUsers',()=>{
-            console.log("Meeting user updated.");
+            console.log("Meeting users updated.");
         });
         this.conusmaWorker.meetingWorkerEvent.on('chatUpdates',()=>{
             console.log("Chat updated.");
@@ -62,7 +62,7 @@ export class Meeting {
             console.log("Meeting updated.");
         });
         const mediaServer:any = await this.getMediaServer(this.meetingUser.Id);
-        await this.createClient(mediaServer);
+        await this.createClient(mediaServer, localStream);
         
     }
 
@@ -100,7 +100,7 @@ export class Meeting {
         return await this.appService.getMediaServer(meetingUserId);
     }
 
-    private async createClient(mediaServer:any) {
+    private async createClient(mediaServer:any, localStream:MediaStream) {
         var mediaServerElement:MediaServer = <MediaServer>this.mediaServerList.find((ms:any) => ms.Id == mediaServer.Id);
         if (mediaServerElement == null) {
         mediaServerElement = new MediaServer();
@@ -111,25 +111,26 @@ export class Meeting {
         this.mediaServerSocket = mediaServerElement.socket;
         this.mediaServerSocket.on('disconnect', async () => {
             await this.close(false);
-            await this.open();
+            await this.open(localStream);
         });
         this.mediaServerSocket.on('WhoAreYou', async () => {
-        var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
-        let setUserInfo = await this.signal('UserInfo', userInfoData, this.mediaServerSocket);
-        let routerRtpCapabilities = await this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket);
+            var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
+            let setUserInfo = await this.signal('UserInfo', userInfoData, this.mediaServerSocket);
+            let routerRtpCapabilities = await this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket);
 
-        const handlerName = mediaServerClient.detectDevice();
-        if (handlerName) {
-            console.log("detected handler: %s", handlerName);
-        } else {
-            console.error("no suitable handler found for current device");
-        }
+            const handlerName = mediaServerClient.detectDevice();
+            if (handlerName) {
+                console.log("detected handler: %s", handlerName);
+            } else {
+                console.error("no suitable handler found for current device");
+            }
 
-        this.mediaServerDevice = new mediaServerClient.Device({
-                handlerName: handlerName
-            });
+            this.mediaServerDevice = new mediaServerClient.Device({
+                    handlerName: handlerName
+                });
             mediaServerElement.mediaServerDevice = this.mediaServerDevice;
             await this.mediaServerDevice.load({ routerRtpCapabilities });
+            await this.createProducerTransport(localStream);
             this.notify();
         });
     }
@@ -138,7 +139,7 @@ export class Meeting {
         try {
             if (this.mediaServerClient != null) {
                 await this.close(false);
-                await this.open();
+                await this.open(localStream);
             }
             else {
                 var transportOptions: any = await this.signal('createProducerTransport', {}, this.mediaServerSocket);
@@ -181,7 +182,7 @@ export class Meeting {
         } catch (error) {
             console.error("createProducerTransport error. " + error);
             await this.close(false);
-            await this.open();
+            await this.open(localStream);
         }
     }
     private async createProducer(localStream:MediaStream, kind:string) {
@@ -257,7 +258,7 @@ export class Meeting {
         },
         };
         const newStream:MediaStream = await mediaDevices.getUserMedia(constraints);
-        await this.createProducerTransport(newStream);
+        await this.open(newStream);
         return newStream;   
     }
 

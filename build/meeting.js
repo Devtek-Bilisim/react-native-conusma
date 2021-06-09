@@ -94,7 +94,7 @@ var Meeting = /** @class */ (function () {
     Meeting.prototype.notify = function () {
         this.observers.forEach(function (observer) { return observer(); });
     };
-    Meeting.prototype.open = function () {
+    Meeting.prototype.open = function (localStream) {
         return __awaiter(this, void 0, void 0, function () {
             var mediaServer;
             return __generator(this, function (_a) {
@@ -102,7 +102,7 @@ var Meeting = /** @class */ (function () {
                     case 0:
                         this.conusmaWorker.start();
                         this.conusmaWorker.meetingWorkerEvent.on('meetingUsers', function () {
-                            console.log("Meeting user updated.");
+                            console.log("Meeting users updated.");
                         });
                         this.conusmaWorker.meetingWorkerEvent.on('chatUpdates', function () {
                             console.log("Chat updated.");
@@ -113,7 +113,7 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, this.getMediaServer(this.meetingUser.Id)];
                     case 1:
                         mediaServer = _a.sent();
-                        return [4 /*yield*/, this.createClient(mediaServer)];
+                        return [4 /*yield*/, this.createClient(mediaServer, localStream)];
                     case 2:
                         _a.sent();
                         return [2 /*return*/];
@@ -158,18 +158,15 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.getMediaServer = function (meetingUserId) {
         return __awaiter(this, void 0, void 0, function () {
-            var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.appService.getMediaServer(meetingUserId)];
-                    case 1:
-                        response = _a.sent();
-                        return [2 /*return*/];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     };
-    Meeting.prototype.createClient = function (mediaServer) {
+    Meeting.prototype.createClient = function (mediaServer, localStream) {
         return __awaiter(this, void 0, void 0, function () {
             var mediaServerElement;
             var _this = this;
@@ -188,7 +185,7 @@ var Meeting = /** @class */ (function () {
                             case 0: return [4 /*yield*/, this.close(false)];
                             case 1:
                                 _a.sent();
-                                return [4 /*yield*/, this.open()];
+                                return [4 /*yield*/, this.open(localStream)];
                             case 2:
                                 _a.sent();
                                 return [2 /*return*/];
@@ -221,6 +218,9 @@ var Meeting = /** @class */ (function () {
                                 return [4 /*yield*/, this.mediaServerDevice.load({ routerRtpCapabilities: routerRtpCapabilities })];
                             case 3:
                                 _a.sent();
+                                return [4 /*yield*/, this.createProducerTransport(localStream)];
+                            case 4:
+                                _a.sent();
                                 this.notify();
                                 return [2 /*return*/];
                         }
@@ -242,7 +242,7 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, this.close(false)];
                     case 1:
                         _b.sent();
-                        return [4 /*yield*/, this.open()];
+                        return [4 /*yield*/, this.open(localStream)];
                     case 2:
                         _b.sent();
                         return [3 /*break*/, 10];
@@ -322,7 +322,7 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, this.close(false)];
                     case 12:
                         _b.sent();
-                        return [4 /*yield*/, this.open()];
+                        return [4 /*yield*/, this.open(localStream)];
                     case 13:
                         _b.sent();
                         return [3 /*break*/, 14];
@@ -435,7 +435,7 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, react_native_webrtc_1.mediaDevices.getUserMedia(constraints)];
                     case 2:
                         newStream = _a.sent();
-                        return [4 /*yield*/, this.createProducerTransport(newStream)];
+                        return [4 /*yield*/, this.open(newStream)];
                     case 3:
                         _a.sent();
                         return [2 /*return*/, newStream];
