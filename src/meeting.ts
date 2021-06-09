@@ -306,7 +306,7 @@ export class Meeting {
         const { rtpCapabilities } = this.mediaServerDevice;
         const data = await this.signal("consume", { consumerTransportId: consumerTransport.transportId, rtpCapabilities: rtpCapabilities, kind: trackKind }, consumerTransport.MediaServer.socket)
         .catch(err => {
-            throw new ConusmaException("consumeTransport", "Consume error: " + err)
+            throw new ConusmaException("consumeTransport", "Consume error.", err);
         });
         const {
             producerId,

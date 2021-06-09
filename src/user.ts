@@ -46,7 +46,7 @@ export class User {
              var profileMeeting:MeetingModel = <MeetingModel>meetings.find(us => us.ProfileMeeting); 
             return profileMeeting;
           } catch (error) {
-            throw new ConusmaException("getProfileMeeting","Profile Meeting cannot be received.", error);
+            throw new ConusmaException("getProfileMeeting", "Profile Meeting cannot be received.", error);
           }
     }
     public async joinMeeting(meeting:MeetingModel,meetingName:string='User')
@@ -57,7 +57,7 @@ export class User {
             var activeMeeting = new Meeting(meetingUser, this.appService);
             return activeMeeting;
           } catch (error) {
-            throw new ConusmaException("joinMeeting","Failed to join the meeting", error);
+            throw new ConusmaException("joinMeeting", "Failed to join the meeting", error);
           }
     }
 
