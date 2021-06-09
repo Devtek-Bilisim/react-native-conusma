@@ -97,7 +97,7 @@ export class Meeting {
     }
     
     private async getMediaServer(meetingUserId:string) {
-        var response = await this.appService.getMediaServer(meetingUserId);
+        return await this.appService.getMediaServer(meetingUserId);
     }
 
     private async createClient(mediaServer:any) {
