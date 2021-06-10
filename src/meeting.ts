@@ -31,6 +31,8 @@ export class Meeting {
     private hasCamera:boolean = false;
     private hasMicrophone:boolean = false;
     private isScreenShare:boolean = false;
+    public isAudioActive:boolean = false;
+    public isVideoActive:boolean = false;
     constructor(meetingUser:MeetingUserModel, appService:AppService){
         registerGlobals();
         this.appService = appService;
@@ -237,6 +239,27 @@ export class Meeting {
         }
 
     }
+    public switchCamera(localStream:MediaStream) {
+        localStream.getVideoTracks().forEach((track:any) => {
+            track._switchCamera();
+         });
+    }
+    public toggleAudio(localStream:MediaStream) {
+        this.isAudioActive = !this.isAudioActive;
+        localStream.getAudioTracks().forEach((track) => {
+            track.enabled = this.isAudioActive;
+        });
+        return this.isAudioActive;
+    }
+    public toggleVideo(localStream:MediaStream) {
+        this.isVideoActive = !this.isVideoActive;
+        localStream.getVideoTracks().forEach((track) => {
+            track.enabled = this.isVideoActive;
+        });
+        return this.isVideoActive;
+    }
+        
+
     public async enableAudioVideo() {
         const isFrontCamera = true;
         const devices = await mediaDevices.enumerateDevices();
@@ -244,6 +267,10 @@ export class Meeting {
         const videoSourceId = devices.find(
         (device: any) => device.kind === 'videoinput' && device.facing === facing,
         );
+        if (videoSourceId) {
+            this.hasCamera = true;
+            this.hasMicrophone = true; // TODO: Check audio source first
+        } 
         const facingMode = isFrontCamera ? 'user' : 'environment';
         const constraints: any = {
         audio: true,
@@ -258,7 +285,8 @@ export class Meeting {
         },
         };
         const newStream:MediaStream = await mediaDevices.getUserMedia(constraints);
-        await this.open(newStream);
+        this.isAudioActive = true;
+        this.isVideoActive = true;
         return newStream;   
     }
 
