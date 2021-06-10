@@ -26,11 +26,13 @@ export declare class Meeting {
     private createProducer;
     private signal;
     enableAudioVideo(): Promise<MediaStream>;
-    consume(producerUser: MeetingUserModel): Promise<void>;
+    consume(producerUser: MeetingUserModel): Promise<any>;
     private createConsumerTransport;
     private createConsumerChildFunction;
     private addConsumer;
     private consumeTransport;
     private resumeConsumer;
     private pauseConsumer;
+    getAllUsers(): Promise<any>;
+    getProducerUsers(): Promise<any>;
 }

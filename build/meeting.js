@@ -503,7 +503,7 @@ var Meeting = /** @class */ (function () {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        if (!(targetMediaServerClient != null && targetMediaServerClient.socket != null)) return [3 /*break*/, 7];
+                        if (!(targetMediaServerClient != null && targetMediaServerClient.socket != null)) return [3 /*break*/, 8];
                         consumerTransport = new Object();
                         consumerTransport.MediaServer = targetMediaServerClient;
                         consumerTransport.MeetingUserId = user.Id;
@@ -545,7 +545,8 @@ var Meeting = /** @class */ (function () {
                     case 6:
                         _b.sent();
                         _b.label = 7;
-                    case 7: return [2 /*return*/];
+                    case 7: return [2 /*return*/, consumerTransport];
+                    case 8: throw new conusma_exception_1.ConusmaException("createConsumerChildFunction", "No socket connection.");
                 }
             });
         });
@@ -655,6 +656,41 @@ var Meeting = /** @class */ (function () {
                         error_3 = _a.sent();
                         return [3 /*break*/, 8];
                     case 8: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Meeting.prototype.getAllUsers = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!(this.meetingUser != null)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id })];
+                    case 1: return [2 /*return*/, _a.sent()];
+                    case 2: return [2 /*return*/, []];
+                }
+            });
+        });
+    };
+    Meeting.prototype.getProducerUsers = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var users, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!(this.meetingUser != null)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id })];
+                    case 1:
+                        users = _a.sent();
+                        result = [];
+                        users.forEach(function (item) {
+                            if (item.Camera == true) {
+                                result.push(item);
+                            }
+                        });
+                        return [2 /*return*/, result];
+                    case 2: return [2 /*return*/, []];
                 }
             });
         });

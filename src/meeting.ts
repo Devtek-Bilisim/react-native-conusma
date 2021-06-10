@@ -413,7 +413,7 @@ export class Meeting {
             users.forEach((item:any) => {
                 if (item.Camera == true) {
                     result.push(item);
-                } 
+                }
             });
             return result;
         } else {
