@@ -324,7 +324,16 @@ export class Meeting {
         
         return result;
     }
-    
+    private async waitWhoAreYou(socket:any)
+    {
+        await new Promise(resolve => {
+             socket.on("WhoAreYou")
+             {
+                 console.log("read WhoAreYou");
+                 resolve("ok");
+             }   
+        });
+    }
     private async createConsumerTransport(user:MeetingUserModel) {
         var targetMediaServerClient:MediaServer = <MediaServer>this.mediaServerList.find((ms:any) => ms.Id == user.MediaServerId);
 
@@ -338,9 +347,13 @@ export class Meeting {
 
             targetMediaServerClient.Id = mediaServerInfo.Id;
             targetMediaServerClient.socket = io.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
-          
-            var userInfoData:any = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken()};
-            let setUserInfo = await this.signal("UserInfo", userInfoData, targetMediaServerClient.socket);
+            console.log("wait WhoAreYou");
+            await this.waitWhoAreYou(targetMediaServerClient.socket);
+            console.log("come WhoAreYou");
+            var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
+            let setUserInfo = await this.signal('UserInfo', userInfoData, targetMediaServerClient.socket);
+            console.log("setUserInfo ");
+
             let routerRtpCapabilities = await this.signal("getRouterRtpCapabilities", null, targetMediaServerClient.socket);
             const handlerName = mediaServerClient.detectDevice();
             if (handlerName) {

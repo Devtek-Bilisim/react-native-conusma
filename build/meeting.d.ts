@@ -34,7 +34,7 @@ export declare class Meeting {
     connectMeeting(): Promise<void>;
     isApproved(): Promise<any>;
     consume(producerUser: MeetingUserModel): Promise<any>;
-    delay(ms: number): Promise<unknown>;
+    private waitWhoAreYou;
     private createConsumerTransport;
     private createConsumerChildFunction;
     private addConsumer;
