@@ -470,6 +470,29 @@ var Meeting = /** @class */ (function () {
             });
         });
     };
+    Meeting.prototype.connectMeeting = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.appService.connectMeeting(this.meetingUser)];
+                    case 1:
+                        _a.sent();
+                        console.log("users connect Meeting");
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Meeting.prototype.isApproved = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.appService.isApproved(this.meetingUser.Id)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
     Meeting.prototype.consume = function (producerUser) {
         return __awaiter(this, void 0, void 0, function () {
             var result;
@@ -478,6 +501,7 @@ var Meeting = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.createConsumerTransport(producerUser)];
                     case 1:
                         result = _a.sent();
+                        console.log("consume okk");
                         this.mediaServerClient.Camera = false;
                         this.mediaServerClient.Mic = false;
                         this.mediaServerClient.Stream = null;
@@ -486,11 +510,13 @@ var Meeting = /** @class */ (function () {
                         this.meetingUser.ShareScreen = false;
                         this.meetingUser.Camera = false;
                         this.meetingUser.Mic = false;
-                        this.appService.connectMeeting(this.meetingUser);
                         return [2 /*return*/, result];
                 }
             });
         });
+    };
+    Meeting.prototype.delay = function (ms) {
+        return new Promise(function (resolve) { return setTimeout(resolve, ms); });
     };
     Meeting.prototype.createConsumerTransport = function (user) {
         return __awaiter(this, void 0, void 0, function () {
@@ -498,24 +524,34 @@ var Meeting = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        console.log("createConsumerTransport start");
                         targetMediaServerClient = this.mediaServerList.find(function (ms) { return ms.Id == user.MediaServerId; });
-                        if (!(targetMediaServerClient == null)) return [3 /*break*/, 5];
+                        if (!(targetMediaServerClient == null)) return [3 /*break*/, 6];
                         targetMediaServerClient = new MediaServer();
+                        console.log("getMediaServerById start");
                         return [4 /*yield*/, this.appService.getMediaServerById(this.meetingUser.Id, user.MediaServerId)];
                     case 1:
                         mediaServerInfo = _a.sent();
                         if (mediaServerInfo == null) {
                             throw new conusma_exception_1.ConusmaException("createConsumerTransport", "Media server not found. (" + user.MediaServerId + ")");
                         }
+                        console.log("getMediaServerById end" + JSON.stringify(mediaServerInfo));
                         targetMediaServerClient.Id = mediaServerInfo.Id;
                         targetMediaServerClient.socket = socket_io_1.default.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
+                        console.log("getMediaServer connect");
+                        return [4 /*yield*/, this.delay(5000)];
+                    case 2:
+                        _a.sent();
+                        console.log("timout end");
                         userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
                         return [4 /*yield*/, this.signal("UserInfo", userInfoData, targetMediaServerClient.socket)];
-                    case 2:
-                        setUserInfo = _a.sent();
-                        return [4 /*yield*/, this.signal("getRouterRtpCapabilities", null, targetMediaServerClient.socket)];
                     case 3:
+                        setUserInfo = _a.sent();
+                        console.log("send setUserInfo");
+                        return [4 /*yield*/, this.signal("getRouterRtpCapabilities", null, targetMediaServerClient.socket)];
+                    case 4:
                         routerRtpCapabilities = _a.sent();
+                        console.log("getRouterRtpCapabilities");
                         handlerName = mediaServerClient.detectDevice();
                         if (handlerName) {
                             console.log("detected handler: %s", handlerName);
@@ -528,9 +564,9 @@ var Meeting = /** @class */ (function () {
                         });
                         this.mediaServerList.push(targetMediaServerClient);
                         return [4 /*yield*/, this.createConsumerChildFunction(targetMediaServerClient, user)];
-                    case 4: return [2 /*return*/, _a.sent()];
-                    case 5: return [4 /*yield*/, this.createConsumerChildFunction(targetMediaServerClient, user)];
-                    case 6: return [2 /*return*/, _a.sent()];
+                    case 5: return [2 /*return*/, _a.sent()];
+                    case 6: return [4 /*yield*/, this.createConsumerChildFunction(targetMediaServerClient, user)];
+                    case 7: return [2 /*return*/, _a.sent()];
                 }
             });
         });
@@ -542,7 +578,8 @@ var Meeting = /** @class */ (function () {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        if (!(targetMediaServerClient != null && targetMediaServerClient.socket != null)) return [3 /*break*/, 8];
+                        console.log("createConsumerChildFunction start");
+                        if (!(targetMediaServerClient != null && targetMediaServerClient.socket != null)) return [3 /*break*/, 7];
                         consumerTransport = new Object();
                         consumerTransport.MediaServer = targetMediaServerClient;
                         consumerTransport.MeetingUserId = user.Id;
@@ -570,22 +607,19 @@ var Meeting = /** @class */ (function () {
                         consumerTransport.Camera = user.Camera;
                         consumerTransport.Mic = user.Mic;
                         consumerTransport.ShareScreen = user.ShareScreen;
-                        if (!(user.Camera || user.ShareScreen)) return [3 /*break*/, 5];
+                        if (!(user.Camera || user.ShareScreen)) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.addConsumer(consumerTransport, "video")];
                     case 3:
                         _b.sent();
-                        return [4 /*yield*/, this.pauseConsumer(consumerTransport, "video")];
+                        _b.label = 4;
                     case 4:
-                        _b.sent();
-                        _b.label = 5;
-                    case 5:
-                        if (!user.Mic) return [3 /*break*/, 7];
+                        if (!user.Mic) return [3 /*break*/, 6];
                         return [4 /*yield*/, this.addConsumer(consumerTransport, "audio")];
-                    case 6:
+                    case 5:
                         _b.sent();
-                        _b.label = 7;
-                    case 7: return [2 /*return*/, consumerTransport];
-                    case 8: throw new conusma_exception_1.ConusmaException("createConsumerChildFunction", "No socket connection.");
+                        _b.label = 6;
+                    case 6: return [2 /*return*/, consumerTransport];
+                    case 7: throw new conusma_exception_1.ConusmaException("createConsumerChildFunction", "No socket connection.");
                 }
             });
         });
@@ -719,6 +753,7 @@ var Meeting = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         if (!(this.meetingUser != null)) return [3 /*break*/, 2];
+                        console.log("meeting User :" + JSON.stringify(this.meetingUser) + "token :" + this.appService.getJwtToken());
                         return [4 /*yield*/, this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id })];
                     case 1:
                         users = _a.sent();

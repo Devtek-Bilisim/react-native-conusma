@@ -594,6 +594,9 @@ export class AppService {
       },
       body: JSON.stringify(data)
     });
+    if (!response.ok) {
+      throw new ConusmaRestApiException(response.status, await response.text());
+    }
     return await response.json();
   }
 
