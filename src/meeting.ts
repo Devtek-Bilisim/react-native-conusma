@@ -139,7 +139,12 @@ export class Meeting {
             this.notify();
         });
     }
-
+    private callback() {
+        console.log("transport: callback");
+    }
+    private errback() {
+        console.error("transport: an error occured.");
+    }
     private async createProducerTransport(localStream:MediaStream) {
         try {
             if (this.mediaServerClient != null) {
@@ -238,6 +243,7 @@ export class Meeting {
         if (mediaServerSocket != null) {
             return new Promise((resolve, reject) => {
                 mediaServerSocket.emit(type, data, (err:any, response:any) => {
+                    console.log("read Response");
                     if (!err) {
                         resolve(response);
                     } else {
@@ -311,7 +317,10 @@ export class Meeting {
         return await this.appService.isApproved(this.meetingUser.Id);
     }
     public async consume(producerUser:MeetingUserModel) {
+        console.log("consume user wait");
         var result = await this.createConsumerTransport(producerUser);
+        console.log("consume user create");
+
         this.mediaServerClient.Camera = false;
         this.mediaServerClient.Mic = false;
         this.mediaServerClient.Stream = null;
@@ -334,6 +343,7 @@ export class Meeting {
              }   
         });
     }
+    
     private async createConsumerTransport(user:MeetingUserModel) {
         var targetMediaServerClient:MediaServer = <MediaServer>this.mediaServerList.find((ms:any) => ms.Id == user.MediaServerId);
 
@@ -351,9 +361,9 @@ export class Meeting {
             await this.waitWhoAreYou(targetMediaServerClient.socket);
             console.log("come WhoAreYou");
             var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
-            let setUserInfo = await this.signal('UserInfo', userInfoData, targetMediaServerClient.socket);
+            this.mediaServerSocket = targetMediaServerClient.socket;
+            let setUserInfo = await this.signal('UserInfo', userInfoData, this.mediaServerSocket);
             console.log("setUserInfo ");
-
             let routerRtpCapabilities = await this.signal("getRouterRtpCapabilities", null, targetMediaServerClient.socket);
             const handlerName = mediaServerClient.detectDevice();
             if (handlerName) {
@@ -373,6 +383,8 @@ export class Meeting {
 
     private async createConsumerChildFunction(targetMediaServerClient:MediaServer, user:MeetingUserModel) {
         if (targetMediaServerClient != null && targetMediaServerClient.socket != null) {
+            console.log("createConsumerChildFunction");
+
             var consumerTransport: any = new Object();
             consumerTransport.MediaServer = targetMediaServerClient;
             consumerTransport.MeetingUserId = user.Id;

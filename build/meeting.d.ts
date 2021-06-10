@@ -24,6 +24,8 @@ export declare class Meeting {
     close(sendCloseRequest?: boolean): Promise<void>;
     private getMediaServer;
     private createClient;
+    private callback;
+    private errback;
     private createProducerTransport;
     private createProducer;
     private signal;

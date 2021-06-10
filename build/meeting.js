@@ -235,6 +235,12 @@ var Meeting = /** @class */ (function () {
             });
         });
     };
+    Meeting.prototype.callback = function () {
+        console.log("transport: callback");
+    };
+    Meeting.prototype.errback = function () {
+        console.error("transport: an error occured.");
+    };
     Meeting.prototype.createProducerTransport = function (localStream) {
         return __awaiter(this, void 0, void 0, function () {
             var transportOptions, _a, error_1;
@@ -394,6 +400,7 @@ var Meeting = /** @class */ (function () {
                 if (mediaServerSocket != null) {
                     return [2 /*return*/, new Promise(function (resolve, reject) {
                             mediaServerSocket.emit(type, data, function (err, response) {
+                                console.log("read Response");
                                 if (!err) {
                                     resolve(response);
                                 }
@@ -498,9 +505,12 @@ var Meeting = /** @class */ (function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.createConsumerTransport(producerUser)];
+                    case 0:
+                        console.log("consume user wait");
+                        return [4 /*yield*/, this.createConsumerTransport(producerUser)];
                     case 1:
                         result = _a.sent();
+                        console.log("consume user create");
                         this.mediaServerClient.Camera = false;
                         this.mediaServerClient.Mic = false;
                         this.mediaServerClient.Stream = null;
@@ -548,14 +558,15 @@ var Meeting = /** @class */ (function () {
                             throw new conusma_exception_1.ConusmaException("createConsumerTransport", "Media server not found. (" + user.MediaServerId + ")");
                         }
                         targetMediaServerClient.Id = mediaServerInfo.Id;
-                        targetMediaServerClient.socket = socket_io_1.default.connect(mediaServerInfo.ConnectionDnsAddress + ":4443");
+                        targetMediaServerClient.socket = socket_io_1.default.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
                         console.log("wait WhoAreYou");
                         return [4 /*yield*/, this.waitWhoAreYou(targetMediaServerClient.socket)];
                     case 2:
                         _a.sent();
                         console.log("come WhoAreYou");
                         userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
-                        return [4 /*yield*/, this.signal('UserInfo', userInfoData, targetMediaServerClient.socket)];
+                        this.mediaServerSocket = targetMediaServerClient.socket;
+                        return [4 /*yield*/, this.signal('UserInfo', userInfoData, this.mediaServerSocket)];
                     case 3:
                         setUserInfo = _a.sent();
                         console.log("setUserInfo ");
@@ -589,6 +600,7 @@ var Meeting = /** @class */ (function () {
                 switch (_b.label) {
                     case 0:
                         if (!(targetMediaServerClient != null && targetMediaServerClient.socket != null)) return [3 /*break*/, 7];
+                        console.log("createConsumerChildFunction");
                         consumerTransport = new Object();
                         consumerTransport.MediaServer = targetMediaServerClient;
                         consumerTransport.MeetingUserId = user.Id;
