@@ -326,6 +326,9 @@ export class Meeting {
             if (user.Mic) {
                 await this.addConsumer(consumerTransport, "audio");
             }
+            return consumerTransport;
+        } else {
+            throw new ConusmaException("createConsumerChildFunction", "No socket connection.");
         }
     }
 
