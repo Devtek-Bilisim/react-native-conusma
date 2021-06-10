@@ -24,8 +24,6 @@ export declare class Meeting {
     close(sendCloseRequest?: boolean): Promise<void>;
     private getMediaServer;
     private createClient;
-    private callback;
-    private errback;
     private createProducerTransport;
     private createProducer;
     private signal;
@@ -35,7 +33,7 @@ export declare class Meeting {
     enableAudioVideo(): Promise<MediaStream>;
     connectMeeting(): Promise<void>;
     isApproved(): Promise<any>;
-    consume(producerUser: MeetingUserModel): Promise<any>;
+    consume(producerUser: MeetingUserModel): Promise<MediaStream>;
     private waitWhoAreYou;
     private createConsumerTransport;
     private createConsumerChildFunction;
