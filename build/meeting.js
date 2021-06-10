@@ -80,6 +80,8 @@ var Meeting = /** @class */ (function () {
         this.hasCamera = false;
         this.hasMicrophone = false;
         this.isScreenShare = false;
+        this.isAudioActive = false;
+        this.isVideoActive = false;
         react_native_webrtc_1.registerGlobals();
         this.appService = appService;
         this.meetingUser = meetingUser;
@@ -204,6 +206,7 @@ var Meeting = /** @class */ (function () {
                                 return [4 /*yield*/, this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket)];
                             case 2:
                                 routerRtpCapabilities = _a.sent();
+                                console.log("routerRtpCapabilities " + JSON.stringify(routerRtpCapabilities));
                                 handlerName = mediaServerClient.detectDevice();
                                 if (handlerName) {
                                     console.log("detected handler: %s", handlerName);
@@ -215,9 +218,11 @@ var Meeting = /** @class */ (function () {
                                     handlerName: handlerName
                                 });
                                 mediaServerElement.mediaServerDevice = this.mediaServerDevice;
+                                console.log("mediaServerDevice.loading ");
                                 return [4 /*yield*/, this.mediaServerDevice.load({ routerRtpCapabilities: routerRtpCapabilities })];
                             case 3:
                                 _a.sent();
+                                console.log("mediaServerDevice.loaded");
                                 return [4 /*yield*/, this.createProducerTransport(localStream)];
                             case 4:
                                 _a.sent();
@@ -246,7 +251,9 @@ var Meeting = /** @class */ (function () {
                     case 2:
                         _b.sent();
                         return [3 /*break*/, 10];
-                    case 3: return [4 /*yield*/, this.signal('createProducerTransport', {}, this.mediaServerSocket)];
+                    case 3:
+                        console.log("createProducerTransport start");
+                        return [4 /*yield*/, this.signal('createProducerTransport', {}, this.mediaServerSocket)];
                     case 4:
                         transportOptions = _b.sent();
                         this.mediaServerClient = new Object();
@@ -314,6 +321,10 @@ var Meeting = /** @class */ (function () {
                         this.mediaServerClient.Stream = localStream;
                         this.mediaServerClient.MeetingUserId = this.meetingUser.Id;
                         this.mediaServerClient.RemoteStream = null;
+                        this.meetingUser.ShareScreen = this.isScreenShare;
+                        this.meetingUser.Camera = this.hasCamera;
+                        this.meetingUser.Mic = this.hasMicrophone;
+                        this.appService.connectMeeting(this.meetingUser);
                         _b.label = 10;
                     case 10: return [3 /*break*/, 14];
                     case 11:
@@ -333,11 +344,11 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.createProducer = function (localStream, kind) {
         return __awaiter(this, void 0, void 0, function () {
-            var videoTrack, _a, _b, aparameters, error_2;
+            var videoTrack, _a, _b, error_2;
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
-                        _c.trys.push([0, 6, , 7]);
+                        _c.trys.push([0, 5, , 6]);
                         if (!(kind == 'video')) return [3 /*break*/, 2];
                         videoTrack = localStream.getVideoTracks()[0];
                         _a = this.mediaServerClient;
@@ -355,9 +366,9 @@ var Meeting = /** @class */ (function () {
                             })];
                     case 1:
                         _a.VideoProducer = _c.sent();
-                        return [3 /*break*/, 5];
+                        return [3 /*break*/, 4];
                     case 2:
-                        if (!(kind == 'audio')) return [3 /*break*/, 5];
+                        if (!(kind == 'audio')) return [3 /*break*/, 4];
                         _b = this.mediaServerClient;
                         return [4 /*yield*/, this.mediaServerClient.transport.produce({
                                 track: localStream.getAudioTracks()[0],
@@ -365,21 +376,13 @@ var Meeting = /** @class */ (function () {
                             })];
                     case 3:
                         _b.AudioProducer = _c.sent();
-                        aparameters = this.mediaServerClient.AudioProducer.rtpSender.getParameters();
-                        if (!aparameters.encodings) {
-                            aparameters.encodings = [{}];
-                        }
-                        aparameters.encodings[0].maxBitrate = 50 * 1000;
-                        return [4 /*yield*/, this.mediaServerClient.AudioProducer.rtpSender.setParameters(aparameters)];
-                    case 4:
-                        _c.sent();
-                        _c.label = 5;
-                    case 5: return [3 /*break*/, 7];
-                    case 6:
+                        _c.label = 4;
+                    case 4: return [3 /*break*/, 6];
+                    case 5:
                         error_2 = _c.sent();
                         console.error("createProducer error. " + error_2);
-                        return [3 /*break*/, 7];
-                    case 7: return [2 /*return*/];
+                        return [3 /*break*/, 6];
+                    case 6: return [2 /*return*/];
                 }
             });
         });
@@ -407,6 +410,27 @@ var Meeting = /** @class */ (function () {
             });
         });
     };
+    Meeting.prototype.switchCamera = function (localStream) {
+        localStream.getVideoTracks().forEach(function (track) {
+            track._switchCamera();
+        });
+    };
+    Meeting.prototype.toggleAudio = function (localStream) {
+        var _this = this;
+        this.isAudioActive = !this.isAudioActive;
+        localStream.getAudioTracks().forEach(function (track) {
+            track.enabled = _this.isAudioActive;
+        });
+        return this.isAudioActive;
+    };
+    Meeting.prototype.toggleVideo = function (localStream) {
+        var _this = this;
+        this.isVideoActive = !this.isVideoActive;
+        localStream.getVideoTracks().forEach(function (track) {
+            track.enabled = _this.isVideoActive;
+        });
+        return this.isVideoActive;
+    };
     Meeting.prototype.enableAudioVideo = function () {
         return __awaiter(this, void 0, void 0, function () {
             var isFrontCamera, devices, facing, videoSourceId, facingMode, constraints, newStream;
@@ -419,6 +443,10 @@ var Meeting = /** @class */ (function () {
                         devices = _a.sent();
                         facing = isFrontCamera ? 'front' : 'environment';
                         videoSourceId = devices.find(function (device) { return device.kind === 'videoinput' && device.facing === facing; });
+                        if (videoSourceId) {
+                            this.hasCamera = true;
+                            this.hasMicrophone = true; // TODO: Check audio source first
+                        }
                         facingMode = isFrontCamera ? 'user' : 'environment';
                         constraints = {
                             audio: true,
@@ -435,9 +463,8 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, react_native_webrtc_1.mediaDevices.getUserMedia(constraints)];
                     case 2:
                         newStream = _a.sent();
-                        return [4 /*yield*/, this.open(newStream)];
-                    case 3:
-                        _a.sent();
+                        this.isAudioActive = true;
+                        this.isVideoActive = true;
                         return [2 /*return*/, newStream];
                 }
             });
@@ -445,10 +472,22 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.consume = function (producerUser) {
         return __awaiter(this, void 0, void 0, function () {
+            var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.createConsumerTransport(producerUser)];
-                    case 1: return [2 /*return*/, _a.sent()];
+                    case 1:
+                        result = _a.sent();
+                        this.mediaServerClient.Camera = false;
+                        this.mediaServerClient.Mic = false;
+                        this.mediaServerClient.Stream = null;
+                        this.mediaServerClient.MeetingUserId = this.meetingUser.Id;
+                        this.mediaServerClient.RemoteStream = result.RemoteStream;
+                        this.meetingUser.ShareScreen = false;
+                        this.meetingUser.Camera = false;
+                        this.meetingUser.Mic = false;
+                        this.appService.connectMeeting(this.meetingUser);
+                        return [2 /*return*/, result];
                 }
             });
         });
@@ -636,7 +675,7 @@ var Meeting = /** @class */ (function () {
                     case 2:
                         _a.sent();
                         ;
-                        consumerTransport.RStream.removeTrack(consumerTransport.videoConsumer.track);
+                        consumerTransport.RemoteStream.removeTrack(consumerTransport.videoConsumer.track);
                         return [3 /*break*/, 6];
                     case 3:
                         if (!(kind == 'audio' && consumerTransport.audioConsumer != null)) return [3 /*break*/, 6];
@@ -649,7 +688,7 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, consumerTransport.audioConsumer.pause()];
                     case 5:
                         _a.sent();
-                        consumerTransport.RStream.removeTrack(consumerTransport.audioConsumer.track);
+                        consumerTransport.RemoteStream.removeTrack(consumerTransport.audioConsumer.track);
                         _a.label = 6;
                     case 6: return [3 /*break*/, 8];
                     case 7:
@@ -683,7 +722,6 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id })];
                     case 1:
                         users = _a.sent();
-                        console.log("Users : " + JSON.stringify(users));
                         result = [];
                         users.forEach(function (item) {
                             if (item.Camera == true) {

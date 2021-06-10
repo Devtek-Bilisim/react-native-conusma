@@ -119,6 +119,7 @@ export class Meeting {
             var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
             let setUserInfo = await this.signal('UserInfo', userInfoData, this.mediaServerSocket);
             let routerRtpCapabilities = await this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket);
+            console.log("routerRtpCapabilities "+JSON.stringify(routerRtpCapabilities));
 
             const handlerName = mediaServerClient.detectDevice();
             if (handlerName) {
@@ -131,7 +132,9 @@ export class Meeting {
                     handlerName: handlerName
                 });
             mediaServerElement.mediaServerDevice = this.mediaServerDevice;
+            console.log("mediaServerDevice.loading ");
             await this.mediaServerDevice.load({ routerRtpCapabilities });
+            console.log("mediaServerDevice.loaded");
             await this.createProducerTransport(localStream);
             this.notify();
         });
@@ -144,6 +147,7 @@ export class Meeting {
                 await this.open(localStream);
             }
             else {
+                console.log("createProducerTransport start");
                 var transportOptions: any = await this.signal('createProducerTransport', {}, this.mediaServerSocket);
                 this.mediaServerClient = new Object();
                 this.mediaServerClient.transportId = transportOptions.id;
@@ -216,12 +220,12 @@ export class Meeting {
                     track: localStream.getAudioTracks()[0],
                     appData: { mediaTag: 'audio' }
                 });
-                let aparameters = this.mediaServerClient.AudioProducer.rtpSender.getParameters();
+              /*  let aparameters = this.mediaServerClient.AudioProducer.rtpSender.getParameters();
                 if (!aparameters.encodings) {
                     aparameters.encodings = [{}];
                 }
                 aparameters.encodings[0].maxBitrate = 50 * 1000;
-                await this.mediaServerClient.AudioProducer.rtpSender.setParameters(aparameters);
+                await this.mediaServerClient.AudioProducer.rtpSender.setParameters(aparameters);*/
             }
 
         } catch (error) {
