@@ -31,7 +31,10 @@ export declare class Meeting {
     toggleAudio(localStream: MediaStream): boolean;
     toggleVideo(localStream: MediaStream): boolean;
     enableAudioVideo(): Promise<MediaStream>;
+    connectMeeting(): Promise<void>;
+    isApproved(): Promise<any>;
     consume(producerUser: MeetingUserModel): Promise<any>;
+    private waitWhoAreYou;
     private createConsumerTransport;
     private createConsumerChildFunction;
     private addConsumer;

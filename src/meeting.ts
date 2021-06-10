@@ -301,7 +301,15 @@ export class Meeting {
         this.isVideoActive = true;
         return newStream;   
     }
-
+    public async connectMeeting()
+    {
+            await this.appService.connectMeeting(this.meetingUser);
+            console.log("users connect Meeting");
+    }
+    public async isApproved()
+    {
+        return await this.appService.isApproved(this.meetingUser.Id);
+    }
     public async consume(producerUser:MeetingUserModel) {
         var result = await this.createConsumerTransport(producerUser);
         this.mediaServerClient.Camera = false;
@@ -314,10 +322,18 @@ export class Meeting {
         this.meetingUser.Camera = false;
         this.meetingUser.Mic = false;
         
-        this.appService.connectMeeting(this.meetingUser);
         return result;
     }
-
+    private async waitWhoAreYou(socket:any)
+    {
+        await new Promise(resolve => {
+             socket.on("WhoAreYou")
+             {
+                 console.log("read WhoAreYou");
+                 resolve("ok");
+             }   
+        });
+    }
     private async createConsumerTransport(user:MeetingUserModel) {
         var targetMediaServerClient:MediaServer = <MediaServer>this.mediaServerList.find((ms:any) => ms.Id == user.MediaServerId);
 
@@ -331,9 +347,13 @@ export class Meeting {
 
             targetMediaServerClient.Id = mediaServerInfo.Id;
             targetMediaServerClient.socket = io.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
+            console.log("wait WhoAreYou");
+            await this.waitWhoAreYou(targetMediaServerClient.socket);
+            console.log("come WhoAreYou");
+            var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
+            let setUserInfo = await this.signal('UserInfo', userInfoData, targetMediaServerClient.socket);
+            console.log("setUserInfo ");
 
-            var userInfoData:any = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken()};
-            let setUserInfo = await this.signal("UserInfo", userInfoData, targetMediaServerClient.socket);
             let routerRtpCapabilities = await this.signal("getRouterRtpCapabilities", null, targetMediaServerClient.socket);
             const handlerName = mediaServerClient.detectDevice();
             if (handlerName) {
@@ -372,7 +392,6 @@ export class Meeting {
             consumerTransport.ShareScreen = user.ShareScreen;
             if (user.Camera || user.ShareScreen) {
                 await this.addConsumer(consumerTransport, "video");
-                await this.pauseConsumer(consumerTransport, "video");
             }
 
             if (user.Mic) {

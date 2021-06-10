@@ -470,6 +470,29 @@ var Meeting = /** @class */ (function () {
             });
         });
     };
+    Meeting.prototype.connectMeeting = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.appService.connectMeeting(this.meetingUser)];
+                    case 1:
+                        _a.sent();
+                        console.log("users connect Meeting");
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Meeting.prototype.isApproved = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.appService.isApproved(this.meetingUser.Id)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
     Meeting.prototype.consume = function (producerUser) {
         return __awaiter(this, void 0, void 0, function () {
             var result;
@@ -486,8 +509,25 @@ var Meeting = /** @class */ (function () {
                         this.meetingUser.ShareScreen = false;
                         this.meetingUser.Camera = false;
                         this.meetingUser.Mic = false;
-                        this.appService.connectMeeting(this.meetingUser);
                         return [2 /*return*/, result];
+                }
+            });
+        });
+    };
+    Meeting.prototype.waitWhoAreYou = function (socket) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, new Promise(function (resolve) {
+                            socket.on("WhoAreYou");
+                            {
+                                console.log("read WhoAreYou");
+                                resolve("ok");
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });
@@ -499,7 +539,7 @@ var Meeting = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         targetMediaServerClient = this.mediaServerList.find(function (ms) { return ms.Id == user.MediaServerId; });
-                        if (!(targetMediaServerClient == null)) return [3 /*break*/, 5];
+                        if (!(targetMediaServerClient == null)) return [3 /*break*/, 6];
                         targetMediaServerClient = new MediaServer();
                         return [4 /*yield*/, this.appService.getMediaServerById(this.meetingUser.Id, user.MediaServerId)];
                     case 1:
@@ -508,13 +548,19 @@ var Meeting = /** @class */ (function () {
                             throw new conusma_exception_1.ConusmaException("createConsumerTransport", "Media server not found. (" + user.MediaServerId + ")");
                         }
                         targetMediaServerClient.Id = mediaServerInfo.Id;
-                        targetMediaServerClient.socket = socket_io_1.default.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
-                        userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
-                        return [4 /*yield*/, this.signal("UserInfo", userInfoData, targetMediaServerClient.socket)];
+                        targetMediaServerClient.socket = socket_io_1.default.connect(mediaServerInfo.ConnectionDnsAddress + ":4443");
+                        console.log("wait WhoAreYou");
+                        return [4 /*yield*/, this.waitWhoAreYou(targetMediaServerClient.socket)];
                     case 2:
-                        setUserInfo = _a.sent();
-                        return [4 /*yield*/, this.signal("getRouterRtpCapabilities", null, targetMediaServerClient.socket)];
+                        _a.sent();
+                        console.log("come WhoAreYou");
+                        userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
+                        return [4 /*yield*/, this.signal('UserInfo', userInfoData, targetMediaServerClient.socket)];
                     case 3:
+                        setUserInfo = _a.sent();
+                        console.log("setUserInfo ");
+                        return [4 /*yield*/, this.signal("getRouterRtpCapabilities", null, targetMediaServerClient.socket)];
+                    case 4:
                         routerRtpCapabilities = _a.sent();
                         handlerName = mediaServerClient.detectDevice();
                         if (handlerName) {
@@ -528,9 +574,9 @@ var Meeting = /** @class */ (function () {
                         });
                         this.mediaServerList.push(targetMediaServerClient);
                         return [4 /*yield*/, this.createConsumerChildFunction(targetMediaServerClient, user)];
-                    case 4: return [2 /*return*/, _a.sent()];
-                    case 5: return [4 /*yield*/, this.createConsumerChildFunction(targetMediaServerClient, user)];
-                    case 6: return [2 /*return*/, _a.sent()];
+                    case 5: return [2 /*return*/, _a.sent()];
+                    case 6: return [4 /*yield*/, this.createConsumerChildFunction(targetMediaServerClient, user)];
+                    case 7: return [2 /*return*/, _a.sent()];
                 }
             });
         });
@@ -542,7 +588,7 @@ var Meeting = /** @class */ (function () {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        if (!(targetMediaServerClient != null && targetMediaServerClient.socket != null)) return [3 /*break*/, 8];
+                        if (!(targetMediaServerClient != null && targetMediaServerClient.socket != null)) return [3 /*break*/, 7];
                         consumerTransport = new Object();
                         consumerTransport.MediaServer = targetMediaServerClient;
                         consumerTransport.MeetingUserId = user.Id;
@@ -570,22 +616,19 @@ var Meeting = /** @class */ (function () {
                         consumerTransport.Camera = user.Camera;
                         consumerTransport.Mic = user.Mic;
                         consumerTransport.ShareScreen = user.ShareScreen;
-                        if (!(user.Camera || user.ShareScreen)) return [3 /*break*/, 5];
+                        if (!(user.Camera || user.ShareScreen)) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.addConsumer(consumerTransport, "video")];
                     case 3:
                         _b.sent();
-                        return [4 /*yield*/, this.pauseConsumer(consumerTransport, "video")];
+                        _b.label = 4;
                     case 4:
-                        _b.sent();
-                        _b.label = 5;
-                    case 5:
-                        if (!user.Mic) return [3 /*break*/, 7];
+                        if (!user.Mic) return [3 /*break*/, 6];
                         return [4 /*yield*/, this.addConsumer(consumerTransport, "audio")];
-                    case 6:
+                    case 5:
                         _b.sent();
-                        _b.label = 7;
-                    case 7: return [2 /*return*/, consumerTransport];
-                    case 8: throw new conusma_exception_1.ConusmaException("createConsumerChildFunction", "No socket connection.");
+                        _b.label = 6;
+                    case 6: return [2 /*return*/, consumerTransport];
+                    case 7: throw new conusma_exception_1.ConusmaException("createConsumerChildFunction", "No socket connection.");
                 }
             });
         });
