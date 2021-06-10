@@ -132,9 +132,9 @@ export class Meeting {
                     handlerName: handlerName
                 });
             mediaServerElement.mediaServerDevice = this.mediaServerDevice;
-            console.log("mediaServerDevice.loading ");
+            console.log("mediaServerDevice loading...");
             await this.mediaServerDevice.load({ routerRtpCapabilities });
-            console.log("mediaServerDevice.loaded");
+            console.log("mediaServerDevice loaded.");
             await this.createProducerTransport(localStream);
             this.notify();
         });
@@ -147,7 +147,7 @@ export class Meeting {
                 await this.open(localStream);
             }
             else {
-                console.log("createProducerTransport start");
+                console.log("createProducerTransport started.");
                 var transportOptions: any = await this.signal('createProducerTransport', {}, this.mediaServerSocket);
                 this.mediaServerClient = new Object();
                 this.mediaServerClient.transportId = transportOptions.id;
@@ -220,7 +220,9 @@ export class Meeting {
                     track: localStream.getAudioTracks()[0],
                     appData: { mediaTag: 'audio' }
                 });
-              /*  let aparameters = this.mediaServerClient.AudioProducer.rtpSender.getParameters();
+              /*
+                // react-native-webrtc does not support setParameters
+                let aparameters = this.mediaServerClient.AudioProducer.rtpSender.getParameters();
                 if (!aparameters.encodings) {
                     aparameters.encodings = [{}];
                 }
