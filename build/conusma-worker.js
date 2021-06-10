@@ -35,20 +35,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConusmaWorker = void 0;
-var react_native_background_timer_1 = __importDefault(require("react-native-background-timer"));
 var events_1 = require("events");
 var conusma_exception_1 = require("./Exceptions/conusma-exception");
+var background_timer_1 = require("./background-timer");
 var ConusmaWorker = /** @class */ (function () {
     function ConusmaWorker(_appService, _meetingUser) {
         this.meetingWorkerEvent = new events_1.EventEmitter();
         this.saveEventData = { 'MeetingUsers': '', 'ChatUpdates': '', 'MeetingUpdate': '' };
-        this.iAmHereInterval = 0;
-        this.meetingChangeEventInterval = 0;
+        this.iAmHereInterval = new background_timer_1.backgroundTimer();
+        this.meetingChangeEventInterval = new background_timer_1.backgroundTimer();
         this.appService = _appService;
         this.meetingUser = _meetingUser;
     }
@@ -105,17 +102,21 @@ var ConusmaWorker = /** @class */ (function () {
     };
     ConusmaWorker.prototype.start = function () {
         var _this = this;
-        this.iAmHereInterval = react_native_background_timer_1.default.setInterval(function () {
+        this.iAmHereInterval.tickEventEmitter.on('timeout', function () {
             _this.iAmHere();
-        }, 20000);
-        this.meetingChangeEventInterval = react_native_background_timer_1.default.setInterval(function () {
+            console.log("iAmHereInterval 20000");
+        });
+        this.meetingChangeEventInterval.tickEventEmitter.on('timeout', function () {
+            console.log("meetingChangeEventInterval 3000");
             _this.controlMeetingEvent();
-        }, 3000);
+        });
+        this.iAmHereInterval.start(20000);
+        this.meetingChangeEventInterval.start(3000);
     };
     ConusmaWorker.prototype.terminate = function () {
         try {
-            react_native_background_timer_1.default.clearInterval(this.iAmHereInterval);
-            react_native_background_timer_1.default.clearInterval(this.meetingChangeEventInterval);
+            this.iAmHereInterval.terminate();
+            this.meetingChangeEventInterval.terminate();
         }
         catch (error) {
             throw new conusma_exception_1.ConusmaException("ConusmaWorker", "terminated interval error", error);

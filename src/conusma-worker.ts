@@ -3,6 +3,7 @@ import { MeetingUserModel } from "./Models/meeting-user-model";
 import BackgroundTimer from 'react-native-background-timer';
 import { EventEmitter } from 'events';
 import { ConusmaException } from "./Exceptions/conusma-exception";
+import { backgroundTimer } from "./background-timer";
 
 export class ConusmaWorker {
 
@@ -15,8 +16,8 @@ export class ConusmaWorker {
     private saveEventData = { 'MeetingUsers': '', 'ChatUpdates': '', 'MeetingUpdate': '' };
     private meetingUser: MeetingUserModel;
     private appService: AppService;
-    private iAmHereInterval: number = 0;
-    private meetingChangeEventInterval: number = 0;
+    private iAmHereInterval: backgroundTimer = new backgroundTimer();
+    private meetingChangeEventInterval: backgroundTimer = new backgroundTimer();
     private async controlMeetingEvent() {
         try {
             var events = await this.appService.getMeetingEvents(this.meetingUser.Id);
@@ -46,17 +47,22 @@ export class ConusmaWorker {
         }
     }
     public start() {
-        this.iAmHereInterval = BackgroundTimer.setInterval(() => {
+        this.iAmHereInterval.tickEventEmitter.on('timeout',()=>{
             this.iAmHere();
-        }, 20000);
-        this.meetingChangeEventInterval = BackgroundTimer.setInterval(() => {
+            console.log("iAmHereInterval 20000" );
+        });
+        this.meetingChangeEventInterval.tickEventEmitter.on('timeout',()=>{
+            console.log("meetingChangeEventInterval 3000" );
             this.controlMeetingEvent();
-        }, 3000);
+        });
+        this.iAmHereInterval.start(20000);
+        this.meetingChangeEventInterval.start(3000);
+     
     }
     public terminate() {
         try {
-            BackgroundTimer.clearInterval(this.iAmHereInterval);
-            BackgroundTimer.clearInterval(this.meetingChangeEventInterval);
+            this.iAmHereInterval.terminate();
+            this.meetingChangeEventInterval.terminate();
         } catch (error) {
             throw new ConusmaException("ConusmaWorker","terminated interval error",error);
         }

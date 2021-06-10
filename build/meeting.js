@@ -683,6 +683,7 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id })];
                     case 1:
                         users = _a.sent();
+                        console.log("Users : " + JSON.stringify(users));
                         result = [];
                         users.forEach(function (item) {
                             if (item.Camera == true) {

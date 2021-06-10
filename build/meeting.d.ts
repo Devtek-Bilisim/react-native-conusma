@@ -33,6 +33,6 @@ export declare class Meeting {
     private consumeTransport;
     private resumeConsumer;
     private pauseConsumer;
-    getAllUsers(): Promise<any>;
-    getProducerUsers(): Promise<any>;
+    getAllUsers(): Promise<MeetingUserModel[]>;
+    getProducerUsers(): Promise<MeetingUserModel[]>;
 }
