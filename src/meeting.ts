@@ -297,7 +297,19 @@ export class Meeting {
     }
 
     public async consume(producerUser:MeetingUserModel) {
-        return await this.createConsumerTransport(producerUser);
+        var result = await this.createConsumerTransport(producerUser);
+        this.mediaServerClient.Camera = false;
+        this.mediaServerClient.Mic = false;
+        this.mediaServerClient.Stream = null;
+        this.mediaServerClient.MeetingUserId = this.meetingUser.Id;
+        this.mediaServerClient.RemoteStream = result.RemoteStream;
+
+        this.meetingUser.ShareScreen = false;
+        this.meetingUser.Camera = false;
+        this.meetingUser.Mic = false;
+        
+        this.appService.connectMeeting(this.meetingUser);
+        return result;
     }
 
     private async createConsumerTransport(user:MeetingUserModel) {
