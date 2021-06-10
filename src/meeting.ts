@@ -397,4 +397,27 @@ export class Meeting {
 
         }
     }
+    
+    public async getAllUsers() {
+        if (this.meetingUser != null) {
+            return await this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id });
+        } else {
+            return [];
+        }
+    }
+
+    public async getProducerUsers() {
+        if (this.meetingUser != null) {
+            var users = await this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id });
+            var result:any = []; 
+            users.forEach((item:any) => {
+                if (item.Camera == true) {
+                    result.push(item);
+                } 
+            });
+            return result;
+        } else {
+            return [];
+        }
+    }
 }
