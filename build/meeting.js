@@ -218,11 +218,11 @@ var Meeting = /** @class */ (function () {
                                     handlerName: handlerName
                                 });
                                 mediaServerElement.mediaServerDevice = this.mediaServerDevice;
-                                console.log("mediaServerDevice.loading ");
+                                console.log("mediaServerDevice loading...");
                                 return [4 /*yield*/, this.mediaServerDevice.load({ routerRtpCapabilities: routerRtpCapabilities })];
                             case 3:
                                 _a.sent();
-                                console.log("mediaServerDevice.loaded");
+                                console.log("mediaServerDevice loaded.");
                                 return [4 /*yield*/, this.createProducerTransport(localStream)];
                             case 4:
                                 _a.sent();
@@ -252,7 +252,7 @@ var Meeting = /** @class */ (function () {
                         _b.sent();
                         return [3 /*break*/, 10];
                     case 3:
-                        console.log("createProducerTransport start");
+                        console.log("createProducerTransport started.");
                         return [4 /*yield*/, this.signal('createProducerTransport', {}, this.mediaServerSocket)];
                     case 4:
                         transportOptions = _b.sent();
