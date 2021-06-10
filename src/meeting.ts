@@ -180,6 +180,12 @@ export class Meeting {
                 this.mediaServerClient.Stream = localStream;
                 this.mediaServerClient.MeetingUserId = this.meetingUser.Id;
                 this.mediaServerClient.RemoteStream = null;
+    
+                this.meetingUser.ShareScreen = this.isScreenShare;
+                this.meetingUser.Camera = this.hasCamera;
+                this.meetingUser.Mic = this.hasMicrophone;
+                
+                this.appService.connectMeeting(this.meetingUser);
             }
         } catch (error) {
             console.error("createProducerTransport error. " + error);
@@ -410,7 +416,7 @@ export class Meeting {
                         consumerTransportId: consumerTransport.transportId
                     }, consumerTransport.MediaServer.socket);
                     await consumerTransport.videoConsumer.pause();;
-                    consumerTransport.RStream.removeTrack(consumerTransport.videoConsumer.track);
+                    consumerTransport.RemoteStream.removeTrack(consumerTransport.videoConsumer.track);
                 }
                 else if (kind == 'audio' && consumerTransport.audioConsumer != null) {
                     await this.signal('pause', {
@@ -418,7 +424,7 @@ export class Meeting {
                         consumerTransportId: consumerTransport.transportId
                     }, consumerTransport.MediaServer.socket);
                     await consumerTransport.audioConsumer.pause();
-                    consumerTransport.RStream.removeTrack(consumerTransport.audioConsumer.track);
+                    consumerTransport.RemoteStream.removeTrack(consumerTransport.audioConsumer.track);
                 }
             }
         } catch (error) {
@@ -428,7 +434,7 @@ export class Meeting {
     
     public async getAllUsers() {
         if (this.meetingUser != null) {
-            return await this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id });
+            return <MeetingUserModel[]>await this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id });
         } else {
             return [];
         }
@@ -437,7 +443,7 @@ export class Meeting {
     public async getProducerUsers() {
         if (this.meetingUser != null) {
             var users = await this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id });
-            var result:any = []; 
+            var result:MeetingUserModel[]=[];
             users.forEach((item:any) => {
                 if (item.Camera == true) {
                     result.push(item);
