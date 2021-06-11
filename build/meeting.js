@@ -82,6 +82,7 @@ var Meeting = /** @class */ (function () {
         this.isScreenShare = false;
         this.isAudioActive = false;
         this.isVideoActive = false;
+        this.isFrontCamera = true;
         react_native_webrtc_1.registerGlobals();
         this.appService = appService;
         this.meetingUser = meetingUser;
@@ -410,9 +411,43 @@ var Meeting = /** @class */ (function () {
             });
         });
     };
-    Meeting.prototype.switchCamera = function (localStream) {
-        localStream.getVideoTracks().forEach(function (track) {
-            track._switchCamera();
+    Meeting.prototype.switchCamera = function (stream) {
+        return __awaiter(this, void 0, void 0, function () {
+            var devices, facing, videoSourceId, facingMode, constraints, newStream;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.isFrontCamera = !this.isFrontCamera;
+                        return [4 /*yield*/, react_native_webrtc_1.mediaDevices.enumerateDevices()];
+                    case 1:
+                        devices = _a.sent();
+                        facing = this.isFrontCamera ? 'front' : 'environment';
+                        videoSourceId = devices.find(function (device) { return device.kind === 'videoinput' && device.facing === facing; });
+                        facingMode = this.isFrontCamera ? 'front' : 'environment';
+                        constraints = {
+                            audio: false,
+                            video: {
+                                mandatory: {
+                                    minWidth: 500,
+                                    minHeight: 300,
+                                    minFrameRate: 30,
+                                },
+                                facingMode: facingMode,
+                                optional: videoSourceId ? [{ sourceId: videoSourceId }] : [],
+                            },
+                        };
+                        return [4 /*yield*/, react_native_webrtc_1.mediaDevices.getUserMedia(constraints)];
+                    case 2:
+                        newStream = _a.sent();
+                        console.log("stream okk" + newStream.getVideoTracks().length);
+                        stream.getVideoTracks()[0].stop();
+                        stream.removeTrack(stream.getVideoTracks()[0]);
+                        stream.addTrack(newStream.getVideoTracks()[0]);
+                        this.mediaServerClient.Stream.removeTrack(stream.getVideoTracks()[0]);
+                        this.mediaServerClient.Stream.addTrack(newStream.getVideoTracks()[0]);
+                        return [2 /*return*/, stream];
+                }
+            });
         });
     };
     Meeting.prototype.toggleAudio = function (localStream) {
@@ -433,21 +468,19 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.enableAudioVideo = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var isFrontCamera, devices, facing, videoSourceId, facingMode, constraints, newStream;
+            var devices, facing, videoSourceId, facingMode, constraints, newStream;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        isFrontCamera = true;
-                        return [4 /*yield*/, react_native_webrtc_1.mediaDevices.enumerateDevices()];
+                    case 0: return [4 /*yield*/, react_native_webrtc_1.mediaDevices.enumerateDevices()];
                     case 1:
                         devices = _a.sent();
-                        facing = isFrontCamera ? 'front' : 'environment';
+                        facing = this.isFrontCamera ? 'front' : 'environment';
                         videoSourceId = devices.find(function (device) { return device.kind === 'videoinput' && device.facing === facing; });
                         if (videoSourceId) {
                             this.hasCamera = true;
                             this.hasMicrophone = true; // TODO: Check audio source first
                         }
-                        facingMode = isFrontCamera ? 'user' : 'environment';
+                        facingMode = this.isFrontCamera ? 'user' : 'environment';
                         constraints = {
                             audio: true,
                             video: {

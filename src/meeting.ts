@@ -33,6 +33,7 @@ export class Meeting {
     private isScreenShare: boolean = false;
     public isAudioActive: boolean = false;
     public isVideoActive: boolean = false;
+    public isFrontCamera: boolean = true;
     constructor(meetingUser: MeetingUserModel, appService: AppService) {
         registerGlobals();
         this.appService = appService;
@@ -250,10 +251,34 @@ export class Meeting {
         }
 
     }
-    public switchCamera(localStream: MediaStream) {
-        localStream.getVideoTracks().forEach((track: any) => {
-            track._switchCamera();
-        });
+    public async switchCamera(stream:MediaStream) {
+        this.isFrontCamera = !this.isFrontCamera;
+        const devices = await mediaDevices.enumerateDevices();
+        const facing = this.isFrontCamera ? 'front' : 'environment';
+        const videoSourceId = devices.find(
+            (device: any) => device.kind === 'videoinput' && device.facing === facing,
+        );
+        const facingMode =this.isFrontCamera ? 'front' : 'environment';
+        const constraints: any = {
+            audio: false,
+            video: {
+                mandatory: {
+                    minWidth: 500,
+                    minHeight: 300,
+                    minFrameRate: 30,
+                },
+                facingMode,
+                optional: videoSourceId ? [{ sourceId: videoSourceId }] : [],
+            },
+        };
+        const newStream: MediaStream = await mediaDevices.getUserMedia(constraints);
+        console.log("stream okk"+newStream.getVideoTracks().length);
+        stream.getVideoTracks()[0].stop();
+        stream.removeTrack(stream.getVideoTracks()[0]);
+        stream.addTrack(newStream.getVideoTracks()[0]);
+        this.mediaServerClient.Stream.removeTrack(stream.getVideoTracks()[0]);
+        this.mediaServerClient.Stream.addTrack(newStream.getVideoTracks()[0]);
+        return stream;
     }
     public toggleAudio(localStream: MediaStream) {
         this.isAudioActive = !this.isAudioActive;
@@ -272,9 +297,8 @@ export class Meeting {
 
 
     public async enableAudioVideo() {
-        const isFrontCamera = true;
         const devices = await mediaDevices.enumerateDevices();
-        const facing = isFrontCamera ? 'front' : 'environment';
+        const facing = this.isFrontCamera ? 'front' : 'environment';
         const videoSourceId = devices.find(
             (device: any) => device.kind === 'videoinput' && device.facing === facing,
         );
@@ -282,7 +306,7 @@ export class Meeting {
             this.hasCamera = true;
             this.hasMicrophone = true; // TODO: Check audio source first
         }
-        const facingMode = isFrontCamera ? 'user' : 'environment';
+        const facingMode = this.isFrontCamera ? 'user' : 'environment';
         const constraints: any = {
             audio: true,
             video: {
