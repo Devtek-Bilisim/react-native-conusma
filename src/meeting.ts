@@ -367,14 +367,16 @@ export class Meeting {
 
             var mediaServerInfo: any = await this.appService.getMediaServerById(this.meetingUser.Id, user.MediaServerId);
             if (mediaServerInfo == null) {
-                throw new ConusmaException("createConsumerTransport", "Media server not found. (" + user.MediaServerId + ")");
+                throw new ConusmaException("createConsumerTransport", "Media server not found. (Id: " + user.MediaServerId + ")");
             }
 
             targetMediaServerClient.Id = mediaServerInfo.Id;
             targetMediaServerClient.socket = io.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
-            console.log("waiting WhoAreYou signal...");
+            
+            /*console.log("waiting WhoAreYou signal...");
             var waitResponse = await this.waitWhoAreYou(targetMediaServerClient.socket);
-            console.log("WhoAreYou signal came.");
+            console.log("WhoAreYou signal came.");*/
+
             var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
             let setUserInfo = await this.signal('UserInfo', userInfoData, targetMediaServerClient.socket);
             console.log("setUserInfo signal came.");

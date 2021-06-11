@@ -496,7 +496,7 @@ var Meeting = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.appService.connectMeeting(this.meetingUser)];
                     case 1:
                         _a.sent();
-                        console.log("users connect Meeting");
+                        console.log("User connected to the meeting.");
                         return [2 /*return*/];
                 }
             });
@@ -529,19 +529,19 @@ var Meeting = /** @class */ (function () {
         return new Promise(function (resolve) {
             socket.on("WhoAreYou");
             {
-                console.log("read WhoAreYou");
+                console.log("WhoAreYou signal.");
                 resolve({});
             }
         });
     };
     Meeting.prototype.createConsumerTransport = function (user) {
         return __awaiter(this, void 0, void 0, function () {
-            var targetMediaServerClient, mediaServerInfo, userInfoData, setUserInfo, routerRtpCapabilities, handlerName;
+            var targetMediaServerClient, mediaServerInfo, waitResponse, userInfoData, setUserInfo, routerRtpCapabilities, handlerName;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         targetMediaServerClient = this.mediaServerList.find(function (ms) { return ms.Id == user.MediaServerId; });
-                        if (!(targetMediaServerClient == null)) return [3 /*break*/, 6];
+                        if (!(targetMediaServerClient == null)) return [3 /*break*/, 7];
                         targetMediaServerClient = new MediaServer();
                         return [4 /*yield*/, this.appService.getMediaServerById(this.meetingUser.Id, user.MediaServerId)];
                     case 1:
@@ -551,16 +551,18 @@ var Meeting = /** @class */ (function () {
                         }
                         targetMediaServerClient.Id = mediaServerInfo.Id;
                         targetMediaServerClient.socket = socket_io_1.default.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
-                        console.log("wait WhoAreYou");
-                        //var wait_Response = await this.waitWhoAreYou(targetMediaServerClient.socket);
-                        console.log("come WhoAreYou");
+                        console.log("waiting WhoAreYou signal...");
+                        return [4 /*yield*/, this.waitWhoAreYou(targetMediaServerClient.socket)];
+                    case 2:
+                        waitResponse = _a.sent();
+                        console.log("WhoAreYou signal came.");
                         userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
                         return [4 /*yield*/, this.signal('UserInfo', userInfoData, targetMediaServerClient.socket)];
-                    case 2:
-                        setUserInfo = _a.sent();
-                        console.log("setUserInfo ");
-                        return [4 /*yield*/, this.signal('getRouterRtpCapabilities', null, targetMediaServerClient.socket)];
                     case 3:
+                        setUserInfo = _a.sent();
+                        console.log("setUserInfo signal came.");
+                        return [4 /*yield*/, this.signal('getRouterRtpCapabilities', null, targetMediaServerClient.socket)];
+                    case 4:
                         routerRtpCapabilities = _a.sent();
                         console.log("routerRtpCapabilities " + JSON.stringify(routerRtpCapabilities));
                         handlerName = mediaServerClient.detectDevice();
@@ -575,14 +577,14 @@ var Meeting = /** @class */ (function () {
                         });
                         console.log("mediaServerDevice loading...");
                         return [4 /*yield*/, targetMediaServerClient.mediaServerDevice.load({ routerRtpCapabilities: routerRtpCapabilities })];
-                    case 4:
+                    case 5:
                         _a.sent();
                         console.log("mediaServerDevice loaded.");
                         this.mediaServerList.push(targetMediaServerClient);
                         return [4 /*yield*/, this.createConsumerChildFunction(targetMediaServerClient, user)];
-                    case 5: return [2 /*return*/, _a.sent()];
-                    case 6: return [4 /*yield*/, this.createConsumerChildFunction(targetMediaServerClient, user)];
-                    case 7: return [2 /*return*/, _a.sent()];
+                    case 6: return [2 /*return*/, _a.sent()];
+                    case 7: return [4 /*yield*/, this.createConsumerChildFunction(targetMediaServerClient, user)];
+                    case 8: return [2 /*return*/, _a.sent()];
                 }
             });
         });
@@ -623,7 +625,7 @@ var Meeting = /** @class */ (function () {
                         consumerTransport.Camera = user.Camera;
                         consumerTransport.Mic = user.Mic;
                         consumerTransport.ShareScreen = user.ShareScreen;
-                        console.log("createConsumerChildFunction crate consumer.");
+                        console.log("createConsumerChildFunction creating the consumer.");
                         if (!(user.Camera || user.ShareScreen)) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.addConsumer(consumerTransport, "video")];
                     case 3:
