@@ -379,8 +379,7 @@ export class Meeting {
 
             var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
             let setUserInfo = await this.signal('UserInfo', userInfoData, targetMediaServerClient.socket);
-            console.log("setUserInfo signal came.");
-
+            console.log("UserInfo signal came.");
 
             let routerRtpCapabilities = await this.signal('getRouterRtpCapabilities', null, targetMediaServerClient.socket);
             console.log("routerRtpCapabilities " + JSON.stringify(routerRtpCapabilities));
