@@ -302,7 +302,7 @@ export class Meeting {
     }
     public async connectMeeting() {
         await this.appService.connectMeeting(this.meetingUser);
-        console.log("users connect Meeting");
+        console.log("User connected to the meeting.");
     }
     public async isApproved() {
         return await this.appService.isApproved(this.meetingUser.Id);
@@ -315,7 +315,7 @@ export class Meeting {
         return new Promise(resolve => {
             socket.on("WhoAreYou")
             {
-                console.log("read WhoAreYou");
+                console.log("WhoAreYou signal.");
                 resolve({});
             }
         });
@@ -333,12 +333,12 @@ export class Meeting {
 
             targetMediaServerClient.Id = mediaServerInfo.Id;
             targetMediaServerClient.socket = io.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
-            console.log("wait WhoAreYou");
-            //var wait_Response = await this.waitWhoAreYou(targetMediaServerClient.socket);
-            console.log("come WhoAreYou");
+            console.log("waiting WhoAreYou signal...");
+            var waitResponse = await this.waitWhoAreYou(targetMediaServerClient.socket);
+            console.log("WhoAreYou signal came.");
             var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
             let setUserInfo = await this.signal('UserInfo', userInfoData, targetMediaServerClient.socket);
-            console.log("setUserInfo ");
+            console.log("setUserInfo signal came.");
 
 
             let routerRtpCapabilities = await this.signal('getRouterRtpCapabilities', null, targetMediaServerClient.socket);
@@ -384,7 +384,7 @@ export class Meeting {
             consumerTransport.Camera = user.Camera;
             consumerTransport.Mic = user.Mic;
             consumerTransport.ShareScreen = user.ShareScreen;
-            console.log("createConsumerChildFunction crate consumer.");
+            console.log("createConsumerChildFunction creating the consumer.");
 
             if (user.Camera || user.ShareScreen) {
                 await this.addConsumer(consumerTransport, "video");
