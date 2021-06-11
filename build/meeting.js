@@ -82,6 +82,7 @@ var Meeting = /** @class */ (function () {
         this.isScreenShare = false;
         this.isAudioActive = false;
         this.isVideoActive = false;
+        this.isReceviedClose = false;
         react_native_webrtc_1.registerGlobals();
         this.appService = appService;
         this.meetingUser = meetingUser;
@@ -102,6 +103,7 @@ var Meeting = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        this.isReceviedClose = false;
                         this.conusmaWorker.start();
                         this.conusmaWorker.meetingWorkerEvent.on('meetingUsers', function () {
                             console.log("Meeting users updated.");
@@ -132,6 +134,7 @@ var Meeting = /** @class */ (function () {
                     closeData = { 'MeetingUserId': this.meetingUser.Id };
                     this.appService.liveClose(closeData);
                 }
+                this.isReceviedClose = true;
                 if (this.conusmaWorker != null) {
                     this.conusmaWorker.terminate();
                 }
@@ -183,15 +186,10 @@ var Meeting = /** @class */ (function () {
                 this.mediaServerSocket = mediaServerElement.socket;
                 this.mediaServerSocket.on('disconnect', function () { return __awaiter(_this, void 0, void 0, function () {
                     return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0: return [4 /*yield*/, this.close(false)];
-                            case 1:
-                                _a.sent();
-                                return [4 /*yield*/, this.open(localStream)];
-                            case 2:
-                                _a.sent();
-                                return [2 /*return*/];
+                        if (!this.isReceviedClose) {
+                            throw new conusma_exception_1.ConusmaException("mediaserverconnection", "mediaserverconnection disconnect");
                         }
+                        return [2 /*return*/];
                     });
                 }); });
                 this.mediaServerSocket.on('WhoAreYou', function () { return __awaiter(_this, void 0, void 0, function () {
@@ -242,7 +240,7 @@ var Meeting = /** @class */ (function () {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        _b.trys.push([0, 11, , 14]);
+                        _b.trys.push([0, 11, , 12]);
                         if (!(this.mediaServerClient != null)) return [3 /*break*/, 3];
                         return [4 /*yield*/, this.close(false)];
                     case 1:
@@ -326,18 +324,11 @@ var Meeting = /** @class */ (function () {
                         this.meetingUser.Mic = this.hasMicrophone;
                         this.appService.connectMeeting(this.meetingUser);
                         _b.label = 10;
-                    case 10: return [3 /*break*/, 14];
+                    case 10: return [3 /*break*/, 12];
                     case 11:
                         error_1 = _b.sent();
-                        console.error("createProducerTransport error. " + error_1);
-                        return [4 /*yield*/, this.close(false)];
-                    case 12:
-                        _b.sent();
-                        return [4 /*yield*/, this.open(localStream)];
-                    case 13:
-                        _b.sent();
-                        return [3 /*break*/, 14];
-                    case 14: return [2 /*return*/];
+                        throw new conusma_exception_1.ConusmaException("createProducerTransport", "createProducerTransport error", error_1);
+                    case 12: return [2 /*return*/];
                 }
             });
         });
@@ -410,26 +401,54 @@ var Meeting = /** @class */ (function () {
             });
         });
     };
-    Meeting.prototype.switchCamera = function (localStream) {
-        localStream.getVideoTracks().forEach(function (track) {
-            track._switchCamera();
-        });
+    Meeting.prototype.switchCamera = function () {
+        try {
+            if (this.mediaServerClient.Stream != null) {
+                this.mediaServerClient.Stream.getVideoTracks()[0]._switchCamera();
+                return this.mediaServerClient.Stream;
+            }
+            else {
+                throw new conusma_exception_1.ConusmaException("switchCamera", "stream not found, first call enableAudioVideo function");
+            }
+        }
+        catch (error) {
+            throw new conusma_exception_1.ConusmaException("switchCamera", "camera switching failed", error);
+        }
     };
-    Meeting.prototype.toggleAudio = function (localStream) {
+    Meeting.prototype.toggleAudio = function () {
         var _this = this;
-        this.isAudioActive = !this.isAudioActive;
-        localStream.getAudioTracks().forEach(function (track) {
-            track.enabled = _this.isAudioActive;
-        });
-        return this.isAudioActive;
+        try {
+            if (this.mediaServerClient.Stream != null) {
+                this.mediaServerClient.Stream.getTracks().forEach(function (t) {
+                    if (t.kind === 'audio') {
+                        t.enabled = !t.enabled;
+                        _this.isAudioActive = t.enabled;
+                    }
+                });
+                return this.mediaServerClient.Stream;
+            }
+            else {
+                throw new conusma_exception_1.ConusmaException("toggleAudio", "stream not found, first call enableAudioVideo function");
+            }
+        }
+        catch (error) {
+            throw new conusma_exception_1.ConusmaException("toggleAudio", "toggleAudio failed", error);
+        }
     };
-    Meeting.prototype.toggleVideo = function (localStream) {
-        var _this = this;
-        this.isVideoActive = !this.isVideoActive;
-        localStream.getVideoTracks().forEach(function (track) {
-            track.enabled = _this.isVideoActive;
-        });
-        return this.isVideoActive;
+    Meeting.prototype.toggleVideo = function () {
+        try {
+            this.isVideoActive = !this.isVideoActive;
+            if (this.mediaServerClient.Stream != null) {
+                this.mediaServerClient.Stream.getVideoTracks()[0].enabled = this.isVideoActive;
+                return this.mediaServerClient.Stream;
+            }
+            else {
+                throw new conusma_exception_1.ConusmaException("toggleVideo", "stream not found, first call enableAudioVideo function");
+            }
+        }
+        catch (error) {
+            throw new conusma_exception_1.ConusmaException("toggleVideo", "toggleVideo failed", error);
+        }
     };
     Meeting.prototype.enableAudioVideo = function () {
         return __awaiter(this, void 0, void 0, function () {

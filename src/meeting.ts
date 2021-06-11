@@ -33,6 +33,7 @@ export class Meeting {
     private isScreenShare: boolean = false;
     public isAudioActive: boolean = false;
     public isVideoActive: boolean = false;
+    public isReceviedClose: boolean = false;
     constructor(meetingUser: MeetingUserModel, appService: AppService) {
         registerGlobals();
         this.appService = appService;
@@ -53,6 +54,7 @@ export class Meeting {
     }
 
     public async open(localStream: MediaStream) {
+        this.isReceviedClose = false;
         this.conusmaWorker.start();
         this.conusmaWorker.meetingWorkerEvent.on('meetingUsers', () => {
             console.log("Meeting users updated.");
@@ -73,7 +75,7 @@ export class Meeting {
             var closeData = { 'MeetingUserId': this.meetingUser.Id };
             this.appService.liveClose(closeData);
         }
-
+        this.isReceviedClose = true;
         if (this.conusmaWorker != null) {
             this.conusmaWorker.terminate();
         }
@@ -111,8 +113,11 @@ export class Meeting {
         }
         this.mediaServerSocket = mediaServerElement.socket;
         this.mediaServerSocket.on('disconnect', async () => {
-            await this.close(false);
-            await this.open(localStream);
+            if(!this.isReceviedClose)
+            {
+                throw new ConusmaException("mediaserverconnection","mediaserverconnection disconnect");
+
+            }
         });
         this.mediaServerSocket.on('WhoAreYou', async () => {
             var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
@@ -191,9 +196,7 @@ export class Meeting {
                 this.appService.connectMeeting(this.meetingUser);
             }
         } catch (error) {
-            console.error("createProducerTransport error. " + error);
-            await this.close(false);
-            await this.open(localStream);
+            throw new ConusmaException("createProducerTransport","createProducerTransport error",error);
         }
     }
     private async createProducer(localStream: MediaStream, kind: string) {
@@ -250,26 +253,62 @@ export class Meeting {
         }
 
     }
-    public switchCamera(localStream: MediaStream) {
-        localStream.getVideoTracks().forEach((track: any) => {
-            track._switchCamera();
-        });
+    public switchCamera() {
+        try {
+            if(this.mediaServerClient.Stream != null)
+            {
+                this.mediaServerClient.Stream.getVideoTracks()[0]._switchCamera();
+                return this.mediaServerClient.Stream;
+            }
+            else
+            {
+                throw new ConusmaException("switchCamera","stream not found, first call enableAudioVideo function");
+            }
+           
+        } catch (error) {
+            throw new ConusmaException("switchCamera","camera switching failed",error);
+        }
     }
-    public toggleAudio(localStream: MediaStream) {
-        this.isAudioActive = !this.isAudioActive;
-        localStream.getAudioTracks().forEach((track) => {
-            track.enabled = this.isAudioActive;
-        });
-        return this.isAudioActive;
-    }
-    public toggleVideo(localStream: MediaStream) {
-        this.isVideoActive = !this.isVideoActive;
-        localStream.getVideoTracks().forEach((track) => {
-            track.enabled = this.isVideoActive;
-        });
-        return this.isVideoActive;
-    }
+    public toggleAudio() {
+        try {
+            if(this.mediaServerClient.Stream != null)
+            {
+                this.mediaServerClient.Stream.getTracks().forEach((t:any) => {
+                    if (t.kind === 'audio')
+                    {
+                        t.enabled = !t.enabled;
+                        this.isAudioActive = t.enabled;
 
+                    } 
+                });
+                return <MediaStream>this.mediaServerClient.Stream;
+            }
+            else
+            {
+                throw new ConusmaException("toggleAudio","stream not found, first call enableAudioVideo function");
+            }
+           
+        } catch (error) {
+            throw new ConusmaException("toggleAudio","toggleAudio failed",error);
+        }
+    }
+    public toggleVideo() {
+        try {
+            this.isVideoActive = !this.isVideoActive;
+            if(this.mediaServerClient.Stream != null)
+            {
+                this.mediaServerClient.Stream.getVideoTracks()[0].enabled = this.isVideoActive;
+                return <MediaStream>this.mediaServerClient.Stream;
+            }
+            else
+            {
+                throw new ConusmaException("toggleVideo","stream not found, first call enableAudioVideo function");
+            }
+           
+        } catch (error) {
+            throw new ConusmaException("toggleVideo","toggleVideo failed",error);
+        }
+    }
 
     public async enableAudioVideo() {
         const isFrontCamera = true;

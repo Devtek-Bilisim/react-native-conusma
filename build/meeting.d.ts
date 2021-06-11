@@ -16,6 +16,7 @@ export declare class Meeting {
     private isScreenShare;
     isAudioActive: boolean;
     isVideoActive: boolean;
+    isReceviedClose: boolean;
     constructor(meetingUser: MeetingUserModel, appService: AppService);
     attach(observer: MediaServerConnectionReadyObserver): void;
     detach(observerToRemove: MediaServerConnectionReadyObserver): void;
@@ -27,9 +28,9 @@ export declare class Meeting {
     private createProducerTransport;
     private createProducer;
     private signal;
-    switchCamera(localStream: MediaStream): void;
-    toggleAudio(localStream: MediaStream): boolean;
-    toggleVideo(localStream: MediaStream): boolean;
+    switchCamera(): any;
+    toggleAudio(): MediaStream;
+    toggleVideo(): MediaStream;
     enableAudioVideo(): Promise<MediaStream>;
     connectMeeting(): Promise<void>;
     isApproved(): Promise<any>;
