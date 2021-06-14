@@ -521,11 +521,19 @@ var Meeting = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.createConsumerTransport(producerUser)];
                     case 1:
                         result = _a.sent();
-                        react_native_incall_manager_1.default.setForceSpeakerphoneOn(true);
                         return [2 /*return*/, result.RemoteStream];
                 }
             });
         });
+    };
+    Meeting.prototype.setSpeaker = function (enable) {
+        try {
+            react_native_incall_manager_1.default.setSpeakerphoneOn(enable);
+            react_native_incall_manager_1.default.setForceSpeakerphoneOn(enable);
+        }
+        catch (error) {
+            throw new conusma_exception_1.ConusmaException("setSpeaker", "setSpeaker undefined error", error);
+        }
     };
     Meeting.prototype.waitWhoAreYou = function (socket) {
         return new Promise(function (resolve) {

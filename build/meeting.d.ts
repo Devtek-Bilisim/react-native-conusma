@@ -35,6 +35,7 @@ export declare class Meeting {
     connectMeeting(): Promise<void>;
     isApproved(): Promise<any>;
     consume(producerUser: MeetingUserModel): Promise<MediaStream>;
+    setSpeaker(enable: boolean): void;
     private waitWhoAreYou;
     private createConsumerTransport;
     private createConsumerChildFunction;

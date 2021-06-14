@@ -349,8 +349,17 @@ export class Meeting {
     }
     public async consume(producerUser: MeetingUserModel) {
         var result = await this.createConsumerTransport(producerUser);
-        InCallManager.setForceSpeakerphoneOn(true);
         return <MediaStream>result.RemoteStream;
+    }
+    public setSpeaker(enable:boolean)
+    {
+        try {
+            InCallManager.setSpeakerphoneOn(enable);
+            InCallManager.setForceSpeakerphoneOn(enable);
+
+        } catch (error) {
+            throw new ConusmaException("setSpeaker","setSpeaker undefined error",error);
+        }
     }
     private waitWhoAreYou(socket: any) {
         return new Promise(resolve => {
