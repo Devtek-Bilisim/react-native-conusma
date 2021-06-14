@@ -9,6 +9,7 @@ import { MeetingModel } from "./Models/meeting-model";
 import { ParticipantModel } from "./Models/participant-model";
 import { ConusmaException } from "./Exceptions/conusma-exception";
 import { ConusmaWorker } from "./conusma-worker";
+import InCallManager from 'react-native-incall-manager';
 class MediaServer {
     Id: number = 0;
     socket: any = null;
@@ -348,7 +349,8 @@ export class Meeting {
     }
     public async consume(producerUser: MeetingUserModel) {
         var result = await this.createConsumerTransport(producerUser);
-         return <MediaStream>result.RemoteStream;
+        InCallManager.setSpeakerphoneOn(true);
+        return <MediaStream>result.RemoteStream;
     }
     private waitWhoAreYou(socket: any) {
         return new Promise(resolve => {

@@ -64,6 +64,7 @@ var react_native_webrtc_1 = require("react-native-webrtc");
 var socket_io_1 = __importDefault(require("socket.io-client/dist/socket.io"));
 var conusma_exception_1 = require("./Exceptions/conusma-exception");
 var conusma_worker_1 = require("./conusma-worker");
+var react_native_incall_manager_1 = require("react-native-incall-manager");
 var MediaServer = /** @class */ (function () {
     function MediaServer() {
         this.Id = 0;
@@ -520,6 +521,7 @@ var Meeting = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.createConsumerTransport(producerUser)];
                     case 1:
                         result = _a.sent();
+                        react_native_incall_manager_1.InCallManagerPackage.setSpeakerphoneOn(true);
                         return [2 /*return*/, result.RemoteStream];
                 }
             });
@@ -536,33 +538,28 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.createConsumerTransport = function (user) {
         return __awaiter(this, void 0, void 0, function () {
-            var targetMediaServerClient, mediaServerInfo, waitResponse, userInfoData, setUserInfo, routerRtpCapabilities, handlerName;
+            var targetMediaServerClient, mediaServerInfo, userInfoData, setUserInfo, routerRtpCapabilities, handlerName;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         targetMediaServerClient = this.mediaServerList.find(function (ms) { return ms.Id == user.MediaServerId; });
-                        if (!(targetMediaServerClient == null)) return [3 /*break*/, 7];
+                        if (!(targetMediaServerClient == null)) return [3 /*break*/, 6];
                         targetMediaServerClient = new MediaServer();
                         return [4 /*yield*/, this.appService.getMediaServerById(this.meetingUser.Id, user.MediaServerId)];
                     case 1:
                         mediaServerInfo = _a.sent();
                         if (mediaServerInfo == null) {
-                            throw new conusma_exception_1.ConusmaException("createConsumerTransport", "Media server not found. (" + user.MediaServerId + ")");
+                            throw new conusma_exception_1.ConusmaException("createConsumerTransport", "Media server not found. (Id: " + user.MediaServerId + ")");
                         }
                         targetMediaServerClient.Id = mediaServerInfo.Id;
                         targetMediaServerClient.socket = socket_io_1.default.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
-                        console.log("waiting WhoAreYou signal...");
-                        return [4 /*yield*/, this.waitWhoAreYou(targetMediaServerClient.socket)];
-                    case 2:
-                        waitResponse = _a.sent();
-                        console.log("WhoAreYou signal came.");
                         userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
                         return [4 /*yield*/, this.signal('UserInfo', userInfoData, targetMediaServerClient.socket)];
-                    case 3:
+                    case 2:
                         setUserInfo = _a.sent();
-                        console.log("setUserInfo signal came.");
+                        console.log("UserInfo signal came.");
                         return [4 /*yield*/, this.signal('getRouterRtpCapabilities', null, targetMediaServerClient.socket)];
-                    case 4:
+                    case 3:
                         routerRtpCapabilities = _a.sent();
                         console.log("routerRtpCapabilities " + JSON.stringify(routerRtpCapabilities));
                         handlerName = mediaServerClient.detectDevice();
@@ -577,14 +574,14 @@ var Meeting = /** @class */ (function () {
                         });
                         console.log("mediaServerDevice loading...");
                         return [4 /*yield*/, targetMediaServerClient.mediaServerDevice.load({ routerRtpCapabilities: routerRtpCapabilities })];
-                    case 5:
+                    case 4:
                         _a.sent();
                         console.log("mediaServerDevice loaded.");
                         this.mediaServerList.push(targetMediaServerClient);
                         return [4 /*yield*/, this.createConsumerChildFunction(targetMediaServerClient, user)];
-                    case 6: return [2 /*return*/, _a.sent()];
-                    case 7: return [4 /*yield*/, this.createConsumerChildFunction(targetMediaServerClient, user)];
-                    case 8: return [2 /*return*/, _a.sent()];
+                    case 5: return [2 /*return*/, _a.sent()];
+                    case 6: return [4 /*yield*/, this.createConsumerChildFunction(targetMediaServerClient, user)];
+                    case 7: return [2 /*return*/, _a.sent()];
                 }
             });
         });
