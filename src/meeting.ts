@@ -349,7 +349,7 @@ export class Meeting {
     }
     public async consume(producerUser: MeetingUserModel) {
         var result = await this.createConsumerTransport(producerUser);
-        InCallManager.setSpeakerphoneOn(true);
+        InCallManager.setForceSpeakerphoneOn(true);
         return <MediaStream>result.RemoteStream;
     }
     private waitWhoAreYou(socket: any) {

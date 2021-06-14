@@ -64,7 +64,7 @@ var react_native_webrtc_1 = require("react-native-webrtc");
 var socket_io_1 = __importDefault(require("socket.io-client/dist/socket.io"));
 var conusma_exception_1 = require("./Exceptions/conusma-exception");
 var conusma_worker_1 = require("./conusma-worker");
-var react_native_incall_manager_1 = require("react-native-incall-manager");
+var react_native_incall_manager_1 = __importDefault(require("react-native-incall-manager"));
 var MediaServer = /** @class */ (function () {
     function MediaServer() {
         this.Id = 0;
@@ -521,7 +521,7 @@ var Meeting = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.createConsumerTransport(producerUser)];
                     case 1:
                         result = _a.sent();
-                        react_native_incall_manager_1.InCallManagerPackage.setSpeakerphoneOn(true);
+                        react_native_incall_manager_1.default.setForceSpeakerphoneOn(true);
                         return [2 /*return*/, result.RemoteStream];
                 }
             });
