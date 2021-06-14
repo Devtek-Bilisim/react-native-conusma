@@ -205,7 +205,6 @@ var Meeting = /** @class */ (function () {
                                 return [4 /*yield*/, this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket)];
                             case 2:
                                 routerRtpCapabilities = _a.sent();
-                                console.log("routerRtpCapabilities " + JSON.stringify(routerRtpCapabilities));
                                 handlerName = mediaServerClient.detectDevice();
                                 if (handlerName) {
                                     console.log("detected handler: %s", handlerName);
@@ -404,7 +403,7 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.switchCamera = function () {
         try {
-            if (this.mediaServerClient.Stream != null) {
+            if (this.mediaServerClient != null && this.mediaServerClient.Stream != null) {
                 this.mediaServerClient.Stream.getVideoTracks()[0]._switchCamera();
                 return this.mediaServerClient.Stream;
             }
@@ -419,7 +418,7 @@ var Meeting = /** @class */ (function () {
     Meeting.prototype.toggleAudio = function () {
         var _this = this;
         try {
-            if (this.mediaServerClient.Stream != null) {
+            if (this.mediaServerClient != null && this.mediaServerClient.Stream != null) {
                 this.mediaServerClient.Stream.getTracks().forEach(function (t) {
                     if (t.kind === 'audio') {
                         t.enabled = !t.enabled;
@@ -438,8 +437,8 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.toggleVideo = function () {
         try {
-            this.isVideoActive = !this.isVideoActive;
-            if (this.mediaServerClient.Stream != null) {
+            if (this.mediaServerClient != null && this.mediaServerClient.Stream != null) {
+                this.isVideoActive = !this.isVideoActive;
                 this.mediaServerClient.Stream.getVideoTracks()[0].enabled = this.isVideoActive;
                 return this.mediaServerClient.Stream;
             }

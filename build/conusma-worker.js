@@ -104,10 +104,8 @@ var ConusmaWorker = /** @class */ (function () {
         var _this = this;
         this.iAmHereInterval.tickEventEmitter.on('timeout', function () {
             _this.iAmHere();
-            console.log("iAmHereInterval 20000");
         });
         this.meetingChangeEventInterval.tickEventEmitter.on('timeout', function () {
-            console.log("meetingChangeEventInterval 3000");
             _this.controlMeetingEvent();
         });
         this.iAmHereInterval.start(20000);

@@ -124,8 +124,6 @@ export class Meeting {
             var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
             let setUserInfo = await this.signal('UserInfo', userInfoData, this.mediaServerSocket);
             let routerRtpCapabilities = await this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket);
-            console.log("routerRtpCapabilities " + JSON.stringify(routerRtpCapabilities));
-
             const handlerName = mediaServerClient.detectDevice();
             if (handlerName) {
                 console.log("detected handler: %s", handlerName);
@@ -256,7 +254,7 @@ export class Meeting {
     }
     public switchCamera() {
         try {
-            if(this.mediaServerClient.Stream != null)
+            if(this.mediaServerClient != null && this.mediaServerClient.Stream != null)
             {
                 this.mediaServerClient.Stream.getVideoTracks()[0]._switchCamera();
                 return this.mediaServerClient.Stream;
@@ -272,7 +270,7 @@ export class Meeting {
     }
     public toggleAudio() {
         try {
-            if(this.mediaServerClient.Stream != null)
+            if(this.mediaServerClient != null && this.mediaServerClient.Stream != null)
             {
                 this.mediaServerClient.Stream.getTracks().forEach((t:any) => {
                     if (t.kind === 'audio')
@@ -295,9 +293,9 @@ export class Meeting {
     }
     public toggleVideo() {
         try {
-            this.isVideoActive = !this.isVideoActive;
-            if(this.mediaServerClient.Stream != null)
+            if(this.mediaServerClient != null && this.mediaServerClient.Stream != null)
             {
+                this.isVideoActive = !this.isVideoActive;
                 this.mediaServerClient.Stream.getVideoTracks()[0].enabled = this.isVideoActive;
                 return <MediaStream>this.mediaServerClient.Stream;
             }

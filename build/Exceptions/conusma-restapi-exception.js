@@ -26,7 +26,6 @@ var ConusmaRestApiException = /** @class */ (function (_super) {
         if (_ex != null) {
             _this.detailEx = _ex;
         }
-        console.error(JSON.stringify(_this));
         return _this;
     }
     ;

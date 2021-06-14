@@ -8,7 +8,6 @@ export class ConusmaRestApiException extends Error {
         {
             this.detailEx = _ex;
         }
-        console.error(JSON.stringify(this));
     };
     public detailEx:Error = new Error(); 
     public statusCode:number=0;

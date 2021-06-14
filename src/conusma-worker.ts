@@ -49,10 +49,8 @@ export class ConusmaWorker {
     public start() {
         this.iAmHereInterval.tickEventEmitter.on('timeout',()=>{
             this.iAmHere();
-            console.log("iAmHereInterval 20000" );
         });
         this.meetingChangeEventInterval.tickEventEmitter.on('timeout',()=>{
-            console.log("meetingChangeEventInterval 3000" );
             this.controlMeetingEvent();
         });
         this.iAmHereInterval.start(20000);
