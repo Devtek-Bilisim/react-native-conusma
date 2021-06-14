@@ -35,60 +35,93 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var app_service_1 = require("./app.service");
+exports.ConusmaWorker = void 0;
+var events_1 = require("events");
 var conusma_exception_1 = require("./Exceptions/conusma-exception");
-var guest_user_1 = require("./guest-user");
-var react_native_device_info_1 = __importDefault(require("react-native-device-info"));
-var user_1 = require("./user");
-var Conusma = /** @class */ (function () {
-    function Conusma(appId, parameters) {
-        var deviceId = react_native_device_info_1.default.getUniqueId();
-        this.appService = new app_service_1.AppService(appId, { apiUrl: parameters.apiUrl, deviceId: deviceId, version: '1.0.0' });
+var background_timer_1 = require("./background-timer");
+var ConusmaWorker = /** @class */ (function () {
+    function ConusmaWorker(_appService, _meetingUser) {
+        this.meetingWorkerEvent = new events_1.EventEmitter();
+        this.saveEventData = { 'MeetingUsers': '', 'ChatUpdates': '', 'MeetingUpdate': '' };
+        this.iAmHereInterval = new background_timer_1.backgroundTimer();
+        this.meetingChangeEventInterval = new background_timer_1.backgroundTimer();
+        this.appService = _appService;
+        this.meetingUser = _meetingUser;
     }
-    Conusma.prototype.createUser = function () {
+    ConusmaWorker.prototype.controlMeetingEvent = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var user, error_1;
+            var events, eventData, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        user = new user_1.User(this.appService);
-                        return [4 /*yield*/, user.create()];
+                        return [4 /*yield*/, this.appService.getMeetingEvents(this.meetingUser.Id)];
                     case 1:
-                        _a.sent();
-                        return [2 /*return*/, user];
+                        events = _a.sent();
+                        eventData = events;
+                        if (eventData.MeetingUsers != this.saveEventData.MeetingUsers) {
+                            this.saveEventData.MeetingUsers = eventData.MeetingUsers;
+                            this.meetingWorkerEvent.emit('meetingUsers', { 'MeetingUsers': this.saveEventData.MeetingUsers });
+                        }
+                        if (eventData.ChatUpdates != this.saveEventData.ChatUpdates) {
+                            this.saveEventData.ChatUpdates = eventData.ChatUpdates;
+                            this.meetingWorkerEvent.emit('chatUpdates', { 'ChatUpdates': this.saveEventData.ChatUpdates });
+                        }
+                        if (eventData.MeetingUpdate != this.saveEventData.MeetingUpdate) {
+                            this.saveEventData.MeetingUpdate = eventData.MeetingUpdate;
+                            this.meetingWorkerEvent.emit('meetingUpdate', { 'MeetingUpdate': this.saveEventData.MeetingUpdate });
+                        }
+                        return [3 /*break*/, 3];
                     case 2:
                         error_1 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("createUser", "User cannot be created.", error_1);
+                        return [3 /*break*/, 3];
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    Conusma.prototype.createGuestUser = function () {
+    ConusmaWorker.prototype.iAmHere = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var user, error_2;
+            var error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        user = new guest_user_1.GuestUser(this.appService);
-                        return [4 /*yield*/, user.create()];
+                        return [4 /*yield*/, this.appService.iAmHere(this.meetingUser.Id)];
                     case 1:
                         _a.sent();
-                        return [2 /*return*/, user];
+                        return [3 /*break*/, 3];
                     case 2:
                         error_2 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("createGuestUser", "GuestUser cannot be created.", error_2);
+                        return [3 /*break*/, 3];
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    return Conusma;
+    ConusmaWorker.prototype.start = function () {
+        var _this = this;
+        this.iAmHereInterval.tickEventEmitter.on('timeout', function () {
+            _this.iAmHere();
+            console.log("iAmHereInterval 20000");
+        });
+        this.meetingChangeEventInterval.tickEventEmitter.on('timeout', function () {
+            console.log("meetingChangeEventInterval 3000");
+            _this.controlMeetingEvent();
+        });
+        this.iAmHereInterval.start(20000);
+        this.meetingChangeEventInterval.start(3000);
+    };
+    ConusmaWorker.prototype.terminate = function () {
+        try {
+            this.iAmHereInterval.terminate();
+            this.meetingChangeEventInterval.terminate();
+        }
+        catch (error) {
+            throw new conusma_exception_1.ConusmaException("ConusmaWorker", "terminated interval error", error);
+        }
+    };
+    return ConusmaWorker;
 }());
-exports.default = Conusma;
+exports.ConusmaWorker = ConusmaWorker;
