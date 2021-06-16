@@ -314,6 +314,7 @@ var Meeting = /** @class */ (function () {
                         this.mediaServerClient.Stream = localStream;
                         this.mediaServerClient.MeetingUserId = this.meetingUser.Id;
                         this.mediaServerClient.RemoteStream = null;
+                        this.meetingUser.MediaServerId = this.mediaServerSocket.Id;
                         this.meetingUser.ShareScreen = this.isScreenShare;
                         this.meetingUser.Camera = this.hasCamera;
                         this.meetingUser.Mic = this.hasMicrophone;
