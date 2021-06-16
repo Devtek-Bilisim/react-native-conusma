@@ -84,6 +84,7 @@ var Meeting = /** @class */ (function () {
         this.isAudioActive = false;
         this.isVideoActive = false;
         this.isReceviedClose = false;
+        this.consumerTransports = [];
         react_native_webrtc_1.registerGlobals();
         this.appService = appService;
         this.meetingUser = meetingUser;
@@ -174,62 +175,56 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.createClient = function (mediaServer, localStream) {
         return __awaiter(this, void 0, void 0, function () {
-            var mediaServerElement;
+            var mediaServerElement, userInfoData, setUserInfo, routerRtpCapabilities, handlerName;
             var _this = this;
             return __generator(this, function (_a) {
-                mediaServerElement = this.mediaServerList.find(function (ms) { return ms.Id == mediaServer.Id; });
-                if (mediaServerElement == null) {
-                    mediaServerElement = new MediaServer();
-                    mediaServerElement.Id = mediaServer.Id;
-                    mediaServerElement.socket = socket_io_1.default.connect(mediaServer.ConnectionDnsAddress + ":" + mediaServer.Port);
-                    this.mediaServerList.push(mediaServerElement);
-                }
-                this.mediaServerSocket = mediaServerElement.socket;
-                this.mediaServerSocket.on('disconnect', function () { return __awaiter(_this, void 0, void 0, function () {
-                    return __generator(this, function (_a) {
-                        if (!this.isReceviedClose) {
-                            throw new conusma_exception_1.ConusmaException("mediaserverconnection", "mediaserverconnection disconnect");
+                switch (_a.label) {
+                    case 0:
+                        mediaServerElement = this.mediaServerList.find(function (ms) { return ms.Id == mediaServer.Id; });
+                        if (mediaServerElement == null) {
+                            mediaServerElement = new MediaServer();
+                            mediaServerElement.Id = mediaServer.Id;
+                            mediaServerElement.socket = socket_io_1.default.connect(mediaServer.ConnectionDnsAddress + ":" + mediaServer.Port);
+                            this.mediaServerList.push(mediaServerElement);
                         }
-                        return [2 /*return*/];
-                    });
-                }); });
-                this.mediaServerSocket.on('WhoAreYou', function () { return __awaiter(_this, void 0, void 0, function () {
-                    var userInfoData, setUserInfo, routerRtpCapabilities, handlerName;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0:
-                                userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
-                                return [4 /*yield*/, this.signal('UserInfo', userInfoData, this.mediaServerSocket)];
-                            case 1:
-                                setUserInfo = _a.sent();
-                                return [4 /*yield*/, this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket)];
-                            case 2:
-                                routerRtpCapabilities = _a.sent();
-                                handlerName = mediaServerClient.detectDevice();
-                                if (handlerName) {
-                                    console.log("detected handler: %s", handlerName);
+                        this.mediaServerSocket = mediaServerElement.socket;
+                        this.mediaServerSocket.on('disconnect', function () { return __awaiter(_this, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                if (!this.isReceviedClose) {
+                                    throw new conusma_exception_1.ConusmaException("mediaserverconnection", "mediaserverconnection disconnect");
                                 }
-                                else {
-                                    console.error("no suitable handler found for current device");
-                                }
-                                this.mediaServerDevice = new mediaServerClient.Device({
-                                    handlerName: handlerName
-                                });
-                                mediaServerElement.mediaServerDevice = this.mediaServerDevice;
-                                console.log("mediaServerDevice loading...");
-                                return [4 /*yield*/, this.mediaServerDevice.load({ routerRtpCapabilities: routerRtpCapabilities })];
-                            case 3:
-                                _a.sent();
-                                console.log("mediaServerDevice loaded.");
-                                return [4 /*yield*/, this.createProducerTransport(localStream)];
-                            case 4:
-                                _a.sent();
-                                this.notify();
                                 return [2 /*return*/];
+                            });
+                        }); });
+                        userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
+                        return [4 /*yield*/, this.signal('UserInfo', userInfoData, this.mediaServerSocket)];
+                    case 1:
+                        setUserInfo = _a.sent();
+                        return [4 /*yield*/, this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket)];
+                    case 2:
+                        routerRtpCapabilities = _a.sent();
+                        handlerName = mediaServerClient.detectDevice();
+                        if (handlerName) {
+                            console.log("detected handler: %s", handlerName);
                         }
-                    });
-                }); });
-                return [2 /*return*/];
+                        else {
+                            console.error("no suitable handler found for current device");
+                        }
+                        this.mediaServerDevice = new mediaServerClient.Device({
+                            handlerName: handlerName
+                        });
+                        mediaServerElement.mediaServerDevice = this.mediaServerDevice;
+                        console.log("mediaServerDevice loading...");
+                        return [4 /*yield*/, this.mediaServerDevice.load({ routerRtpCapabilities: routerRtpCapabilities })];
+                    case 3:
+                        _a.sent();
+                        console.log("mediaServerDevice loaded.");
+                        return [4 /*yield*/, this.createProducerTransport(localStream)];
+                    case 4:
+                        _a.sent();
+                        this.notify();
+                        return [2 /*return*/];
+                }
             });
         });
     };
@@ -520,10 +515,38 @@ var Meeting = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.createConsumerTransport(producerUser)];
                     case 1:
                         result = _a.sent();
+                        this.consumerTransports.push(result);
                         return [2 /*return*/, result.RemoteStream];
                 }
             });
         });
+    };
+    Meeting.prototype.closeConsumer = function (user) {
+        return __awaiter(this, void 0, void 0, function () {
+            var index, _i, _a, item;
+            return __generator(this, function (_b) {
+                index = 0;
+                for (_i = 0, _a = this.consumerTransports; _i < _a.length; _i++) {
+                    item = _a[_i];
+                    if (item.MeetingUserId == user.Id) {
+                        if (item.transport) {
+                            item.transport.close();
+                        }
+                        break;
+                    }
+                    index++;
+                }
+                ;
+                this.removeItemOnce(this.consumerTransports, index);
+                return [2 /*return*/];
+            });
+        });
+    };
+    Meeting.prototype.removeItemOnce = function (arr, index) {
+        if (index > -1) {
+            arr.splice(index, 1);
+        }
+        return arr;
     };
     Meeting.prototype.setSpeaker = function (enable) {
         try {

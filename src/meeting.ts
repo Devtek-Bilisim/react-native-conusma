@@ -122,7 +122,7 @@ export class Meeting {
 
             }
         });
-        this.mediaServerSocket.on('WhoAreYou', async () => {
+       // this.mediaServerSocket.on('WhoAreYou', async () => {
             var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
             let setUserInfo = await this.signal('UserInfo', userInfoData, this.mediaServerSocket);
             let routerRtpCapabilities = await this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket);
@@ -142,7 +142,7 @@ export class Meeting {
             console.log("mediaServerDevice loaded.");
             await this.createProducerTransport(localStream);
             this.notify();
-        });
+       // });
     }
 
     private async createProducerTransport(localStream: MediaStream) {
@@ -357,7 +357,10 @@ export class Meeting {
         var index = 0;
         for (let item of this.consumerTransports) {
             if (item.MeetingUserId == user.Id) {
-                if (item.transport) this.mediaServerClient.transport.close();
+                if (item.transport)
+                {
+                    item.transport.close();
+                } 
                 break;
             }
             index++;

@@ -17,6 +17,7 @@ export declare class Meeting {
     isAudioActive: boolean;
     isVideoActive: boolean;
     isReceviedClose: boolean;
+    private consumerTransports;
     constructor(meetingUser: MeetingUserModel, appService: AppService);
     attach(observer: MediaServerConnectionReadyObserver): void;
     detach(observerToRemove: MediaServerConnectionReadyObserver): void;
@@ -35,6 +36,8 @@ export declare class Meeting {
     connectMeeting(): Promise<void>;
     isApproved(): Promise<any>;
     consume(producerUser: MeetingUserModel): Promise<MediaStream>;
+    closeConsumer(user: MeetingUserModel): Promise<void>;
+    private removeItemOnce;
     setSpeaker(enable: boolean): void;
     private waitWhoAreYou;
     private createConsumerTransport;
