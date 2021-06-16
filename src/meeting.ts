@@ -35,6 +35,8 @@ export class Meeting {
     public isAudioActive: boolean = false;
     public isVideoActive: boolean = false;
     public isReceviedClose: boolean = false;
+    private consumerTransports:any = [];
+
     constructor(meetingUser: MeetingUserModel, appService: AppService) {
         registerGlobals();
         this.appService = appService;
@@ -347,8 +349,29 @@ export class Meeting {
     }
     public async consume(producerUser: MeetingUserModel) {
         var result = await this.createConsumerTransport(producerUser);
+        this.consumerTransports.push(result);
         return <MediaStream>result.RemoteStream;
     }
+
+    public async closeConsumer(user:MeetingUserModel) {
+        var index = 0;
+        for (let item of this.consumerTransports) {
+            if (item.MeetingUserId == user.Id) {
+                if (item.transport) this.mediaServerClient.transport.close();
+                break;
+            }
+            index++;
+        };
+        this.removeItemOnce(this.consumerTransports, index);
+    }
+
+    private removeItemOnce(arr:any, index:any) {
+        if (index > -1) {
+          arr.splice(index, 1);
+        }
+        return arr;
+    }
+
     public setSpeaker(enable:boolean)
     {
         try {
