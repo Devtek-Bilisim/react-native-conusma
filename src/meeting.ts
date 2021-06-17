@@ -271,7 +271,7 @@ export class Meeting {
             if (this.mediaServerClient != null && this.mediaServerClient.Stream != null) {
 
                 var deviceModel: string = DeviceInfo.getModel();
-                deviceModel.toLowerCase();
+                deviceModel = deviceModel.toLowerCase();
                 if (deviceModel.includes('sm-975') || deviceModel.includes('sm-g981') || deviceModel.includes('sm-g980')) {
                     if (this.cameraCrashCounter <= 0) {
                         throw new Error("camera switching is not supported on this model ");
@@ -584,11 +584,11 @@ export class Meeting {
             } else {
                 return [];
             }
-            
+
         } catch (error) {
-           throw new ConusmaException("getAllUsers","Unable to fetch user list, please check detail exception");
+            throw new ConusmaException("getAllUsers", "Unable to fetch user list, please check detail exception");
         }
-       
+
     }
 
     public async getProducerUsers() {
@@ -606,8 +606,8 @@ export class Meeting {
                 return [];
             }
         } catch (error) {
-            throw new ConusmaException("getProducerUsers","Unable to fetch producer user list, please check detail exception"); 
+            throw new ConusmaException("getProducerUsers", "Unable to fetch producer user list, please check detail exception");
         }
-       
+
     }
 }

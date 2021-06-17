@@ -1,6 +1,6 @@
 {
   "name": "react-native-conusma",
-  "version": "1.0.21",
+  "version": "1.0.23",
   "description": "wwww.conusma.com",
   "main": "build/index.js",
   "types": "build/index.d.ts",
