@@ -26,6 +26,7 @@ var ConusmaRestApiException = /** @class */ (function (_super) {
         if (_ex != null) {
             _this.detailEx = _ex;
         }
+        Object.setPrototypeOf(_this, ConusmaRestApiException.prototype);
         return _this;
     }
     ;

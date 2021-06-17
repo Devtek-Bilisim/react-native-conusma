@@ -27,6 +27,7 @@ var ConusmaException = /** @class */ (function (_super) {
         if (_ex != null) {
             _this.detailEx = _ex;
         }
+        Object.setPrototypeOf(_this, ConusmaException.prototype);
         return _this;
     }
     ;

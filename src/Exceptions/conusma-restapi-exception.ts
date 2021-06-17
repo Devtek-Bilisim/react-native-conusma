@@ -8,6 +8,8 @@ export class ConusmaRestApiException extends Error {
         {
             this.detailEx = _ex;
         }
+        Object.setPrototypeOf(this, ConusmaRestApiException.prototype);
+
     };
     public detailEx:Error = new Error(); 
     public statusCode:number=0;

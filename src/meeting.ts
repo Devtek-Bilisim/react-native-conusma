@@ -10,6 +10,8 @@ import { ParticipantModel } from "./Models/participant-model";
 import { ConusmaException } from "./Exceptions/conusma-exception";
 import { ConusmaWorker } from "./conusma-worker";
 import InCallManager from 'react-native-incall-manager';
+import DeviceInfo from 'react-native-device-info';
+
 class MediaServer {
     Id: number = 0;
     socket: any = null;
@@ -35,8 +37,9 @@ export class Meeting {
     public isAudioActive: boolean = false;
     public isVideoActive: boolean = false;
     public isReceviedClose: boolean = false;
-    private consumerTransports:any = [];
+    private consumerTransports: any = [];
     private connectMediaServerId = 0;
+    private cameraCrashCounter = 2;
     constructor(meetingUser: MeetingUserModel, appService: AppService) {
         registerGlobals();
         this.appService = appService;
@@ -57,49 +60,58 @@ export class Meeting {
     }
 
     public async open(localStream: MediaStream) {
-        this.isReceviedClose = false;
-        this.conusmaWorker.start();
-        this.conusmaWorker.meetingWorkerEvent.on('meetingUsers', () => {
-            console.log("Meeting users updated.");
-        });
-        this.conusmaWorker.meetingWorkerEvent.on('chatUpdates', () => {
-            console.log("Chat updated.");
-        });
-        this.conusmaWorker.meetingWorkerEvent.on('meetingUpdate', () => {
-            console.log("Meeting updated.");
-        });
-        const mediaServer: any = await this.getMediaServer(this.meetingUser.Id);
-        await this.createClient(mediaServer, localStream);
+        try {
+            this.isReceviedClose = false;
+            this.conusmaWorker.start();
+            this.conusmaWorker.meetingWorkerEvent.on('meetingUsers', () => {
+                console.log("Meeting users updated.");
+            });
+            this.conusmaWorker.meetingWorkerEvent.on('chatUpdates', () => {
+                console.log("Chat updated.");
+            });
+            this.conusmaWorker.meetingWorkerEvent.on('meetingUpdate', () => {
+                console.log("Meeting updated.");
+            });
+            const mediaServer: any = await this.getMediaServer(this.meetingUser.Id);
+            await this.createClient(mediaServer, localStream);
+        } catch (error) {
+            throw new ConusmaException("open", "can not open meeting , please check exception ", error);
 
+        }
     }
 
     public async close(sendCloseRequest: boolean = false) {
-        if (sendCloseRequest) {
-            var closeData = { 'MeetingUserId': this.meetingUser.Id };
-            this.appService.liveClose(closeData);
-        }
-        this.isReceviedClose = true;
-        if (this.conusmaWorker != null) {
-            this.conusmaWorker.terminate();
-        }
-
-        if (this.mediaServerClient != null) {
-            if (this.mediaServerClient.transport) this.mediaServerClient.transport.close();
-            if (this.mediaServerClient.VideoProducer) this.mediaServerClient.VideoProducer.close();
-            if (this.mediaServerClient.AudioProducer) this.mediaServerClient.AudioProducer.close();
-            this.mediaServerClient = null;
-        }
-
-        this.mediaServerList.forEach(element => {
-            if (element != null) {
-                element.socket.close();
+        try {
+            if (sendCloseRequest) {
+                var closeData = { 'MeetingUserId': this.meetingUser.Id };
+                this.appService.liveClose(closeData);
             }
-        });
-        if (this.mediaServerSocket != null) {
-            this.mediaServerSocket.close();
-            this.mediaServerSocket = null;
+            this.isReceviedClose = true;
+            if (this.conusmaWorker != null) {
+                this.conusmaWorker.terminate();
+            }
+
+            if (this.mediaServerClient != null) {
+                if (this.mediaServerClient.transport) this.mediaServerClient.transport.close();
+                if (this.mediaServerClient.VideoProducer) this.mediaServerClient.VideoProducer.close();
+                if (this.mediaServerClient.AudioProducer) this.mediaServerClient.AudioProducer.close();
+                this.mediaServerClient = null;
+            }
+
+            this.mediaServerList.forEach(element => {
+                if (element != null) {
+                    element.socket.close();
+                }
+            });
+            if (this.mediaServerSocket != null) {
+                this.mediaServerSocket.close();
+                this.mediaServerSocket = null;
+            }
+            this.mediaServerList = [];
+        } catch (error) {
+            throw new ConusmaException("close", "can not close meeting , please check exception ", error);
         }
-        this.mediaServerList = [];
+
     }
 
     private async getMediaServer(meetingUserId: string) {
@@ -120,32 +132,31 @@ export class Meeting {
         this.mediaServerSocket = mediaServerElement.socket;
         this.connectMediaServerId = mediaServerElement.Id;
         this.mediaServerSocket.on('disconnect', async () => {
-            if(!this.isReceviedClose)
-            {
-                throw new ConusmaException("mediaserverconnection","mediaserverconnection disconnect");
+            if (!this.isReceviedClose) {
+                throw new ConusmaException("mediaserverconnection", "mediaserverconnection disconnect");
 
             }
         });
-       // this.mediaServerSocket.on('WhoAreYou', async () => {
-           
-            let routerRtpCapabilities = await this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket);
-            const handlerName = mediaServerClient.detectDevice();
-            if (handlerName) {
-                console.log("detected handler: %s", handlerName);
-            } else {
-                console.error("no suitable handler found for current device");
-            }
+        // this.mediaServerSocket.on('WhoAreYou', async () => {
 
-            this.mediaServerDevice = new mediaServerClient.Device({
-                handlerName: handlerName
-            });
-            mediaServerElement.mediaServerDevice = this.mediaServerDevice;
-            console.log("mediaServerDevice loading...");
-            await this.mediaServerDevice.load({ routerRtpCapabilities });
-            console.log("mediaServerDevice loaded.");
-            await this.createProducerTransport(localStream);
-            this.notify();
-       // });
+        let routerRtpCapabilities = await this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket);
+        const handlerName = mediaServerClient.detectDevice();
+        if (handlerName) {
+            console.log("detected handler: %s", handlerName);
+        } else {
+            console.error("no suitable handler found for current device");
+        }
+
+        this.mediaServerDevice = new mediaServerClient.Device({
+            handlerName: handlerName
+        });
+        mediaServerElement.mediaServerDevice = this.mediaServerDevice;
+        console.log("mediaServerDevice loading...");
+        await this.mediaServerDevice.load({ routerRtpCapabilities });
+        console.log("mediaServerDevice loaded.");
+        await this.createProducerTransport(localStream);
+        this.notify();
+        // });
     }
 
     private async createProducerTransport(localStream: MediaStream) {
@@ -198,7 +209,7 @@ export class Meeting {
                 this.appService.connectMeeting(this.meetingUser);
             }
         } catch (error) {
-            throw new ConusmaException("createProducerTransport","createProducerTransport error",error);
+            throw new ConusmaException("createProducerTransport", "createProducerTransport error", error);
         }
     }
     private async createProducer(localStream: MediaStream, kind: string) {
@@ -257,62 +268,70 @@ export class Meeting {
     }
     public switchCamera() {
         try {
-            if(this.mediaServerClient != null && this.mediaServerClient.Stream != null)
-            {
+            if (this.mediaServerClient != null && this.mediaServerClient.Stream != null) {
+
+                var deviceModel: string = DeviceInfo.getModel();
+                deviceModel.toLowerCase();
+                if (deviceModel.includes('sm-975') || deviceModel.includes('sm-g981') || deviceModel.includes('sm-g980')) {
+                    if (this.cameraCrashCounter <= 0) {
+                        throw new Error("camera switching is not supported on this model ");
+                    }
+                }
                 this.mediaServerClient.Stream.getVideoTracks()[0]._switchCamera();
+                this.cameraCrashCounter--;
                 return this.mediaServerClient.Stream;
             }
-            else
-            {
-                throw new ConusmaException("switchCamera","stream not found, first call enableAudioVideo function");
+            else {
+                throw new Error("stream not found, first call enableAudioVideo function");
             }
-           
+
         } catch (error) {
-            throw new ConusmaException("switchCamera","camera switching failed",error);
+            throw new ConusmaException("switchCamera", "camera switching failed, please check detail exception", error);
         }
     }
     public toggleAudio() {
         try {
-            if(this.mediaServerClient != null && this.mediaServerClient.Stream != null)
-            {
-                this.mediaServerClient.Stream.getTracks().forEach((t:any) => {
-                    if (t.kind === 'audio')
-                    {
+            if (this.mediaServerClient != null && this.mediaServerClient.Stream != null) {
+                this.mediaServerClient.Stream.getTracks().forEach((t: any) => {
+                    if (t.kind === 'audio') {
                         t.enabled = !t.enabled;
                         this.isAudioActive = t.enabled;
 
-                    } 
+                    }
                 });
                 return <MediaStream>this.mediaServerClient.Stream;
             }
-            else
-            {
-                throw new ConusmaException("toggleAudio","stream not found, first call enableAudioVideo function");
+            else {
+                throw new ConusmaException("toggleAudio", "stream not found, first call enableAudioVideo function");
             }
-           
+
         } catch (error) {
-            throw new ConusmaException("toggleAudio","toggleAudio failed",error);
+            throw new ConusmaException("toggleAudio", "toggleAudio failed", error);
         }
     }
     public toggleVideo() {
         try {
-            if(this.mediaServerClient != null && this.mediaServerClient.Stream != null)
-            {
+            if (this.mediaServerClient != null && this.mediaServerClient.Stream != null) {
                 this.isVideoActive = !this.isVideoActive;
                 this.mediaServerClient.Stream.getVideoTracks()[0].enabled = this.isVideoActive;
                 return <MediaStream>this.mediaServerClient.Stream;
             }
-            else
-            {
-                throw new ConusmaException("toggleVideo","stream not found, first call enableAudioVideo function");
+            else {
+                throw new ConusmaException("toggleVideo", "stream not found, first call enableAudioVideo function");
             }
-           
+
         } catch (error) {
-            throw new ConusmaException("toggleVideo","toggleVideo failed",error);
+            throw new ConusmaException("toggleVideo", "toggleVideo failed", error);
         }
     }
 
     public async enableAudioVideo() {
+        try {
+
+        } catch (error) {
+            throw new ConusmaException("enableAudioVideo", "can not read stream , please check exception ", error);
+
+        }
         const isFrontCamera = true;
         const devices = await mediaDevices.enumerateDevices();
         const facing = isFrontCamera ? 'front' : 'environment';
@@ -342,48 +361,66 @@ export class Meeting {
         return newStream;
     }
     public async connectMeeting() {
-        await this.appService.connectMeeting(this.meetingUser);
-        console.log("User connected to the meeting.");
+        try {
+            await this.appService.connectMeeting(this.meetingUser);
+            console.log("User connected to the meeting.");
+        } catch (error) {
+            throw new ConusmaException("connectMeeting", "can not connect meeting , please check exception", error);
+        }
+
     }
     public async isApproved() {
-        return await this.appService.isApproved(this.meetingUser.Id);
+        try {
+            return await this.appService.isApproved(this.meetingUser.Id);
+
+        } catch (error) {
+            throw new ConusmaException("isApproved", "user is not approved , please check exception ", error);
+        }
     }
     public async consume(producerUser: MeetingUserModel) {
-        var result = await this.createConsumerTransport(producerUser);
-        this.consumerTransports.push(result);
-        return <MediaStream>result.RemoteStream;
+        try {
+            var result = await this.createConsumerTransport(producerUser);
+            this.consumerTransports.push(result);
+            return <MediaStream>result.RemoteStream;
+        } catch (error) {
+
+            throw new ConusmaException("consume", producerUser.Id + "The stream of the user is currently not captured. User connection information is out of date.", error);
+        }
     }
 
-    public async closeConsumer(user:MeetingUserModel) {
-        var index = 0;
-        for (let item of this.consumerTransports) {
-            if (item.MeetingUserId == user.Id) {
-                if (item.transport)
-                {
-                    item.transport.close();
-                } 
-                break;
-            }
-            index++;
-        };
-        this.removeItemOnce(this.consumerTransports, index);
+    public async closeConsumer(user: MeetingUserModel) {
+        try {
+            var index = 0;
+            for (let item of this.consumerTransports) {
+                if (item.MeetingUserId == user.Id) {
+                    if (item.transport) {
+                        item.transport.close();
+                    }
+                    break;
+                }
+                index++;
+            };
+            this.removeItemOnce(this.consumerTransports, index);
+        } catch (error) {
+            throw new ConusmaException("isApproved", "user is not approved , please check exception ", error);
+        }
+
     }
 
-    private removeItemOnce(arr:any, index:any) {
+    private removeItemOnce(arr: any, index: any) {
         if (index > -1) {
-          arr.splice(index, 1);
+            arr.splice(index, 1);
         }
         return arr;
     }
 
-    public setSpeaker(enable:boolean)
-    {
+    public setSpeaker(enable: boolean) {
         try {
             InCallManager.setSpeakerphoneOn(enable);
             InCallManager.setForceSpeakerphoneOn(enable);
 
         } catch (error) {
-            throw new ConusmaException("setSpeaker","setSpeaker undefined error",error);
+            throw new ConusmaException("setSpeaker", "setSpeaker undefined error", error);
         }
     }
     private waitWhoAreYou(socket: any) {
@@ -407,7 +444,7 @@ export class Meeting {
             }
             targetMediaServerClient.Id = mediaServerInfo.Id;
             targetMediaServerClient.socket = io.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
-            
+
             /*console.log("waiting WhoAreYou signal...");
             var waitResponse = await this.waitWhoAreYou(targetMediaServerClient.socket);
             console.log("WhoAreYou signal came.");*/
@@ -541,25 +578,36 @@ export class Meeting {
     }
 
     public async getAllUsers() {
-        if (this.meetingUser != null) {
-            return <MeetingUserModel[]>await this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id });
-        } else {
-            return [];
+        try {
+            if (this.meetingUser != null) {
+                return <MeetingUserModel[]>await this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id });
+            } else {
+                return [];
+            }
+            
+        } catch (error) {
+           throw new ConusmaException("getAllUsers","Unable to fetch user list, please check detail exception");
         }
+       
     }
 
     public async getProducerUsers() {
-        if (this.meetingUser != null) {
-            var users = await this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id });
-            var result: MeetingUserModel[] = [];
-            users.forEach((item: any) => {
-                if (item.Camera == true) {
-                    result.push(item);
-                }
-            });
-            return result;
-        } else {
-            return [];
+        try {
+            if (this.meetingUser != null) {
+                var users = await this.appService.getMeetingUserList({ 'MeetingUserId': this.meetingUser.Id });
+                var result: MeetingUserModel[] = [];
+                users.forEach((item: any) => {
+                    if (item.Camera == true) {
+                        result.push(item);
+                    }
+                });
+                return result;
+            } else {
+                return [];
+            }
+        } catch (error) {
+            throw new ConusmaException("getProducerUsers","Unable to fetch producer user list, please check detail exception"); 
         }
+       
     }
 }

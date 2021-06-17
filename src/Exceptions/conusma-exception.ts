@@ -8,6 +8,7 @@ export class ConusmaException extends Error {
         {
             this.detailEx = _ex;
         }
+        Object.setPrototypeOf(this, ConusmaException.prototype);
     };
     public detailEx:Error = new Error(); 
     public message:string="";
