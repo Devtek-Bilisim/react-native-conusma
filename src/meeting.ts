@@ -115,7 +115,6 @@ export class Meeting {
             this.mediaServerList.push(mediaServerElement);
             var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
             let setUserInfo = await this.signal('UserInfo', userInfoData, mediaServerElement.socket);
-            console.log("media server yoktu oluşturuldu. media server Id "+mediaServer.Id);
 
         }
         this.mediaServerSocket = mediaServerElement.socket;
@@ -187,7 +186,6 @@ export class Meeting {
                 if (this.hasMicrophone) {
                     await this.createProducer(localStream, 'audio');
                 }
-                console.log("Create Producer Media ServerId :"+this.connectMediaServerId);
                 this.mediaServerClient.Camera = this.hasCamera;
                 this.mediaServerClient.Mic = this.hasMicrophone;
                 this.mediaServerClient.Stream = localStream;
@@ -407,7 +405,6 @@ export class Meeting {
             if (mediaServerInfo == null) {
                 throw new ConusmaException("createConsumerTransport", "Media server not found. (Id: " + user.MediaServerId + ")");
             }
-            console.log(" createConsumerTransport media server yoktu oluşturuldu. media server Id : "+mediaServerInfo.Id+" user mediaserver Id"+user.MediaServerId);
             targetMediaServerClient.Id = mediaServerInfo.Id;
             targetMediaServerClient.socket = io.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
             
