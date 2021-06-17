@@ -417,7 +417,7 @@ var Meeting = /** @class */ (function () {
             if (this.mediaServerClient != null && this.mediaServerClient.Stream != null) {
                 var deviceModel = react_native_device_info_1.default.getModel();
                 deviceModel = deviceModel.toLowerCase();
-                if (deviceModel.includes('sm-975') || deviceModel.includes('sm-g981') || deviceModel.includes('sm-g980')) {
+                if (deviceModel.includes('sm-n975') || deviceModel.includes('sm-g981') || deviceModel.includes('sm-g980')) {
                     if (this.cameraCrashCounter <= 0) {
                         throw new Error("camera switching is not supported on this model ");
                     }
