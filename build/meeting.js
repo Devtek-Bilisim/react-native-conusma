@@ -85,6 +85,7 @@ var Meeting = /** @class */ (function () {
         this.isVideoActive = false;
         this.isReceviedClose = false;
         this.consumerTransports = [];
+        this.connectMediaServerId = 0;
         react_native_webrtc_1.registerGlobals();
         this.appService = appService;
         this.meetingUser = meetingUser;
@@ -181,13 +182,20 @@ var Meeting = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         mediaServerElement = this.mediaServerList.find(function (ms) { return ms.Id == mediaServer.Id; });
-                        if (mediaServerElement == null) {
-                            mediaServerElement = new MediaServer();
-                            mediaServerElement.Id = mediaServer.Id;
-                            mediaServerElement.socket = socket_io_1.default.connect(mediaServer.ConnectionDnsAddress + ":" + mediaServer.Port);
-                            this.mediaServerList.push(mediaServerElement);
-                        }
+                        if (!(mediaServerElement == null)) return [3 /*break*/, 2];
+                        mediaServerElement = new MediaServer();
+                        mediaServerElement.Id = mediaServer.Id;
+                        mediaServerElement.socket = socket_io_1.default.connect(mediaServer.ConnectionDnsAddress + ":" + mediaServer.Port);
+                        this.mediaServerList.push(mediaServerElement);
+                        userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
+                        return [4 /*yield*/, this.signal('UserInfo', userInfoData, mediaServerElement.socket)];
+                    case 1:
+                        setUserInfo = _a.sent();
+                        console.log("media server yoktu oluşturuldu. media server Id " + mediaServer.Id);
+                        _a.label = 2;
+                    case 2:
                         this.mediaServerSocket = mediaServerElement.socket;
+                        this.connectMediaServerId = mediaServerElement.Id;
                         this.mediaServerSocket.on('disconnect', function () { return __awaiter(_this, void 0, void 0, function () {
                             return __generator(this, function (_a) {
                                 if (!this.isReceviedClose) {
@@ -196,12 +204,8 @@ var Meeting = /** @class */ (function () {
                                 return [2 /*return*/];
                             });
                         }); });
-                        userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
-                        return [4 /*yield*/, this.signal('UserInfo', userInfoData, this.mediaServerSocket)];
-                    case 1:
-                        setUserInfo = _a.sent();
                         return [4 /*yield*/, this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket)];
-                    case 2:
+                    case 3:
                         routerRtpCapabilities = _a.sent();
                         handlerName = mediaServerClient.detectDevice();
                         if (handlerName) {
@@ -216,11 +220,11 @@ var Meeting = /** @class */ (function () {
                         mediaServerElement.mediaServerDevice = this.mediaServerDevice;
                         console.log("mediaServerDevice loading...");
                         return [4 /*yield*/, this.mediaServerDevice.load({ routerRtpCapabilities: routerRtpCapabilities })];
-                    case 3:
+                    case 4:
                         _a.sent();
                         console.log("mediaServerDevice loaded.");
                         return [4 /*yield*/, this.createProducerTransport(localStream)];
-                    case 4:
+                    case 5:
                         _a.sent();
                         this.notify();
                         return [2 /*return*/];
@@ -309,12 +313,13 @@ var Meeting = /** @class */ (function () {
                         _b.sent();
                         _b.label = 9;
                     case 9:
+                        console.log("Create Producer Media ServerId :" + this.connectMediaServerId);
                         this.mediaServerClient.Camera = this.hasCamera;
                         this.mediaServerClient.Mic = this.hasMicrophone;
                         this.mediaServerClient.Stream = localStream;
                         this.mediaServerClient.MeetingUserId = this.meetingUser.Id;
                         this.mediaServerClient.RemoteStream = null;
-                        this.meetingUser.MediaServerId = this.mediaServerSocket.Id;
+                        this.meetingUser.MediaServerId = this.connectMediaServerId;
                         this.meetingUser.ShareScreen = this.isScreenShare;
                         this.meetingUser.Camera = this.hasCamera;
                         this.meetingUser.Mic = this.hasMicrophone;
@@ -582,6 +587,7 @@ var Meeting = /** @class */ (function () {
                         if (mediaServerInfo == null) {
                             throw new conusma_exception_1.ConusmaException("createConsumerTransport", "Media server not found. (Id: " + user.MediaServerId + ")");
                         }
+                        console.log(" createConsumerTransport media server yoktu oluşturuldu. media server Id : " + mediaServerInfo.Id + " user mediaserver Id" + user.MediaServerId);
                         targetMediaServerClient.Id = mediaServerInfo.Id;
                         targetMediaServerClient.socket = socket_io_1.default.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
                         userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };

@@ -18,6 +18,7 @@ export declare class Meeting {
     isVideoActive: boolean;
     isReceviedClose: boolean;
     private consumerTransports;
+    private connectMediaServerId;
     constructor(meetingUser: MeetingUserModel, appService: AppService);
     attach(observer: MediaServerConnectionReadyObserver): void;
     detach(observerToRemove: MediaServerConnectionReadyObserver): void;
