@@ -191,7 +191,6 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, this.signal('UserInfo', userInfoData, mediaServerElement.socket)];
                     case 1:
                         setUserInfo = _a.sent();
-                        console.log("media server yoktu oluşturuldu. media server Id " + mediaServer.Id);
                         _a.label = 2;
                     case 2:
                         this.mediaServerSocket = mediaServerElement.socket;
@@ -313,7 +312,6 @@ var Meeting = /** @class */ (function () {
                         _b.sent();
                         _b.label = 9;
                     case 9:
-                        console.log("Create Producer Media ServerId :" + this.connectMediaServerId);
                         this.mediaServerClient.Camera = this.hasCamera;
                         this.mediaServerClient.Mic = this.hasMicrophone;
                         this.mediaServerClient.Stream = localStream;
@@ -587,7 +585,6 @@ var Meeting = /** @class */ (function () {
                         if (mediaServerInfo == null) {
                             throw new conusma_exception_1.ConusmaException("createConsumerTransport", "Media server not found. (Id: " + user.MediaServerId + ")");
                         }
-                        console.log(" createConsumerTransport media server yoktu oluşturuldu. media server Id : " + mediaServerInfo.Id + " user mediaserver Id" + user.MediaServerId);
                         targetMediaServerClient.Id = mediaServerInfo.Id;
                         targetMediaServerClient.socket = socket_io_1.default.connect(mediaServerInfo.ConnectionDnsAddress + ":" + mediaServerInfo.Port);
                         userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
