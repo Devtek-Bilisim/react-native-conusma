@@ -58,8 +58,16 @@ export class Meeting {
     private notify() {
         this.observers.forEach(observer => observer());
     }
+    public async produce(localStream: MediaStream) {
+        try {
+            const mediaServer: any = await this.getMediaServer(this.meetingUser.Id);
+            await this.createClient(mediaServer, localStream);
+        } catch (error) {
+            throw new ConusmaException("produce", "can not send stream , please check exception ", error);
 
-    public async open(localStream: MediaStream) {
+        }
+    }
+    public open() {
         try {
             this.isReceviedClose = false;
             this.conusmaWorker.start();
@@ -72,12 +80,11 @@ export class Meeting {
             this.conusmaWorker.meetingWorkerEvent.on('meetingUpdate', () => {
                 console.log("Meeting updated.");
             });
-            const mediaServer: any = await this.getMediaServer(this.meetingUser.Id);
-            await this.createClient(mediaServer, localStream);
         } catch (error) {
             throw new ConusmaException("open", "can not open meeting , please check exception ", error);
 
         }
+
     }
 
     public async close(sendCloseRequest: boolean = false) {
@@ -158,12 +165,11 @@ export class Meeting {
         this.notify();
         // });
     }
-
     private async createProducerTransport(localStream: MediaStream) {
         try {
             if (this.mediaServerClient != null) {
                 await this.close(false);
-                await this.open(localStream);
+                await this.produce(localStream);
             }
             else {
                 console.log("createProducerTransport started.");

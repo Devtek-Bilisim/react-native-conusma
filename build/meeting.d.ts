@@ -24,7 +24,8 @@ export declare class Meeting {
     attach(observer: MediaServerConnectionReadyObserver): void;
     detach(observerToRemove: MediaServerConnectionReadyObserver): void;
     private notify;
-    open(localStream: MediaStream): Promise<void>;
+    produce(localStream: MediaStream): Promise<void>;
+    open(): void;
     close(sendCloseRequest?: boolean): Promise<void>;
     private getMediaServer;
     private createClient;

@@ -102,24 +102,13 @@ var Meeting = /** @class */ (function () {
     Meeting.prototype.notify = function () {
         this.observers.forEach(function (observer) { return observer(); });
     };
-    Meeting.prototype.open = function (localStream) {
+    Meeting.prototype.produce = function (localStream) {
         return __awaiter(this, void 0, void 0, function () {
             var mediaServer, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
-                        this.isReceviedClose = false;
-                        this.conusmaWorker.start();
-                        this.conusmaWorker.meetingWorkerEvent.on('meetingUsers', function () {
-                            console.log("Meeting users updated.");
-                        });
-                        this.conusmaWorker.meetingWorkerEvent.on('chatUpdates', function () {
-                            console.log("Chat updated.");
-                        });
-                        this.conusmaWorker.meetingWorkerEvent.on('meetingUpdate', function () {
-                            console.log("Meeting updated.");
-                        });
                         return [4 /*yield*/, this.getMediaServer(this.meetingUser.Id)];
                     case 1:
                         mediaServer = _a.sent();
@@ -129,11 +118,29 @@ var Meeting = /** @class */ (function () {
                         return [3 /*break*/, 4];
                     case 3:
                         error_1 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("open", "can not open meeting , please check exception ", error_1);
+                        throw new conusma_exception_1.ConusmaException("produce", "can not send stream , please check exception ", error_1);
                     case 4: return [2 /*return*/];
                 }
             });
         });
+    };
+    Meeting.prototype.open = function () {
+        try {
+            this.isReceviedClose = false;
+            this.conusmaWorker.start();
+            this.conusmaWorker.meetingWorkerEvent.on('meetingUsers', function () {
+                console.log("Meeting users updated.");
+            });
+            this.conusmaWorker.meetingWorkerEvent.on('chatUpdates', function () {
+                console.log("Chat updated.");
+            });
+            this.conusmaWorker.meetingWorkerEvent.on('meetingUpdate', function () {
+                console.log("Meeting updated.");
+            });
+        }
+        catch (error) {
+            throw new conusma_exception_1.ConusmaException("open", "can not open meeting , please check exception ", error);
+        }
     };
     Meeting.prototype.close = function (sendCloseRequest) {
         if (sendCloseRequest === void 0) { sendCloseRequest = false; }
@@ -255,7 +262,7 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, this.close(false)];
                     case 1:
                         _b.sent();
-                        return [4 /*yield*/, this.open(localStream)];
+                        return [4 /*yield*/, this.produce(localStream)];
                     case 2:
                         _b.sent();
                         return [3 /*break*/, 10];
