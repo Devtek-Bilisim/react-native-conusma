@@ -1,5 +1,4 @@
 import { AppService } from "./app.service";
-import * as mediaServerClient from 'mediasoup-client';
 import {
     mediaDevices, registerGlobals
 } from 'react-native-webrtc';
@@ -11,16 +10,14 @@ import { ConusmaException } from "./Exceptions/conusma-exception";
 import { ConusmaWorker } from "./conusma-worker";
 import InCallManager from 'react-native-incall-manager';
 import DeviceInfo from 'react-native-device-info';
+import { MediaServer } from "./media-server";
 
-class MediaServer {
-    Id: number = 0;
-    socket: any = null;
-    mediaServerDevice: any = null;
-};
+
 
 export type MediaServerConnectionReadyObserver = () => void;
 export class Meeting {
-    public meetingUser: MeetingUserModel;
+    public ownerUser: MeetingUserModel;
+    public users: MeetingUserModel[] = [];
 
     public conusmaWorker: ConusmaWorker;
     private observers: MediaServerConnectionReadyObserver[] = [];
@@ -28,23 +25,15 @@ export class Meeting {
     private appService: AppService;
 
     private mediaServerList: Array<MediaServer> = [];
-    private mediaServerSocket: any;
-    private mediaServerDevice: any;
-    private mediaServerClient: any;
-    private hasCamera: boolean = false;
-    private hasMicrophone: boolean = false;
-    private isScreenShare: boolean = false;
-    public isAudioActive: boolean = false;
-    public isVideoActive: boolean = false;
+   
     public isReceviedClose: boolean = false;
-    private consumerTransports: any = [];
-    private connectMediaServerId = 0;
+
     private cameraCrashCounter = 2;
-    constructor(meetingUser: MeetingUserModel, appService: AppService) {
+    constructor(ownerUser: MeetingUserModel, appService: AppService) {
         registerGlobals();
         this.appService = appService;
-        this.meetingUser = meetingUser;
-        this.conusmaWorker = new ConusmaWorker(this.appService, this.meetingUser);
+        this.ownerUser = ownerUser;
+        this.conusmaWorker = new ConusmaWorker(this.appService, this.ownerUser);
     }
 
     public attach(observer: MediaServerConnectionReadyObserver) {
@@ -58,16 +47,8 @@ export class Meeting {
     private notify() {
         this.observers.forEach(observer => observer());
     }
-    public async produce(localStream: MediaStream) {
-        try {
-            const mediaServer: any = await this.getMediaServer(this.meetingUser.Id);
-            await this.createClient(mediaServer, localStream);
-        } catch (error) {
-            throw new ConusmaException("produce", "can not send stream , please check exception ", error);
-
-        }
-    }
-    public open() {
+    
+    public startWorker() {
         try {
             this.isReceviedClose = false;
             this.conusmaWorker.start();
@@ -87,66 +68,56 @@ export class Meeting {
 
     }
 
-    public async close(sendCloseRequest: boolean = false) {
+    public async stopWorker(sendCloseRequest: boolean = false) {
         try {
             if (sendCloseRequest) {
-                var closeData = { 'MeetingUserId': this.meetingUser.Id };
-                this.appService.liveClose(closeData);
+                var closeData = { 'MeetingUserId': this.ownerUser.Id };
+                await this.appService.liveClose(closeData);
             }
             this.isReceviedClose = true;
             if (this.conusmaWorker != null) {
                 this.conusmaWorker.terminate();
             }
-
-            if (this.mediaServerClient != null) {
-                if (this.mediaServerClient.transport) this.mediaServerClient.transport.close();
-                if (this.mediaServerClient.VideoProducer) this.mediaServerClient.VideoProducer.close();
-                if (this.mediaServerClient.AudioProducer) this.mediaServerClient.AudioProducer.close();
-                this.mediaServerClient = null;
-            }
-
-            this.mediaServerList.forEach(element => {
-                if (element != null) {
-                    element.socket.close();
-                }
-            });
-            if (this.mediaServerSocket != null) {
-                this.mediaServerSocket.close();
-                this.mediaServerSocket = null;
-            }
-            this.mediaServerList = [];
         } catch (error) {
             throw new ConusmaException("close", "can not close meeting , please check exception ", error);
         }
 
     }
 
+    public async produce(user:MeetingUserModel, localStream: MediaStream) {
+        try {
+            const mediaServerModel: any = await this.getMediaServer(user.Id);
+            await this.createClient(mediaServerModel, localStream);
+        } catch (error) {
+            throw new ConusmaException("produce", "can not send stream , please check exception ", error);
+
+        }
+    }
+
     private async getMediaServer(meetingUserId: string) {
         return await this.appService.getMediaServer(meetingUserId);
     }
 
-    private async createClient(mediaServer: any, localStream: MediaStream) {
-        var mediaServerElement: MediaServer = <MediaServer>this.mediaServerList.find((ms: any) => ms.Id == mediaServer.Id);
-        if (mediaServerElement == null) {
-            mediaServerElement = new MediaServer();
-            mediaServerElement.Id = mediaServer.Id;
-            mediaServerElement.socket = io.connect(mediaServer.ConnectionDnsAddress + ":" + mediaServer.Port);
-            this.mediaServerList.push(mediaServerElement);
-            var userInfoData = { 'MeetingUserId': this.meetingUser.Id, 'Token': this.appService.getJwtToken() };
-            let setUserInfo = await this.signal('UserInfo', userInfoData, mediaServerElement.socket);
+    private async createClient(mediaServerModel: any, localStream: MediaStream) {
+        var mediaServer: MediaServer = <MediaServer>this.mediaServerList.find((ms: any) => ms.Id == mediaServerModel.Id);
+        
+        if (mediaServer == null) {
+            mediaServer = new MediaServer();
+            mediaServer.id = mediaServerModel.Id;
+            mediaServer.socket = io.connect(mediaServerModel.ConnectionDnsAddress + ":" + mediaServerModel.Port);
+            this.mediaServerList.push(mediaServer);
+            var userInfoData = { 'MeetingUserId': this.ownerUser.Id, 'Token': this.appService.getJwtToken() };
+            let setUserInfo = await this.signal('UserInfo', userInfoData, mediaServer.socket);
 
         }
-        this.mediaServerSocket = mediaServerElement.socket;
-        this.connectMediaServerId = mediaServerElement.Id;
-        this.mediaServerSocket.on('disconnect', async () => {
+      
+        mediaServer.socket.on('disconnect', async () => {
             if (!this.isReceviedClose) {
                 throw new ConusmaException("mediaserverconnection", "mediaserverconnection disconnect");
-
             }
         });
-        // this.mediaServerSocket.on('WhoAreYou', async () => {
 
-        let routerRtpCapabilities = await this.signal('getRouterRtpCapabilities', null, this.mediaServerSocket);
+        let routerRtpCapabilities = await this.signal('getRouterRtpCapabilities', null, mediaServer.socket);
         const handlerName = mediaServerClient.detectDevice();
         if (handlerName) {
             console.log("detected handler: %s", handlerName);
@@ -154,66 +125,54 @@ export class Meeting {
             console.error("no suitable handler found for current device");
         }
 
-        this.mediaServerDevice = new mediaServerClient.Device({
+        mediaServer.device = new mediaServerClient.Device({
             handlerName: handlerName
         });
-        mediaServerElement.mediaServerDevice = this.mediaServerDevice;
-        console.log("mediaServerDevice loading...");
-        await this.mediaServerDevice.load({ routerRtpCapabilities });
-        console.log("mediaServerDevice loaded.");
-        await this.createProducerTransport(localStream);
+     
+        console.log("device loading...");
+        await mediaServer.device.load({ routerRtpCapabilities });
+        console.log("device loaded.");
+
+        await this.createProducerTransport(mediaServer, localStream);
         this.notify();
-        // });
     }
-    private async createProducerTransport(localStream: MediaStream) {
+    private async createProducerTransport(user:MeetingUserModel, mediaServer:MediaServer, localStream: MediaStream) {
         try {
-            if (this.mediaServerClient != null) {
-                await this.close(false);
-                await this.produce(localStream);
-            }
-            else {
                 console.log("createProducerTransport started.");
-                var transportOptions: any = await this.signal('createProducerTransport', {}, this.mediaServerSocket);
-                this.mediaServerClient = new Object();
-                this.mediaServerClient.transportId = transportOptions.id;
-                this.mediaServerClient.transport = await this.mediaServerDevice.createSendTransport(transportOptions);
-                this.mediaServerClient.transport.on('connect', async ({ dtlsParameters }: any, callback: any, errback: any) => {
+                var transportOptions: any = await this.signal('createProducerTransport', {}, mediaServer.socket);
+    
+
+                mediaServer.transport = await mediaServer.device.createSendTransport(transportOptions);
+                mediaServer.transport.on('connect', async ({ dtlsParameters }: any, callback: any, errback: any) => {
                     let error = await this.signal('connectProducerTransport', {
                         transportId: transportOptions.id,
                         dtlsParameters
-                    }, this.mediaServerSocket);
+                    }, mediaServer.socket);
                     callback();
                 });
-                this.mediaServerClient.transport.on('produce', async ({ kind, rtpParameters, appData }: any,
+                
+                mediaServer.transport.on('produce', async ({ kind, rtpParameters, appData }: any,
                     callback: any, errback: any) => {
                     let paused = false;
                     paused = false;
                     let id = await this.signal('produce', {
-                        transportId: this.mediaServerClient.transportId,
+                        transportId: transportOptions.id,
                         kind,
                         rtpParameters,
                         paused,
                         appData
-                    }, this.mediaServerSocket);
+                    }, mediaServer.socket);
                     callback(id)
                 });
-                if (this.hasCamera || this.isScreenShare) {
+                if (user.Camera || user.ShareScreen) {
                     await this.createProducer(localStream, 'video');
                 }
-                if (this.hasMicrophone) {
+                if (user.Mic) {
                     await this.createProducer(localStream, 'audio');
                 }
-                this.mediaServerClient.Camera = this.hasCamera;
-                this.mediaServerClient.Mic = this.hasMicrophone;
-                this.mediaServerClient.Stream = localStream;
-                this.mediaServerClient.MeetingUserId = this.meetingUser.Id;
-                this.mediaServerClient.RemoteStream = null;
-                this.meetingUser.MediaServerId = this.connectMediaServerId;
-                this.meetingUser.ShareScreen = this.isScreenShare;
-                this.meetingUser.Camera = this.hasCamera;
-                this.meetingUser.Mic = this.hasMicrophone;
-                this.appService.connectMeeting(this.meetingUser);
-            }
+        
+                user.MediaServerId = mediaServer.id;
+                this.appService.connectMeeting(user);
         } catch (error) {
             throw new ConusmaException("createProducerTransport", "createProducerTransport error", error);
         }
