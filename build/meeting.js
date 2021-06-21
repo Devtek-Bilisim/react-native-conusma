@@ -478,28 +478,29 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.enableAudioVideo = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var isFrontCamera, devices, facing, videoSourceId, facingMode, constraints, newStream;
+            var isFrontCamera, devices, facing_1, videoSourceId, facingMode, constraints, newStream, error_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        try {
-                        }
-                        catch (error) {
-                            throw new conusma_exception_1.ConusmaException("enableAudioVideo", "can not read stream , please check exception ", error);
-                        }
+                        _a.trys.push([0, 3, , 4]);
                         isFrontCamera = true;
                         return [4 /*yield*/, react_native_webrtc_1.mediaDevices.enumerateDevices()];
                     case 1:
                         devices = _a.sent();
-                        facing = isFrontCamera ? 'front' : 'environment';
-                        videoSourceId = devices.find(function (device) { return device.kind === 'videoinput' && device.facing === facing; });
+                        facing_1 = isFrontCamera ? 'front' : 'environment';
+                        videoSourceId = devices.find(function (device) { return device.kind === 'videoinput' && device.facing === facing_1; });
                         if (videoSourceId) {
                             this.hasCamera = true;
                             this.hasMicrophone = true; // TODO: Check audio source first
                         }
                         facingMode = isFrontCamera ? 'user' : 'environment';
                         constraints = {
-                            audio: true,
+                            audio: {
+                                echoCancellation: true,
+                                noiseSuppression: true,
+                                googEchoCancellation: true,
+                                googNoiseSuppression: true
+                            },
                             video: {
                                 mandatory: {
                                     minWidth: 500,
@@ -516,13 +517,17 @@ var Meeting = /** @class */ (function () {
                         this.isAudioActive = true;
                         this.isVideoActive = true;
                         return [2 /*return*/, newStream];
+                    case 3:
+                        error_4 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("enableAudioVideo", "can not read stream, please check exception", error_4);
+                    case 4: return [2 /*return*/];
                 }
             });
         });
     };
     Meeting.prototype.connectMeeting = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var error_4;
+            var error_5;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -533,8 +538,8 @@ var Meeting = /** @class */ (function () {
                         console.log("User connected to the meeting.");
                         return [3 /*break*/, 3];
                     case 2:
-                        error_4 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("connectMeeting", "can not connect meeting , please check exception", error_4);
+                        error_5 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("connectMeeting", "can not connect meeting , please check exception", error_5);
                     case 3: return [2 /*return*/];
                 }
             });
@@ -542,7 +547,7 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.isApproved = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var error_5;
+            var error_6;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -550,8 +555,8 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, this.appService.isApproved(this.meetingUser.Id)];
                     case 1: return [2 /*return*/, _a.sent()];
                     case 2:
-                        error_5 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("isApproved", "user is not approved , please check exception ", error_5);
+                        error_6 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("isApproved", "user is not approved , please check exception ", error_6);
                     case 3: return [2 /*return*/];
                 }
             });
@@ -559,7 +564,7 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.consume = function (producerUser) {
         return __awaiter(this, void 0, void 0, function () {
-            var result, error_6;
+            var result, error_7;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -570,8 +575,8 @@ var Meeting = /** @class */ (function () {
                         this.consumerTransports.push(result);
                         return [2 /*return*/, result.RemoteStream];
                     case 2:
-                        error_6 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("consume", producerUser.Id + "The stream of the user is currently not captured. User connection information is out of date.", error_6);
+                        error_7 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("consume", producerUser.Id + "The stream of the user is currently not captured. User connection information is out of date.", error_7);
                     case 3: return [2 /*return*/];
                 }
             });
@@ -799,7 +804,7 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.pauseConsumer = function (consumerTransport, kind) {
         return __awaiter(this, void 0, void 0, function () {
-            var error_7;
+            var error_8;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -833,7 +838,7 @@ var Meeting = /** @class */ (function () {
                         _a.label = 6;
                     case 6: return [3 /*break*/, 8];
                     case 7:
-                        error_7 = _a.sent();
+                        error_8 = _a.sent();
                         return [3 /*break*/, 8];
                     case 8: return [2 /*return*/];
                 }
@@ -842,7 +847,7 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.getAllUsers = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var error_8;
+            var error_9;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -853,7 +858,7 @@ var Meeting = /** @class */ (function () {
                     case 2: return [2 /*return*/, []];
                     case 3: return [3 /*break*/, 5];
                     case 4:
-                        error_8 = _a.sent();
+                        error_9 = _a.sent();
                         throw new conusma_exception_1.ConusmaException("getAllUsers", "Unable to fetch user list, please check detail exception");
                     case 5: return [2 /*return*/];
                 }
@@ -862,7 +867,7 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.getProducerUsers = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var users, result, error_9;
+            var users, result, error_10;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -881,7 +886,7 @@ var Meeting = /** @class */ (function () {
                     case 2: return [2 /*return*/, []];
                     case 3: return [3 /*break*/, 5];
                     case 4:
-                        error_9 = _a.sent();
+                        error_10 = _a.sent();
                         throw new conusma_exception_1.ConusmaException("getProducerUsers", "Unable to fetch producer user list, please check detail exception");
                     case 5: return [2 /*return*/];
                 }
