@@ -2,6 +2,7 @@ import { MeetingUserModel } from "./Models/meeting-user-model";
 import * as mediaServerClient from 'mediasoup-client';
 import { AppService } from "./app.service";
 import { ConusmaException } from "./Exceptions/conusma-exception";
+
 export class MediaServer {
     id: number = 0;
     socket: any = null;
@@ -118,19 +119,6 @@ export class MediaServer {
         }
 
     }
-    public closeProducer():void {
-
-    }
-
-    public consume(producerUser:MeetingUserModel):MediaStream {
-
-    }
-
-    public closeConsumer(user:MeetingUserModel):void {
-        
-    }
 
     
-
-    
-};
+}

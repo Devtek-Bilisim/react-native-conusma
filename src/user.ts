@@ -6,8 +6,6 @@ import { MeetingUserModel } from "./Models/meeting-user-model";
 import { UserModel } from "./Models/user-model";
 
 export class User {
-  
-
     constructor(_appService:AppService) {
         this.appService = _appService;
        
