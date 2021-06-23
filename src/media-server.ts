@@ -31,8 +31,24 @@ export class MediaServer {
         await this.device.load({ routerRtpCapabilities });
         console.log("device loaded.");
     }
+    public async produce(user:MeetingUserModel, localStream:MediaStream) {
+        try { 
+            await this.createProducerTransport();
+            if (user.Camera || user.ShareScreen) {
+                await this.createProducer(localStream, 'video');
+            }
+            if (user.Mic) {
+                await this.createProducer(localStream, 'audio');
+            }
+            user.MediaServerId = this.id;
+            this.appService.connectMeeting(user);
 
-    public async createProducerTransport() {
+        } catch (error) {
+            throw new ConusmaException("produce", "can not send stream, please check exception", error);
+        }
+    }
+
+    private async createProducerTransport() {
         try {
                 console.log("createProducerTransport started.");
                 var transportOptions: any = await this.signal('createProducerTransport', {}, this.socket);
@@ -64,7 +80,7 @@ export class MediaServer {
         }
     }
 
-    public async createProducer(localStream: MediaStream, kind: string) {
+    private async createProducer(localStream: MediaStream, kind: string) {
         try {
             if (kind == 'video') {
                 const videoTrack = localStream.getVideoTracks()[0];
@@ -118,6 +134,145 @@ export class MediaServer {
             console.error("no socket connection " + type);
         }
 
+    }
+
+    public async consume(producerUser: MeetingUserModel) {
+        try {
+            var result = await this.createConsumerTransport(this, producerUser);
+            this.consumerTransports.push(result);
+            return <MediaStream>result.RemoteStream;
+        } catch (error) {
+
+            throw new ConusmaException("consume", producerUser.Id + "The stream of the user is currently not captured. User connection information is out of date.", error);
+        }
+    }
+
+    private async createConsumerTransport(targetMediaServerClient: MediaServer, user: MeetingUserModel) {
+        if (targetMediaServerClient != null && targetMediaServerClient.socket != null) {
+            console.log("createConsumerChildFunction start.");
+
+            var consumerTransport: any = new Object();
+            consumerTransport.MediaServer = targetMediaServerClient;
+            consumerTransport.MeetingUserId = user.Id;
+            var transportOptions = await this.signal("createConsumerTransport", { MeetingUserId: user.Id }, targetMediaServerClient.socket);
+            consumerTransport.MediaServerSocketId = user.MediaServerSocketId;
+            consumerTransport.transportId = transportOptions.Id;
+            consumerTransport.transport = await targetMediaServerClient.device.createRecvTransport(transportOptions.transportOptions);
+            consumerTransport.transport.on("connect", async ({ dtlsParameters }: any, callback: any, errback: any) => {
+                this.signal("connectConsumerTransport", { consumerTransportId: consumerTransport.transportId, dtlsParameters: dtlsParameters }, targetMediaServerClient.socket)
+                    .then(callback)
+                    .catch(errback);
+            });
+            consumerTransport.RemoteStream = new MediaStream();
+            consumerTransport.Camera = user.Camera;
+            consumerTransport.Mic = user.Mic;
+            consumerTransport.ShareScreen = user.ShareScreen;
+            console.log("createConsumerChildFunction creating the consumer.");
+
+            if (user.Camera || user.ShareScreen) {
+                await this.addConsumer(consumerTransport, "video");
+            }
+
+            if (user.Mic) {
+                await this.addConsumer(consumerTransport, "audio");
+            }
+            return consumerTransport;
+        } else {
+            throw new ConusmaException("createConsumerChildFunction", "No socket connection.");
+        }
+    }
+
+    private async addConsumer(consumerTransport: any, kind: string) {
+        if (consumerTransport != null) {
+            if (kind == "video") {
+                consumerTransport.videoConsumer = await this.consumeTransport(consumerTransport, "video");
+                this.resumeConsumer(consumerTransport, "video");
+                consumerTransport.RemoteStream.addTrack(consumerTransport.videoConsumer.track);
+            } else {
+                consumerTransport.audioConsumer = await this.consumeTransport(consumerTransport, "audio");
+                this.resumeConsumer(consumerTransport, "audio");
+                consumerTransport.RemoteStream.addTrack(consumerTransport.audioConsumer.track);
+                consumerTransport.audioConsumer.resume();
+            }
+        }
+    }
+    private async resumeConsumer(consumerTransport: any, kind: string) {
+        this.signal('resume', { consumerTransportId: consumerTransport.transportId, kind: kind }, consumerTransport.MediaServer.socket);
+    }
+
+
+    private async consumeTransport(consumerTransport: any, trackKind: string) {
+        const { rtpCapabilities } = consumerTransport.MediaServer.mediaServerDevice;
+        const data = await this.signal("consume", { consumerTransportId: consumerTransport.transportId, rtpCapabilities: rtpCapabilities, kind: trackKind }, consumerTransport.MediaServer.socket)
+            .catch(err => {
+                throw new ConusmaException("consumeTransport", "Consume error.", err);
+            });
+        const {
+            producerId,
+            id,
+            kind,
+            rtpParameters,
+        } = data;
+        let codecOptions = {};
+        const consumer = await consumerTransport.transport.consume({
+            id,
+            producerId,
+            kind,
+            rtpParameters,
+            codecOptions,
+        });
+        return consumer;
+    }
+
+      
+    private async pauseConsumer(consumerTransport: any, kind: string) {
+        try {
+            if (consumerTransport != null && consumerTransport.videoConsumer != null) {
+                if (kind == 'video') {
+                    await this.signal('pause', {
+                        kind: 'video',
+                        consumerTransportId: consumerTransport.transportId
+                    }, consumerTransport.MediaServer.socket);
+                    await consumerTransport.videoConsumer.pause();;
+                    consumerTransport.RemoteStream.removeTrack(consumerTransport.videoConsumer.track);
+                }
+                else if (kind == 'audio' && consumerTransport.audioConsumer != null) {
+                    await this.signal('pause', {
+                        kind: 'audio',
+                        consumerTransportId: consumerTransport.transportId
+                    }, consumerTransport.MediaServer.socket);
+                    await consumerTransport.audioConsumer.pause();
+                    consumerTransport.RemoteStream.removeTrack(consumerTransport.audioConsumer.track);
+                }
+            }
+        } catch (error) {
+
+        }
+    }
+    public async closeConsumer(user: MeetingUserModel) {
+        try {
+            var index = 0;
+            for (let item of this.consumerTransports) {
+                if (item.MeetingUserId == user.Id) {
+                    if (item.transport) {
+                        item.transport.close();
+                    }
+                    break;
+                }
+                index++;
+            };
+            this.removeItemOnce(this.consumerTransports, index);
+        } catch (error) {
+            throw new ConusmaException("isApproved", "user is not approved , please check exception ", error);
+        }
+
+    }
+
+    private removeItemOnce(arr: any, index: any) {
+        if (index > -1) {
+            arr.splice(index, 1);
+        }
+        return arr;
     }
 
     
