@@ -6,12 +6,13 @@ export class ConusmaRestApiException extends Error {
         this.statusCode = _statusCode;
         if(_ex != null)
         {
-            this.detailEx = _ex;
+            var data = JSON.stringify(_ex, Object.getOwnPropertyNames(_ex))
+            this.detailEx = JSON.parse(data);
         }
         Object.setPrototypeOf(this, ConusmaRestApiException.prototype);
 
     };
-    public detailEx:Error = new Error(); 
+    public detailEx:JSON; 
     public statusCode:number=0;
     public message:string=""; 
 }

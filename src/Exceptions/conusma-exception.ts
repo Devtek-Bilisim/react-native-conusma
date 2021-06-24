@@ -6,11 +6,12 @@ export class ConusmaException extends Error {
         this.type = _type;
         if(_ex != null)
         {
-            this.detailEx = _ex;
+            var data = JSON.stringify(_ex, Object.getOwnPropertyNames(_ex))
+            this.detailEx = JSON.parse(data);
         }
         Object.setPrototypeOf(this, ConusmaException.prototype);
     };
-    public detailEx:Error = new Error(); 
+    public detailEx:JSON; 
     public message:string="";
     public type:string="";
     public className:string=""; 
