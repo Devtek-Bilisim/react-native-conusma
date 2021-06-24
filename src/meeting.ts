@@ -99,7 +99,7 @@ export class Meeting {
             this.mediaServers.push(mediaServer);
             var userInfoData = { 'MeetingUserId': this.activeUser.Id, 'Token': this.appService.getJwtToken() };
             let setUserInfo = await this.signal('UserInfo', userInfoData, mediaServer.socket);
-
+            await mediaServer.load();
         }
       
         mediaServer.socket.on('disconnect', async () => {
@@ -107,8 +107,6 @@ export class Meeting {
                 throw new ConusmaException("mediaserverconnection", "mediaserverconnection disconnect");
             }
         });
-
-        await mediaServer.load();
         
         return mediaServer;
     }
@@ -271,7 +269,6 @@ export class Meeting {
         var mediaServer = await this.createMediaServer(mediaServerModel);
         var connection:Connection = new Connection(this.activeUser, mediaServer);
         connection.isProducer = true;
-        this.mediaServers.push(mediaServer);
         this.connections.push(connection);
         return connection;
     }
@@ -280,7 +277,6 @@ export class Meeting {
         const mediaServerModel: any = await this.appService.getMediaServerById(this.activeUser.Id, user.MediaServerId);
         var mediaServer = await this.createMediaServer(mediaServerModel);
         var connection:Connection = new Connection(user, mediaServer);
-        this.mediaServers.push(mediaServer);
         this.connections.push(connection);
         return connection;
     }
