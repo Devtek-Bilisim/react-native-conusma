@@ -6,8 +6,8 @@ import DeviceInfo from 'react-native-device-info';
 export class Connection {
     user:MeetingUserModel;
     mediaServer:MediaServer;
-    localStream:MediaStream;
-    remoteStream:MediaStream;
+    stream:MediaStream;
+    isProducer:boolean = false;
 
     private cameraCrashCounter = 2;
     private isAudioActive = true;
@@ -15,13 +15,12 @@ export class Connection {
     constructor(user:MeetingUserModel, mediaServer:MediaServer) {
         this.user = user;
         this.mediaServer = mediaServer;
-        this.localStream = new MediaStream();
-        this.remoteStream = new MediaStream();
+        this.stream = new MediaStream();
     }
     
     public switchCamera() {
         try {
-            if (this.localStream != null) {
+            if (this.isProducer && this.stream != null) {
 
                 var deviceModel: string = DeviceInfo.getModel();
                 deviceModel = deviceModel.toLowerCase();
@@ -30,9 +29,9 @@ export class Connection {
                         throw new Error("camera switching is not supported on this model ");
                     }
                 }
-                (this.localStream as any).getVideoTracks()[0]._switchCamera();
+                (this.stream as any).getVideoTracks()[0]._switchCamera();
                 this.cameraCrashCounter--;
-                return this.localStream;
+                return this.stream;
             }
             else {
                 throw new Error("stream not found, first call enableAudioVideo function");
@@ -45,8 +44,8 @@ export class Connection {
 
     public toggleAudio() {
         try {
-            if (this.localStream != null) {
-                this.localStream.getTracks().forEach((t: any) => {
+            if (this.isProducer && this.stream != null) {
+                this.stream.getTracks().forEach((t: any) => {
                     if (t.kind === 'audio') {
                         t.enabled = !t.enabled;
                         this.isAudioActive = t.enabled;
@@ -65,9 +64,9 @@ export class Connection {
     }
     public toggleVideo() {
         try {
-            if (this.localStream != null) {
+            if (this.isProducer && this.stream != null) {
                 this.isVideoActive = !this.isVideoActive;
-                this.localStream.getVideoTracks()[0].enabled = this.isVideoActive;
+                this.stream.getVideoTracks()[0].enabled = this.isVideoActive;
                 return this.isVideoActive;
             }
             else {

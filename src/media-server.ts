@@ -263,7 +263,7 @@ export class MediaServer {
             };
             this.removeItemOnce(this.consumerTransports, index);
         } catch (error) {
-            throw new ConusmaException("isApproved", "user is not approved , please check exception ", error);
+            throw new ConusmaException("closeConsumer", "consumer cannot be closed, please check exception", error);
         }
 
     }
@@ -275,5 +275,14 @@ export class MediaServer {
         return arr;
     }
 
+    public async closeProducer() {
+        try {
+            if (this.producerTransport)
+                this.producerTransport.close(); 
+        } catch (error) {
+            throw new ConusmaException("closeProducer", "producer cannot be closed, please check exception ", error);
+        }
+
+    }
     
 }

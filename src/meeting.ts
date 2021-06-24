@@ -31,7 +31,7 @@ export class Meeting {
         this.conusmaWorker = new ConusmaWorker(this.appService, this.activeUser);
     }
 
-    public startWorker() {
+    public open() {
         try {
             this.isClosedRequestRecieved = false;
             this.conusmaWorker.start();
@@ -45,12 +45,12 @@ export class Meeting {
                 console.log("Meeting updated.");
             });
         } catch (error) {
-            throw new ConusmaException("startWorker", "cannot start worker, please check exception", error);
+            throw new ConusmaException("open", "cannot open, please check exception", error);
 
         }
     }
 
-    public async stopWorker(sendCloseRequest: boolean = false) {
+    public async close(sendCloseRequest: boolean = false) {
         try {
             if (sendCloseRequest) {
                 var closeData = { 'MeetingUserId': this.activeUser.Id };
@@ -61,7 +61,7 @@ export class Meeting {
                 this.conusmaWorker.terminate();
             }
         } catch (error) {
-            throw new ConusmaException("stopWorker", "can not stop worker, please check exception", error);
+            throw new ConusmaException("close", "cannot close, please check exception", error);
         }
     }
 
@@ -207,5 +207,44 @@ export class Meeting {
         } catch (error) {
             throw new ConusmaException("setSpeaker", "setSpeaker undefined error", error);
         }
+    }
+
+    public async produce(localStream:MediaStream) {
+        var connection = await this.createConnectionForProducer();
+        connection.stream = localStream;
+        await connection.mediaServer.produce(this.activeUser, localStream);
+        return connection; 
+    }
+
+    public async closeProducer(connection:Connection) {
+        await connection.mediaServer.closeProducer();
+    }
+
+    public async consume(user:MeetingUserModel) {
+        var connection = await this.createConnectionForConsumer(user);
+        connection.stream = await connection.mediaServer.consume(user);
+        return connection; 
+    }
+    public async closeConsumer(connection:Connection) {
+        await connection.mediaServer.closeConsumer(connection.user);
+    }
+
+    private async createConnectionForProducer() {
+        const mediaServerModel: any = await this.getMediaServer(this.activeUser.Id);
+        var mediaServer = await this.createMediaServer(mediaServerModel);
+        var connection:Connection = new Connection(this.activeUser, mediaServer);
+        this.mediaServers.push(mediaServer);
+        this.connections.push(connection);
+        return connection;
+    }
+
+    private async createConnectionForConsumer(user:MeetingUserModel) {
+        const mediaServerModel: any = await this.getMediaServer(user.Id);
+        var mediaServer = await this.createMediaServer(mediaServerModel);
+        var connection:Connection = new Connection(user, mediaServer);
+        connection.isProducer = true;
+        this.mediaServers.push(mediaServer);
+        this.connections.push(connection);
+        return connection;
     }
 }
