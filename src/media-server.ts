@@ -99,7 +99,7 @@ export class MediaServer {
                 });
             }
             else if (kind == 'audio') {
-                this.audioProducer = await this.producerTransport.transport.produce({
+                this.audioProducer = await this.producerTransport.produce({
                     track: localStream.getAudioTracks()[0],
                     appData: { mediaTag: 'audio' }
                 });
