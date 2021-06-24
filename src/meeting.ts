@@ -261,7 +261,7 @@ export class Meeting {
     }
 
     private async createConnectionForConsumer(user:MeetingUserModel) {
-        const mediaServerModel: any = await this.appService.getMediaServer(user.Id);
+        const mediaServerModel: any = await this.appService.getMediaServerById(this.activeUser.Id, user.MediaServerId);
         var mediaServer = await this.createMediaServer(mediaServerModel);
         var connection:Connection = new Connection(user, mediaServer);
         connection.isProducer = true;
