@@ -1,6 +1,5 @@
 import { MeetingUserModel } from "./Models/meeting-user-model";
 import { MediaServer } from "./media-server";
-import { AppService } from "./app.service";
 import { ConusmaException } from "./Exceptions/conusma-exception";
 import DeviceInfo from 'react-native-device-info';
 export class Connection {
@@ -28,7 +27,7 @@ export class Connection {
                 deviceModel = deviceModel.toLowerCase();
                 if (deviceModel.includes('sm-n975') || deviceModel.includes('sm-g981') || deviceModel.includes('sm-g980')) {
                     if (this.cameraCrashCounter <= 0) {
-                        throw new Error("camera switching is not supported on this model ");
+                        throw new Error("camera switching is not supported on this model");
                     }
                 }
                 (this.stream as any).getVideoTracks()[0]._switchCamera();
@@ -36,7 +35,7 @@ export class Connection {
                 return this.stream;
             }
             else {
-                throw new Error("stream not found, first call enableAudioVideo function");
+                throw new ConusmaException("switchCamera", "stream not found, first call enableAudioVideo function");
             }
 
         } catch (error) {
