@@ -72,6 +72,11 @@ export class Meeting {
         }
     }
 
+    public async closeForAll() {
+        var closeData = { 'MeetingUserId': this.activeUser.Id };
+        await this.appService.liveMeetingCloseAll(closeData);
+        await this.close(false);   
+    }
     
 
     private async createMediaServer(mediaServerModel: any) {
