@@ -10,8 +10,10 @@ export class Connection {
     isProducer:boolean = false;
 
     private cameraCrashCounter = 2;
-    private isAudioActive = true;
-    private isVideoActive = true;
+    
+    public isAudioActive = true;
+    public isVideoActive = true;
+
     constructor(user:MeetingUserModel, mediaServer:MediaServer) {
         this.user = user;
         this.mediaServer = mediaServer;
