@@ -255,6 +255,7 @@ export class Meeting {
         const mediaServerModel: any = await this.appService.getMediaServer(this.activeUser.Id);
         var mediaServer = await this.createMediaServer(mediaServerModel);
         var connection:Connection = new Connection(this.activeUser, mediaServer);
+        connection.isProducer = true;
         this.mediaServers.push(mediaServer);
         this.connections.push(connection);
         return connection;
@@ -264,7 +265,6 @@ export class Meeting {
         const mediaServerModel: any = await this.appService.getMediaServerById(this.activeUser.Id, user.MediaServerId);
         var mediaServer = await this.createMediaServer(mediaServerModel);
         var connection:Connection = new Connection(user, mediaServer);
-        connection.isProducer = true;
         this.mediaServers.push(mediaServer);
         this.connections.push(connection);
         return connection;
