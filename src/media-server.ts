@@ -202,7 +202,7 @@ export class MediaServer {
 
 
     private async consumeTransport(consumerTransport: any, trackKind: string) {
-        const { rtpCapabilities } = consumerTransport.MediaServer.mediaServerDevice;
+        const { rtpCapabilities } = consumerTransport.MediaServer.device;
         const data = await this.signal("consume", { consumerTransportId: consumerTransport.transportId, rtpCapabilities: rtpCapabilities, kind: trackKind }, consumerTransport.MediaServer.socket)
             .catch(err => {
                 throw new ConusmaException("consumeTransport", "Consume error.", err);
