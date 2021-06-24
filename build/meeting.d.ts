@@ -3,6 +3,7 @@ import { MeetingUserModel } from "./Models/meeting-user-model";
 import { ConusmaWorker } from "./conusma-worker";
 import { MediaServer } from "./media-server";
 import { Connection } from "./connection";
+import { MeetingModel } from "./Models/meeting-model";
 export declare class Meeting {
     activeUser: MeetingUserModel;
     conusmaWorker: ConusmaWorker;
@@ -14,6 +15,7 @@ export declare class Meeting {
     open(): void;
     close(sendCloseRequest?: boolean): Promise<void>;
     closeForAll(): Promise<void>;
+    getMeetingInfo(): Promise<MeetingModel>;
     private createMediaServer;
     private signal;
     enableAudioVideo(): Promise<MediaStream>;

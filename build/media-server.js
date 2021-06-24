@@ -379,7 +379,7 @@ var MediaServer = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        rtpCapabilities = consumerTransport.MediaServer.mediaServerDevice.rtpCapabilities;
+                        rtpCapabilities = consumerTransport.MediaServer.device.rtpCapabilities;
                         return [4 /*yield*/, this.signal("consume", { consumerTransportId: consumerTransport.transportId, rtpCapabilities: rtpCapabilities, kind: trackKind }, consumerTransport.MediaServer.socket)
                                 .catch(function (err) {
                                 throw new conusma_exception_1.ConusmaException("consumeTransport", "Consume error.", err);

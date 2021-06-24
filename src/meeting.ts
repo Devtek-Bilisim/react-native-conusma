@@ -10,6 +10,7 @@ import InCallManager from 'react-native-incall-manager';
 
 import { MediaServer } from "./media-server";
 import { Connection } from "./connection";
+import { MeetingModel } from "./Models/meeting-model";
 
 
 export class Meeting {
@@ -79,7 +80,7 @@ export class Meeting {
     }
     
     public async getMeetingInfo() {
-        return await this.appService.getLiveMeetingInfo({ 'MeetingUserId': this.activeUser.Id });
+        return <MeetingModel>await this.appService.getLiveMeetingInfo({ 'MeetingUserId': this.activeUser.Id });
     }
 
     private async createMediaServer(mediaServerModel: any) {

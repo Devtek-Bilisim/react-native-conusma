@@ -129,6 +129,16 @@ var Meeting = /** @class */ (function () {
             });
         });
     };
+    Meeting.prototype.getMeetingInfo = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.appService.getLiveMeetingInfo({ 'MeetingUserId': this.activeUser.Id })];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
     Meeting.prototype.createMediaServer = function (mediaServerModel) {
         return __awaiter(this, void 0, void 0, function () {
             var mediaServer, userInfoData, setUserInfo;

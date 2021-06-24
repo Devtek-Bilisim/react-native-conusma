@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MeetingModel = void 0;
+exports.MeetingStatusEnum = exports.MeetingModel = void 0;
 var MeetingModel = /** @class */ (function () {
     function MeetingModel() {
         this.InviteCode = "";
@@ -22,3 +22,9 @@ var MeetingModel = /** @class */ (function () {
     return MeetingModel;
 }());
 exports.MeetingModel = MeetingModel;
+var MeetingStatusEnum;
+(function (MeetingStatusEnum) {
+    MeetingStatusEnum[MeetingStatusEnum["active"] = 1] = "active";
+    MeetingStatusEnum[MeetingStatusEnum["end"] = 2] = "end";
+    MeetingStatusEnum[MeetingStatusEnum["locked"] = 3] = "locked";
+})(MeetingStatusEnum = exports.MeetingStatusEnum || (exports.MeetingStatusEnum = {}));
