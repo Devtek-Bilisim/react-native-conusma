@@ -72,9 +72,7 @@ export class Meeting {
         }
     }
 
-    private async getMediaServer(meetingUserId: string) {
-        return await this.appService.getMediaServer(meetingUserId);
-    }
+    
 
     private async createMediaServer(mediaServerModel: any) {
         var mediaServer: MediaServer = <MediaServer>this.mediaServers.find((ms: any) => ms.Id == mediaServerModel.Id);
@@ -237,7 +235,7 @@ export class Meeting {
     }
 
     private async createConnectionForProducer() {
-        const mediaServerModel: any = await this.getMediaServer(this.activeUser.Id);
+        const mediaServerModel: any = await this.appService.getMediaServer(this.activeUser.Id);
         var mediaServer = await this.createMediaServer(mediaServerModel);
         var connection:Connection = new Connection(this.activeUser, mediaServer);
         this.mediaServers.push(mediaServer);
@@ -246,7 +244,7 @@ export class Meeting {
     }
 
     private async createConnectionForConsumer(user:MeetingUserModel) {
-        const mediaServerModel: any = await this.getMediaServer(user.Id);
+        const mediaServerModel: any = await this.appService.getMediaServer(user.Id);
         var mediaServer = await this.createMediaServer(mediaServerModel);
         var connection:Connection = new Connection(user, mediaServer);
         connection.isProducer = true;
