@@ -223,6 +223,18 @@ export class Meeting {
 
     public async closeProducer(connection:Connection) {
         await connection.mediaServer.closeProducer();
+        for (var i = 0; i < this.connections.length; i++) {
+            if (this.connections[i].user.Id == connection.user.Id && this.connections[i].mediaServer.id == connection.mediaServer.id) {
+                this.removeItemOnce(this.connections, i);
+            }
+        }
+    }
+
+    private removeItemOnce(arr: any, index: any) {
+        if (index > -1) {
+            arr.splice(index, 1);
+        }
+        return arr;
     }
 
     public async consume(user:MeetingUserModel) {
@@ -232,6 +244,11 @@ export class Meeting {
     }
     public async closeConsumer(connection:Connection) {
         await connection.mediaServer.closeConsumer(connection.user);
+        for (var i = 0; i < this.connections.length; i++) {
+            if (this.connections[i].user.Id == connection.user.Id && this.connections[i].mediaServer.id == connection.mediaServer.id) {
+                this.removeItemOnce(this.connections, i);
+            }
+        }
     }
 
     private async createConnectionForProducer() {
