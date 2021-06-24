@@ -68,6 +68,12 @@ export class Meeting {
                     item.mediaServer.closeProducer();
                 }
             }
+            for (var i = 0; i < this.connections.length; i++) {
+                    if (this.connections[i].mediaServer.socket && this.connections[i].mediaServer.socket.connected)  {
+                        this.connections[i].mediaServer.socket.close();
+                    }
+                    this.removeItemOnce(this.connections, i);
+            }
         } catch (error) {
             throw new ConusmaException("close", "cannot close, please check exception", error);
         }
