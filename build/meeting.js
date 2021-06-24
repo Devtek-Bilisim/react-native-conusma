@@ -78,7 +78,7 @@ var Meeting = /** @class */ (function () {
     Meeting.prototype.close = function (sendCloseRequest) {
         if (sendCloseRequest === void 0) { sendCloseRequest = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var closeData, _i, _a, item, error_1;
+            var closeData, _i, _a, item, i, error_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -101,6 +101,12 @@ var Meeting = /** @class */ (function () {
                             else {
                                 item.mediaServer.closeProducer();
                             }
+                        }
+                        for (i = 0; i < this.connections.length; i++) {
+                            if (this.connections[i].mediaServer.socket && this.connections[i].mediaServer.socket.connected) {
+                                this.connections[i].mediaServer.socket.close();
+                            }
+                            this.removeItemOnce(this.connections, i);
                         }
                         return [3 /*break*/, 4];
                     case 3:

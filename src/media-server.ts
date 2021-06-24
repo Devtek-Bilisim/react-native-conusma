@@ -34,10 +34,10 @@ export class MediaServer {
     public async produce(user:MeetingUserModel, localStream:MediaStream) {
         try { 
             await this.createProducerTransport();
-            if (user.Camera || user.ShareScreen) {
+            if (localStream.getVideoTracks().length > 0) {
                 await this.createProducer(localStream, 'video');
             }
-            if (user.Mic) {
+            if (localStream.getAudioTracks().length > 0) {
                 await this.createProducer(localStream, 'audio');
             }
             user.MediaServerId = this.id;
