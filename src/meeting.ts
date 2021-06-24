@@ -60,6 +60,13 @@ export class Meeting {
             if (this.conusmaWorker != null) {
                 this.conusmaWorker.terminate();
             }
+            for (let item of this.connections) {
+                if (!item.isProducer)
+                    item.mediaServer.closeConsumer(item.user);
+                else {
+                    item.mediaServer.closeProducer();
+                }
+            }
         } catch (error) {
             throw new ConusmaException("close", "cannot close, please check exception", error);
         }
