@@ -78,6 +78,9 @@ export class Meeting {
         await this.close(false);   
     }
     
+    public async getMeetingInfo() {
+        return await this.appService.getLiveMeetingInfo({ 'MeetingUserId': this.activeUser.Id });
+    }
 
     private async createMediaServer(mediaServerModel: any) {
         var mediaServer: MediaServer = <MediaServer>this.mediaServers.find((ms: any) => ms.Id == mediaServerModel.Id);
