@@ -104,16 +104,20 @@ var MediaServer = /** @class */ (function () {
                         return [4 /*yield*/, this.createProducerTransport()];
                     case 1:
                         _a.sent();
-                        if (!(user.Camera || user.ShareScreen)) return [3 /*break*/, 3];
+                        if (!(localStream.getVideoTracks().length > 0)) return [3 /*break*/, 3];
                         return [4 /*yield*/, this.createProducer(localStream, 'video')];
                     case 2:
                         _a.sent();
+                        user.Camera = true;
+                        user.ActiveCamera = true;
                         _a.label = 3;
                     case 3:
-                        if (!user.Mic) return [3 /*break*/, 5];
+                        if (!(localStream.getAudioTracks().length > 0)) return [3 /*break*/, 5];
                         return [4 /*yield*/, this.createProducer(localStream, 'audio')];
                     case 4:
                         _a.sent();
+                        user.Mic = true;
+                        user.ActiveMic = true;
                         _a.label = 5;
                     case 5:
                         user.MediaServerId = this.id;

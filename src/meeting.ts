@@ -11,14 +11,15 @@ import InCallManager from 'react-native-incall-manager';
 import { MediaServer } from "./media-server";
 import { Connection } from "./connection";
 import { MeetingModel } from "./Models/meeting-model";
+import { MediaServerModel } from "./Models/media-server-model";
 
 
 export class Meeting {
     public activeUser: MeetingUserModel;
     public conusmaWorker: ConusmaWorker;
 
-    public mediaServers: Array<MediaServer> = [];
-    public connections: Array<Connection> = [];
+    public mediaServers: MediaServer[] = new Array();
+    public connections: Connection[] = new Array();
 
     private appService: AppService;
 
@@ -89,25 +90,23 @@ export class Meeting {
         return <MeetingModel>await this.appService.getLiveMeetingInfo({ 'MeetingUserId': this.activeUser.Id });
     }
 
-    private async createMediaServer(mediaServerModel: any) {
-        var mediaServer: MediaServer = <MediaServer>this.mediaServers.find((ms: any) => ms.Id == mediaServerModel.Id);
-        
-        if (mediaServer == null) {
+    private async createMediaServer(_MediaServerModel:MediaServerModel) {
+
+        var mediaServer = this.mediaServers.find( us => us.id == _MediaServerModel.Id);
+        if (mediaServer == null || mediaServer == undefined) {
             mediaServer = new MediaServer(this.appService);
-            mediaServer.id = mediaServerModel.Id;
-            mediaServer.socket = io.connect(mediaServerModel.ConnectionDnsAddress + ":" + mediaServerModel.Port);
+            mediaServer.id = _MediaServerModel.Id;
+            mediaServer.socket = io.connect(_MediaServerModel.ConnectionDnsAddress + ":" + _MediaServerModel.Port);
             this.mediaServers.push(mediaServer);
             var userInfoData = { 'MeetingUserId': this.activeUser.Id, 'Token': this.appService.getJwtToken() };
             let setUserInfo = await this.signal('UserInfo', userInfoData, mediaServer.socket);
             await mediaServer.load();
-        }
-      
-        mediaServer.socket.on('disconnect', async () => {
-            if (!this.isClosedRequestRecieved) {
-                throw new ConusmaException("mediaserverconnection", "mediaserverconnection disconnect");
-            }
-        });
-        
+            mediaServer.socket.on('disconnect', async () => {
+                if (!this.isClosedRequestRecieved) {
+                    throw new ConusmaException("mediaserverconnection", "mediaserverconnection disconnect");
+                }
+            });
+        }        
         return mediaServer;
     }
     
@@ -265,16 +264,20 @@ export class Meeting {
     }
 
     private async createConnectionForProducer() {
-        const mediaServerModel: any = await this.appService.getMediaServer(this.activeUser.Id);
+        const mediaServerModel: MediaServerModel = <MediaServerModel>await this.appService.getMediaServer(this.activeUser.Id);
+
         var mediaServer = await this.createMediaServer(mediaServerModel);
+
         var connection:Connection = new Connection(this.activeUser, mediaServer);
+
         connection.isProducer = true;
+
         this.connections.push(connection);
         return connection;
     }
 
     private async createConnectionForConsumer(user:MeetingUserModel) {
-        const mediaServerModel: any = await this.appService.getMediaServerById(this.activeUser.Id, user.MediaServerId);
+        const mediaServerModel: MediaServerModel = <MediaServerModel>await this.appService.getMediaServerById(this.activeUser.Id, user.MediaServerId);
         var mediaServer = await this.createMediaServer(mediaServerModel);
         var connection:Connection = new Connection(user, mediaServer);
         this.connections.push(connection);

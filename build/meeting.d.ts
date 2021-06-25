@@ -7,8 +7,8 @@ import { MeetingModel } from "./Models/meeting-model";
 export declare class Meeting {
     activeUser: MeetingUserModel;
     conusmaWorker: ConusmaWorker;
-    mediaServers: Array<MediaServer>;
-    connections: Array<Connection>;
+    mediaServers: MediaServer[];
+    connections: Connection[];
     private appService;
     isClosedRequestRecieved: boolean;
     constructor(activeUser: MeetingUserModel, appService: AppService);

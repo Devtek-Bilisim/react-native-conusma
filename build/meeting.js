@@ -49,8 +49,8 @@ var media_server_1 = require("./media-server");
 var connection_1 = require("./connection");
 var Meeting = /** @class */ (function () {
     function Meeting(activeUser, appService) {
-        this.mediaServers = [];
-        this.connections = [];
+        this.mediaServers = new Array();
+        this.connections = new Array();
         this.isClosedRequestRecieved = false;
         react_native_webrtc_1.registerGlobals();
         this.appService = appService;
@@ -145,25 +145,26 @@ var Meeting = /** @class */ (function () {
             });
         });
     };
-    Meeting.prototype.createMediaServer = function (mediaServerModel) {
+    Meeting.prototype.createMediaServer = function (_MediaServerModel) {
         return __awaiter(this, void 0, void 0, function () {
             var mediaServer, userInfoData, setUserInfo;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        mediaServer = this.mediaServers.find(function (ms) { return ms.Id == mediaServerModel.Id; });
-                        if (!(mediaServer == null)) return [3 /*break*/, 2];
+                        mediaServer = this.mediaServers.find(function (us) { return us.id == _MediaServerModel.Id; });
+                        if (!(mediaServer == null || mediaServer == undefined)) return [3 /*break*/, 3];
                         mediaServer = new media_server_1.MediaServer(this.appService);
-                        mediaServer.id = mediaServerModel.Id;
-                        mediaServer.socket = socket_io_1.default.connect(mediaServerModel.ConnectionDnsAddress + ":" + mediaServerModel.Port);
+                        mediaServer.id = _MediaServerModel.Id;
+                        mediaServer.socket = socket_io_1.default.connect(_MediaServerModel.ConnectionDnsAddress + ":" + _MediaServerModel.Port);
                         this.mediaServers.push(mediaServer);
                         userInfoData = { 'MeetingUserId': this.activeUser.Id, 'Token': this.appService.getJwtToken() };
                         return [4 /*yield*/, this.signal('UserInfo', userInfoData, mediaServer.socket)];
                     case 1:
                         setUserInfo = _a.sent();
-                        _a.label = 2;
+                        return [4 /*yield*/, mediaServer.load()];
                     case 2:
+                        _a.sent();
                         mediaServer.socket.on('disconnect', function () { return __awaiter(_this, void 0, void 0, function () {
                             return __generator(this, function (_a) {
                                 if (!this.isClosedRequestRecieved) {
@@ -172,10 +173,8 @@ var Meeting = /** @class */ (function () {
                                 return [2 /*return*/];
                             });
                         }); });
-                        return [4 /*yield*/, mediaServer.load()];
-                    case 3:
-                        _a.sent();
-                        return [2 /*return*/, mediaServer];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/, mediaServer];
                 }
             });
         });
@@ -433,7 +432,6 @@ var Meeting = /** @class */ (function () {
                         mediaServer = _a.sent();
                         connection = new connection_1.Connection(this.activeUser, mediaServer);
                         connection.isProducer = true;
-                        this.mediaServers.push(mediaServer);
                         this.connections.push(connection);
                         return [2 /*return*/, connection];
                 }
@@ -452,7 +450,6 @@ var Meeting = /** @class */ (function () {
                     case 2:
                         mediaServer = _a.sent();
                         connection = new connection_1.Connection(user, mediaServer);
-                        this.mediaServers.push(mediaServer);
                         this.connections.push(connection);
                         return [2 /*return*/, connection];
                 }

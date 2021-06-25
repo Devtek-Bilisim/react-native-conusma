@@ -18,14 +18,14 @@ var ConusmaException = /** @class */ (function (_super) {
     __extends(ConusmaException, _super);
     function ConusmaException(_type, _message, _ex) {
         var _this = _super.call(this) || this;
+        _this.detailEx = "";
         _this.message = "";
         _this.type = "";
         _this.className = "";
         _this.message = _message;
         _this.type = _type;
         if (_ex != null) {
-            var data = JSON.stringify(_ex, Object.getOwnPropertyNames(_ex));
-            _this.detailEx = JSON.parse(data);
+            _this.detailEx = _ex.message;
         }
         Object.setPrototypeOf(_this, ConusmaException.prototype);
         return _this;

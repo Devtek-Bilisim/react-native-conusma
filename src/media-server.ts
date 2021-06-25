@@ -36,9 +36,13 @@ export class MediaServer {
             await this.createProducerTransport();
             if (localStream.getVideoTracks().length > 0) {
                 await this.createProducer(localStream, 'video');
+                user.Camera = true;
+                user.ActiveCamera = true;
             }
             if (localStream.getAudioTracks().length > 0) {
                 await this.createProducer(localStream, 'audio');
+                user.Mic = true;
+                user.ActiveMic = true;
             }
             user.MediaServerId = this.id;
             this.appService.connectMeeting(user);
@@ -150,7 +154,6 @@ export class MediaServer {
     private async createConsumerTransport(targetMediaServerClient: MediaServer, user: MeetingUserModel) {
         if (targetMediaServerClient != null && targetMediaServerClient.socket != null) {
             console.log("createConsumerChildFunction start.");
-
             var consumerTransport: any = new Object();
             consumerTransport.MediaServer = targetMediaServerClient;
             consumerTransport.MeetingUserId = user.Id;
@@ -168,7 +171,6 @@ export class MediaServer {
             consumerTransport.Mic = user.Mic;
             consumerTransport.ShareScreen = user.ShareScreen;
             console.log("createConsumerChildFunction creating the consumer.");
-
             if (user.Camera || user.ShareScreen) {
                 await this.addConsumer(consumerTransport, "video");
             }
