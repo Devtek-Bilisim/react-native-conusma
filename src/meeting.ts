@@ -24,7 +24,7 @@ export class Meeting {
     private appService: AppService;
 
     public isClosedRequestRecieved: boolean = false;
-    
+
 
     constructor(activeUser: MeetingUserModel, appService: AppService) {
         registerGlobals();
@@ -70,10 +70,10 @@ export class Meeting {
                 }
             }
             for (var i = 0; i < this.connections.length; i++) {
-                    if (this.connections[i].mediaServer.socket && this.connections[i].mediaServer.socket.connected)  {
-                        this.connections[i].mediaServer.socket.close();
-                    }
-                    this.removeItemOnce(this.connections, i);
+                if (this.connections[i].mediaServer.socket && this.connections[i].mediaServer.socket.connected) {
+                    this.connections[i].mediaServer.socket.close();
+                }
+                this.removeItemOnce(this.connections, i);
             }
         } catch (error) {
             throw new ConusmaException("close", "cannot close, please check exception", error);
@@ -83,16 +83,16 @@ export class Meeting {
     public async closeForAll() {
         var closeData = { 'MeetingUserId': this.activeUser.Id };
         await this.appService.liveMeetingCloseAll(closeData);
-        await this.close(false);   
+        await this.close(false);
     }
-    
+
     public async getMeetingInfo() {
         return <MeetingModel>await this.appService.getLiveMeetingInfo({ 'MeetingUserId': this.activeUser.Id });
     }
 
-    private async createMediaServer(_MediaServerModel:MediaServerModel) {
+    private async createMediaServer(_MediaServerModel: MediaServerModel) {
 
-        var mediaServer = this.mediaServers.find( us => us.id == _MediaServerModel.Id);
+        var mediaServer = this.mediaServers.find(us => us.id == _MediaServerModel.Id);
         if (mediaServer == null || mediaServer == undefined) {
             mediaServer = new MediaServer(this.appService);
             mediaServer.id = _MediaServerModel.Id;
@@ -106,11 +106,11 @@ export class Meeting {
                     throw new ConusmaException("mediaserverconnection", "mediaserverconnection disconnect");
                 }
             });
-        }        
+        }
         return mediaServer;
     }
-    
-    
+
+
     private async signal(type: string, data: any = null, mediaServerSocket: any): Promise<any> {
         if (mediaServerSocket != null) {
             return new Promise((resolve, reject) => {
@@ -127,44 +127,34 @@ export class Meeting {
             console.error("no socket connection " + type);
         }
     }
-    
+
     public async enableAudioVideo() {
         try {
-            const isFrontCamera = true;
-            const devices = await mediaDevices.enumerateDevices();
-            const facing = isFrontCamera ? 'front' : 'environment';
-            const videoSourceId = devices.find(
-                (device: any) => device.kind === 'videoinput' && device.facing === facing,
-            );
-            if (videoSourceId) {
-                this.hasCamera = true;
-                this.hasMicrophone = true; // TODO: Check audio source first
-            }
-            const facingMode = isFrontCamera ? 'user' : 'environment';
-            const constraints: any = {
-                audio: {
-                     echoCancellation: true,
-                     noiseSuppression: true,
-                     googEchoCancellation: true,
-                     googNoiseSuppression: true
-                },
-                video: {
-                    mandatory: {
-                        minWidth: 500,
-                        minHeight: 300,
-                        minFrameRate: 30,
-                    },
-                    facingMode,
-                    optional: videoSourceId ? [{ sourceId: videoSourceId }] : [],
-                },
-            };
-            const newStream: MediaStream = await mediaDevices.getUserMedia(constraints);
-            this.isAudioActive = true;
-            this.isVideoActive = true;
-            return newStream;
+
         } catch (error) {
             throw new ConusmaException("enableAudioVideo", "can not read stream , please check exception ", error);
         }
+        const isFrontCamera = true;
+        const devices = await mediaDevices.enumerateDevices();
+        const facing = isFrontCamera ? 'front' : 'environment';
+        const videoSourceId = devices.find(
+            (device: any) => device.kind === 'videoinput' && device.facing === facing,
+        );
+        const facingMode = isFrontCamera ? 'user' : 'environment';
+        const constraints: any = {
+            audio: true,
+            video: {
+                mandatory: {
+                    minWidth: 500,
+                    minHeight: 300,
+                    minFrameRate: 30,
+                },
+                facingMode,
+                optional: videoSourceId ? [{ sourceId: videoSourceId }] : [],
+            },
+        };
+        const newStream: MediaStream = await mediaDevices.getUserMedia(constraints);
+        return newStream;
     }
     public async connectMeeting() {
         try {
@@ -183,7 +173,7 @@ export class Meeting {
             throw new ConusmaException("isApproved", "user is not approved, please check exception ", error);
         }
     }
-    
+
     private waitWhoAreYou(socket: any) {
         return new Promise(resolve => {
             socket.on("WhoAreYou")
@@ -236,19 +226,33 @@ export class Meeting {
         }
     }
 
-    public async produce(localStream:MediaStream) {
+    public async produce(localStream: MediaStream) {
         var connection = await this.createConnectionForProducer();
         connection.stream = localStream;
         await connection.mediaServer.produce(this.activeUser, localStream);
-        return connection; 
+        return connection;
     }
 
-    public async closeProducer(connection:Connection) {
-        await connection.mediaServer.closeProducer();
-        for (var i = 0; i < this.connections.length; i++) {
-            if (this.connections[i].user.Id == connection.user.Id && this.connections[i].mediaServer.id == connection.mediaServer.id) {
-                this.removeItemOnce(this.connections, i);
+    public async closeProducer() {
+        try {
+            var myConenctionUser = this.connections.find(us => us.user.Id == this.activeUser.Id);
+            if (myConenctionUser != null) {
+                await myConenctionUser.mediaServer.closeProducer();
+                this.activeUser.Camera = false;
+                this.activeUser.Mic = false;
+                this.activeUser.ActiveCamera = false;
+                this.activeUser.ActiveMic = false;
+                await this.appService.updateMeetingUser(this.activeUser);
+                var index = this.connections.findIndex(us => us.user.Id == this.activeUser.Id);
+                this.removeItemOnce(this.connections, index);
             }
+            else
+            {
+                throw new ConusmaException("closeProducer","producer connection not found");
+
+            }
+        } catch (error) {
+            throw new ConusmaException("closeProducer"," please check detail exception",error);
         }
     }
 
@@ -259,12 +263,12 @@ export class Meeting {
         return arr;
     }
 
-    public async consume(user:MeetingUserModel) {
+    public async consume(user: MeetingUserModel) {
         var connection = await this.createConnectionForConsumer(user);
         connection.stream = await connection.mediaServer.consume(user);
-        return connection; 
+        return connection;
     }
-    public async closeConsumer(connection:Connection) {
+    public async closeConsumer(connection: Connection) {
         await connection.mediaServer.closeConsumer(connection.user);
         for (var i = 0; i < this.connections.length; i++) {
             if (this.connections[i].user.Id == connection.user.Id && this.connections[i].mediaServer.id == connection.mediaServer.id) {
@@ -278,7 +282,7 @@ export class Meeting {
 
         var mediaServer = await this.createMediaServer(mediaServerModel);
 
-        var connection:Connection = new Connection(this.activeUser, mediaServer);
+        var connection: Connection = new Connection(this.activeUser, mediaServer);
 
         connection.isProducer = true;
 
@@ -286,10 +290,10 @@ export class Meeting {
         return connection;
     }
 
-    private async createConnectionForConsumer(user:MeetingUserModel) {
+    private async createConnectionForConsumer(user: MeetingUserModel) {
         const mediaServerModel: MediaServerModel = <MediaServerModel>await this.appService.getMediaServerById(this.activeUser.Id, user.MediaServerId);
         var mediaServer = await this.createMediaServer(mediaServerModel);
-        var connection:Connection = new Connection(user, mediaServer);
+        var connection: Connection = new Connection(user, mediaServer);
         this.connections.push(connection);
         return connection;
     }

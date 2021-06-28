@@ -281,6 +281,8 @@ export class MediaServer {
         try {
             if (this.producerTransport)
                 this.producerTransport.close(); 
+                await this.signal('produceclose',{'kind':'video'},this.socket);
+                await this.signal('produceclose',{'kind':'audio'},this.socket);
         } catch (error) {
             throw new ConusmaException("closeProducer", "producer cannot be closed, please check exception ", error);
         }

@@ -26,7 +26,7 @@ export declare class Meeting {
     getProducerUsers(): Promise<MeetingUserModel[]>;
     setSpeaker(enable: boolean): void;
     produce(localStream: MediaStream): Promise<Connection>;
-    closeProducer(connection: Connection): Promise<void>;
+    closeProducer(): Promise<void>;
     private removeItemOnce;
     consume(user: MeetingUserModel): Promise<Connection>;
     closeConsumer(connection: Connection): Promise<void>;

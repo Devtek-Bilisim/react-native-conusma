@@ -483,15 +483,25 @@ var MediaServer = /** @class */ (function () {
     };
     MediaServer.prototype.closeProducer = function () {
         return __awaiter(this, void 0, void 0, function () {
+            var error_6;
             return __generator(this, function (_a) {
-                try {
-                    if (this.producerTransport)
-                        this.producerTransport.close();
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        if (this.producerTransport)
+                            this.producerTransport.close();
+                        return [4 /*yield*/, this.signal('produceclose', { 'kind': 'video' }, this.socket)];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.signal('produceclose', { 'kind': 'audio' }, this.socket)];
+                    case 2:
+                        _a.sent();
+                        return [3 /*break*/, 4];
+                    case 3:
+                        error_6 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("closeProducer", "producer cannot be closed, please check exception ", error_6);
+                    case 4: return [2 /*return*/];
                 }
-                catch (error) {
-                    throw new conusma_exception_1.ConusmaException("closeProducer", "producer cannot be closed, please check exception ", error);
-                }
-                return [2 /*return*/];
             });
         });
     };
