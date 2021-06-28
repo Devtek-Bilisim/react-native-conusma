@@ -130,31 +130,41 @@ export class Meeting {
     
     public async enableAudioVideo() {
         try {
-
+            const isFrontCamera = true;
+            const devices = await mediaDevices.enumerateDevices();
+            const facing = isFrontCamera ? 'front' : 'environment';
+            const videoSourceId = devices.find(
+                (device: any) => device.kind === 'videoinput' && device.facing === facing,
+            );
+            if (videoSourceId) {
+                this.hasCamera = true;
+                this.hasMicrophone = true; // TODO: Check audio source first
+            }
+            const facingMode = isFrontCamera ? 'user' : 'environment';
+            const constraints: any = {
+                audio: {
+                     echoCancellation: true,
+                     noiseSuppression: true,
+                     googEchoCancellation: true,
+                     googNoiseSuppression: true
+                },
+                video: {
+                    mandatory: {
+                        minWidth: 500,
+                        minHeight: 300,
+                        minFrameRate: 30,
+                    },
+                    facingMode,
+                    optional: videoSourceId ? [{ sourceId: videoSourceId }] : [],
+                },
+            };
+            const newStream: MediaStream = await mediaDevices.getUserMedia(constraints);
+            this.isAudioActive = true;
+            this.isVideoActive = true;
+            return newStream;
         } catch (error) {
             throw new ConusmaException("enableAudioVideo", "can not read stream , please check exception ", error);
         }
-        const isFrontCamera = true;
-        const devices = await mediaDevices.enumerateDevices();
-        const facing = isFrontCamera ? 'front' : 'environment';
-        const videoSourceId = devices.find(
-            (device: any) => device.kind === 'videoinput' && device.facing === facing,
-        );
-        const facingMode = isFrontCamera ? 'user' : 'environment';
-        const constraints: any = {
-            audio: true,
-            video: {
-                mandatory: {
-                    minWidth: 500,
-                    minHeight: 300,
-                    minFrameRate: 30,
-                },
-                facingMode,
-                optional: videoSourceId ? [{ sourceId: videoSourceId }] : [],
-            },
-        };
-        const newStream: MediaStream = await mediaDevices.getUserMedia(constraints);
-        return newStream;
     }
     public async connectMeeting() {
         try {
