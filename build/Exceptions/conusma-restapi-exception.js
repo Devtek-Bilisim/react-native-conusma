@@ -18,13 +18,13 @@ var ConusmaRestApiException = /** @class */ (function (_super) {
     __extends(ConusmaRestApiException, _super);
     function ConusmaRestApiException(_statusCode, _message, _ex) {
         var _this = _super.call(this) || this;
-        _this.detailEx = new Error();
+        _this.detailEx = "";
         _this.statusCode = 0;
         _this.message = "";
         _this.message = _message;
         _this.statusCode = _statusCode;
         if (_ex != null) {
-            _this.detailEx = _ex;
+            _this.detailEx = _ex.message;
         }
         Object.setPrototypeOf(_this, ConusmaRestApiException.prototype);
         return _this;

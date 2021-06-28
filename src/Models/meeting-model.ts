@@ -19,3 +19,9 @@ export class MeetingModel {
     public MeetingStatus:number = 0;
     public Id:number = 0;
 }
+export enum MeetingStatusEnum
+{
+    active = 1,
+    end = 2,
+    locked = 3
+}
