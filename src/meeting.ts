@@ -68,6 +68,7 @@ export class Meeting {
                 else {
                     item.mediaServer.closeProducer();
                 }
+                item.stream.getTracks().forEach(track => track.stop());
             }
             for (var i = 0; i < this.connections.length; i++) {
                 if (this.connections[i].mediaServer.socket && this.connections[i].mediaServer.socket.connected) {
