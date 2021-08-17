@@ -78,41 +78,54 @@ var Meeting = /** @class */ (function () {
     Meeting.prototype.close = function (sendCloseRequest) {
         if (sendCloseRequest === void 0) { sendCloseRequest = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var closeData, _i, _a, item, i, error_1;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var closeData, _i, _a, item, _b, _c, server, error_1;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
                     case 0:
-                        _b.trys.push([0, 3, , 4]);
+                        _d.trys.push([0, 9, , 10]);
+                        this.isClosedRequestRecieved = true;
                         if (!sendCloseRequest) return [3 /*break*/, 2];
                         closeData = { 'MeetingUserId': this.activeUser.Id };
                         return [4 /*yield*/, this.appService.liveClose(closeData)];
                     case 1:
-                        _b.sent();
-                        _b.label = 2;
+                        _d.sent();
+                        _d.label = 2;
                     case 2:
-                        this.isClosedRequestRecieved = true;
                         if (this.conusmaWorker != null) {
                             this.conusmaWorker.terminate();
                         }
-                        for (_i = 0, _a = this.connections; _i < _a.length; _i++) {
-                            item = _a[_i];
-                            if (!item.isProducer)
-                                item.mediaServer.closeConsumer(item.user);
-                            else {
-                                item.mediaServer.closeProducer();
-                            }
-                        }
-                        for (i = 0; i < this.connections.length; i++) {
-                            if (this.connections[i].mediaServer.socket && this.connections[i].mediaServer.socket.connected) {
-                                this.connections[i].mediaServer.socket.close();
-                            }
-                            this.removeItemOnce(this.connections, i);
-                        }
-                        return [3 /*break*/, 4];
+                        _i = 0, _a = this.connections;
+                        _d.label = 3;
                     case 3:
-                        error_1 = _b.sent();
+                        if (!(_i < _a.length)) return [3 /*break*/, 8];
+                        item = _a[_i];
+                        if (!!item.isProducer) return [3 /*break*/, 4];
+                        item.mediaServer.closeConsumer(item.user);
+                        return [3 /*break*/, 6];
+                    case 4: return [4 /*yield*/, item.mediaServer.closeProducer()];
+                    case 5:
+                        _d.sent();
+                        _d.label = 6;
+                    case 6:
+                        item.stream.getTracks().forEach(function (track) { return track.stop(); });
+                        _d.label = 7;
+                    case 7:
+                        _i++;
+                        return [3 /*break*/, 3];
+                    case 8:
+                        this.connections = [];
+                        for (_b = 0, _c = this.mediaServers; _b < _c.length; _b++) {
+                            server = _c[_b];
+                            if (server.socket != null && server.socket.connected) {
+                                server.socket.close();
+                            }
+                        }
+                        this.mediaServers = [];
+                        return [3 /*break*/, 10];
+                    case 9:
+                        error_1 = _d.sent();
                         throw new conusma_exception_1.ConusmaException("close", "cannot close, please check exception", error_1);
-                    case 4: return [2 /*return*/];
+                    case 10: return [2 /*return*/];
                 }
             });
         });

@@ -46,7 +46,7 @@ export class MediaServer {
             }
             user.MediaServerId = this.id;
             this.appService.connectMeeting(user);
-
+            console.log("created produce");
         } catch (error) {
             throw new ConusmaException("produce", "can not send stream, please check exception", error);
         }
@@ -251,7 +251,7 @@ export class MediaServer {
 
         }
     }
-    public async closeConsumer(user: MeetingUserModel) {
+    public closeConsumer(user: MeetingUserModel) {
         try {
             var index = 0;
             for (let item of this.consumerTransports) {
@@ -280,9 +280,10 @@ export class MediaServer {
     public async closeProducer() {
         try {
             if (this.producerTransport)
-                this.producerTransport.close(); 
+                //this.producerTransport.close(); 
                 await this.signal('produceclose',{'kind':'video'},this.socket);
                 await this.signal('produceclose',{'kind':'audio'},this.socket);
+                this.producerTransport = null;
         } catch (error) {
             throw new ConusmaException("closeProducer", "producer cannot be closed, please check exception ", error);
         }

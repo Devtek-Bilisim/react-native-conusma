@@ -21,7 +21,7 @@ export declare class MediaServer {
     private resumeConsumer;
     private consumeTransport;
     private pauseConsumer;
-    closeConsumer(user: MeetingUserModel): Promise<void>;
+    closeConsumer(user: MeetingUserModel): void;
     private removeItemOnce;
     closeProducer(): Promise<void>;
 }

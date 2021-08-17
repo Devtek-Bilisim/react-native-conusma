@@ -92,7 +92,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                'Token': this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -113,7 +113,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                'Token': this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -134,7 +134,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                'Token': this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -160,7 +160,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                'Token': this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify({
                                 meetingId: meetingId,
@@ -257,7 +257,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                'Token': this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -362,7 +362,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -428,7 +428,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -454,7 +454,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -476,7 +476,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -498,7 +498,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -519,7 +519,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify({
                                 id: id
@@ -543,7 +543,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify({
                                 fileName: fileName,
@@ -569,7 +569,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -590,7 +590,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify({
                                 logs: logs
@@ -640,7 +640,7 @@ var AppService = /** @class */ (function () {
                                 headers: {
                                     accept: 'application/json',
                                     'content-type': 'application/json',
-                                    Token: this.token
+                                    'Authorization': 'Bearer ' + this.token
                                 },
                                 body: JSON.stringify({
                                     log: log
@@ -664,7 +664,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -685,7 +685,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -706,7 +706,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -728,7 +728,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -750,7 +750,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -772,7 +772,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify({
                                 meetingId: meetingId,
@@ -802,7 +802,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify({
                                 meetingId: meetingId,
@@ -833,7 +833,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -859,7 +859,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -880,7 +880,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -901,7 +901,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -922,7 +922,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             }
                         })];
                     case 1:
@@ -943,7 +943,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -965,7 +965,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -992,7 +992,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1019,7 +1019,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1041,7 +1041,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1063,7 +1063,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1085,7 +1085,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1107,7 +1107,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1129,7 +1129,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1151,7 +1151,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1173,7 +1173,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1195,7 +1195,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1217,7 +1217,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1239,7 +1239,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1261,7 +1261,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1283,7 +1283,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1305,7 +1305,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1327,7 +1327,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1349,7 +1349,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                Token: this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify(data)
                         })];
@@ -1371,7 +1371,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                'Token': this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify({ meetingUserId: _meetingUserId })
                         })];
@@ -1398,7 +1398,7 @@ var AppService = /** @class */ (function () {
                             headers: {
                                 accept: 'application/json',
                                 'content-type': 'application/json',
-                                'Token': this.token
+                                'Authorization': 'Bearer ' + this.token
                             },
                             body: JSON.stringify({ meetingUserId: _meetingUserId })
                         })];

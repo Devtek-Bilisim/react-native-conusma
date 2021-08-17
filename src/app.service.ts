@@ -44,7 +44,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        'Token': this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     return await response.json();
@@ -56,7 +56,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        'Token': this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     return await response.json();
@@ -68,7 +68,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        'Token': this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     if (!response.ok) {
@@ -83,7 +83,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        'Token': this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify({
         meetingId: meetingId,
@@ -144,7 +144,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        'Token': this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     return await response.json();
@@ -204,7 +204,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -249,7 +249,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     if (!response.ok) {
@@ -264,7 +264,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -277,7 +277,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -290,7 +290,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     return await response.json();
@@ -302,7 +302,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify({
         id: id
@@ -317,7 +317,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify({
         fileName: fileName,
@@ -334,7 +334,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     return await response.json();
@@ -346,7 +346,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify({
         logs: logs
@@ -386,7 +386,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify({
         log: log
@@ -400,7 +400,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     return await response.json();
@@ -412,7 +412,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     return await response.json();
@@ -424,7 +424,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -437,7 +437,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -450,7 +450,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -463,7 +463,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify({
         meetingId: meetingId,
@@ -482,7 +482,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify({
         meetingId: meetingId,
@@ -502,7 +502,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     if (!response.ok) {
@@ -517,7 +517,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     return await response.json();
@@ -528,7 +528,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     return await response.json();
@@ -540,7 +540,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     return await response.json();
@@ -552,7 +552,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       }
     });
     return await response.json();
@@ -564,7 +564,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -577,7 +577,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -593,7 +593,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -609,7 +609,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -622,7 +622,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -635,7 +635,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -648,7 +648,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -661,7 +661,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -674,7 +674,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -687,7 +687,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -700,7 +700,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -713,7 +713,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -726,7 +726,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -739,7 +739,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -752,7 +752,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -765,7 +765,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -778,7 +778,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -791,7 +791,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -804,7 +804,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        Token: this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify(data)
     });
@@ -816,7 +816,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        'Token': this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify({meetingUserId:_meetingUserId})
     });
@@ -831,7 +831,7 @@ export class AppService {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        'Token': this.token
+        'Authorization':'Bearer '+this.token
       },
       body: JSON.stringify({meetingUserId:_meetingUserId})
     });

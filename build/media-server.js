@@ -122,6 +122,7 @@ var MediaServer = /** @class */ (function () {
                     case 5:
                         user.MediaServerId = this.id;
                         this.appService.connectMeeting(user);
+                        console.log("created produce");
                         return [3 /*break*/, 7];
                     case 6:
                         error_1 = _a.sent();
@@ -450,30 +451,24 @@ var MediaServer = /** @class */ (function () {
         });
     };
     MediaServer.prototype.closeConsumer = function (user) {
-        return __awaiter(this, void 0, void 0, function () {
-            var index, _i, _a, item;
-            return __generator(this, function (_b) {
-                try {
-                    index = 0;
-                    for (_i = 0, _a = this.consumerTransports; _i < _a.length; _i++) {
-                        item = _a[_i];
-                        if (item.MeetingUserId == user.Id) {
-                            if (item.transport) {
-                                item.transport.close();
-                            }
-                            break;
-                        }
-                        index++;
+        try {
+            var index = 0;
+            for (var _i = 0, _a = this.consumerTransports; _i < _a.length; _i++) {
+                var item = _a[_i];
+                if (item.MeetingUserId == user.Id) {
+                    if (item.transport) {
+                        item.transport.close();
                     }
-                    ;
-                    this.removeItemOnce(this.consumerTransports, index);
+                    break;
                 }
-                catch (error) {
-                    throw new conusma_exception_1.ConusmaException("closeConsumer", "consumer cannot be closed, please check exception", error);
-                }
-                return [2 /*return*/];
-            });
-        });
+                index++;
+            }
+            ;
+            this.removeItemOnce(this.consumerTransports, index);
+        }
+        catch (error) {
+            throw new conusma_exception_1.ConusmaException("closeConsumer", "consumer cannot be closed, please check exception", error);
+        }
     };
     MediaServer.prototype.removeItemOnce = function (arr, index) {
         if (index > -1) {
@@ -487,20 +482,23 @@ var MediaServer = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 3, , 4]);
-                        if (this.producerTransport)
-                            this.producerTransport.close();
+                        _a.trys.push([0, 4, , 5]);
+                        if (!this.producerTransport) return [3 /*break*/, 2];
+                        //this.producerTransport.close(); 
                         return [4 /*yield*/, this.signal('produceclose', { 'kind': 'video' }, this.socket)];
                     case 1:
+                        //this.producerTransport.close(); 
                         _a.sent();
-                        return [4 /*yield*/, this.signal('produceclose', { 'kind': 'audio' }, this.socket)];
-                    case 2:
-                        _a.sent();
-                        return [3 /*break*/, 4];
+                        _a.label = 2;
+                    case 2: return [4 /*yield*/, this.signal('produceclose', { 'kind': 'audio' }, this.socket)];
                     case 3:
+                        _a.sent();
+                        this.producerTransport = null;
+                        return [3 /*break*/, 5];
+                    case 4:
                         error_6 = _a.sent();
                         throw new conusma_exception_1.ConusmaException("closeProducer", "producer cannot be closed, please check exception ", error_6);
-                    case 4: return [2 /*return*/];
+                    case 5: return [2 /*return*/];
                 }
             });
         });
