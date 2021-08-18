@@ -82,7 +82,7 @@ var Meeting = /** @class */ (function () {
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:
-                        _d.trys.push([0, 9, , 10]);
+                        _d.trys.push([0, 10, , 11]);
                         this.isClosedRequestRecieved = true;
                         if (!sendCloseRequest) return [3 /*break*/, 2];
                         closeData = { 'MeetingUserId': this.activeUser.Id };
@@ -97,22 +97,24 @@ var Meeting = /** @class */ (function () {
                         _i = 0, _a = this.connections;
                         _d.label = 3;
                     case 3:
-                        if (!(_i < _a.length)) return [3 /*break*/, 8];
+                        if (!(_i < _a.length)) return [3 /*break*/, 9];
                         item = _a[_i];
-                        if (!!item.isProducer) return [3 /*break*/, 4];
-                        item.mediaServer.closeConsumer(item.user);
-                        return [3 /*break*/, 6];
-                    case 4: return [4 /*yield*/, item.mediaServer.closeProducer()];
-                    case 5:
+                        if (!!item.isProducer) return [3 /*break*/, 5];
+                        return [4 /*yield*/, item.mediaServer.closeConsumer(item.user)];
+                    case 4:
                         _d.sent();
-                        _d.label = 6;
+                        return [3 /*break*/, 7];
+                    case 5: return [4 /*yield*/, item.mediaServer.closeProducer()];
                     case 6:
-                        item.stream.getTracks().forEach(function (track) { return track.stop(); });
+                        _d.sent();
                         _d.label = 7;
                     case 7:
+                        item.stream.getTracks().forEach(function (track) { return track.stop(); });
+                        _d.label = 8;
+                    case 8:
                         _i++;
                         return [3 /*break*/, 3];
-                    case 8:
+                    case 9:
                         this.connections = [];
                         for (_b = 0, _c = this.mediaServers; _b < _c.length; _b++) {
                             server = _c[_b];
@@ -121,11 +123,11 @@ var Meeting = /** @class */ (function () {
                             }
                         }
                         this.mediaServers = [];
-                        return [3 /*break*/, 10];
-                    case 9:
+                        return [3 /*break*/, 11];
+                    case 10:
                         error_1 = _d.sent();
                         throw new conusma_exception_1.ConusmaException("close", "cannot close, please check exception", error_1);
-                    case 10: return [2 /*return*/];
+                    case 11: return [2 /*return*/];
                 }
             });
         });

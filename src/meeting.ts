@@ -64,7 +64,7 @@ export class Meeting {
             }
             for (let item of this.connections) {
                 if (!item.isProducer)
-                    item.mediaServer.closeConsumer(item.user);
+                    await item.mediaServer.closeConsumer(item.user);
                 else {
                     await item.mediaServer.closeProducer();
                 }
