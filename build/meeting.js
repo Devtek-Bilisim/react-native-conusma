@@ -95,18 +95,32 @@ var Meeting = /** @class */ (function () {
                         if (this.conusmaWorker != null) {
                             this.conusmaWorker.terminate();
                         }
-                        for (_i = 0, _a = this.connections; _i < _a.length; _i++) {
-                            item = _a[_i];
-                            if (!item.isProducer)
-                                item.mediaServer.closeConsumer(item.user);
-                            else {
-                                item.mediaServer.closeProducer();
-                            }
-                            item.stream.getTracks().forEach(function (track) { return track.stop(); });
-                        }
-                        for (i = 0; i < this.connections.length; i++) {
-                            if (this.connections[i].mediaServer.socket && this.connections[i].mediaServer.socket.connected) {
-                                this.connections[i].mediaServer.socket.close();
+                        _i = 0, _a = this.connections;
+                        _d.label = 3;
+                    case 3:
+                        if (!(_i < _a.length)) return [3 /*break*/, 9];
+                        item = _a[_i];
+                        if (!!item.isProducer) return [3 /*break*/, 5];
+                        return [4 /*yield*/, item.mediaServer.closeConsumer(item.user)];
+                    case 4:
+                        _d.sent();
+                        return [3 /*break*/, 7];
+                    case 5: return [4 /*yield*/, item.mediaServer.closeProducer()];
+                    case 6:
+                        _d.sent();
+                        _d.label = 7;
+                    case 7:
+                        item.stream.getTracks().forEach(function (track) { return track.stop(); });
+                        _d.label = 8;
+                    case 8:
+                        _i++;
+                        return [3 /*break*/, 3];
+                    case 9:
+                        this.connections = [];
+                        for (_b = 0, _c = this.mediaServers; _b < _c.length; _b++) {
+                            server = _c[_b];
+                            if (server.socket != null && server.socket.connected) {
+                                server.socket.close();
                             }
                         }
                         this.mediaServers = [];
