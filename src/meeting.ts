@@ -12,7 +12,7 @@ import { MediaServer } from "./media-server";
 import { Connection } from "./connection";
 import { MeetingModel } from "./Models/meeting-model";
 import { MediaServerModel } from "./Models/media-server-model";
-
+import { Platform } from 'react-native';
 
 export class Meeting {
     public activeUser: MeetingUserModel;
@@ -220,7 +220,8 @@ export class Meeting {
     public setSpeaker(enable: boolean) {
         try {
             InCallManager.setSpeakerphoneOn(enable);
-            InCallManager.setForceSpeakerphoneOn(enable);
+            if (Platform.OS === 'ios')
+                InCallManager.setForceSpeakerphoneOn(enable);
 
         } catch (error) {
             throw new ConusmaException("setSpeaker", "setSpeaker undefined error", error);

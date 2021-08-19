@@ -47,6 +47,7 @@ var conusma_worker_1 = require("./conusma-worker");
 var react_native_incall_manager_1 = __importDefault(require("react-native-incall-manager"));
 var media_server_1 = require("./media-server");
 var connection_1 = require("./connection");
+var react_native_1 = require("react-native");
 var Meeting = /** @class */ (function () {
     function Meeting(activeUser, appService) {
         this.mediaServers = new Array();
@@ -101,6 +102,7 @@ var Meeting = /** @class */ (function () {
                             else {
                                 item.mediaServer.closeProducer();
                             }
+                            item.stream.getTracks().forEach(function (track) { return track.stop(); });
                         }
                         for (i = 0; i < this.connections.length; i++) {
                             if (this.connections[i].mediaServer.socket && this.connections[i].mediaServer.socket.connected) {
@@ -337,7 +339,8 @@ var Meeting = /** @class */ (function () {
     Meeting.prototype.setSpeaker = function (enable) {
         try {
             react_native_incall_manager_1.default.setSpeakerphoneOn(enable);
-            react_native_incall_manager_1.default.setForceSpeakerphoneOn(enable);
+            if (react_native_1.Platform.OS === 'ios')
+                react_native_incall_manager_1.default.setForceSpeakerphoneOn(enable);
         }
         catch (error) {
             throw new conusma_exception_1.ConusmaException("setSpeaker", "setSpeaker undefined error", error);
