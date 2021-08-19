@@ -54,28 +54,30 @@ export class Meeting {
 
     public async close(sendCloseRequest: boolean = false) {
         try {
+            this.isClosedRequestRecieved = true;
             if (sendCloseRequest) {
                 var closeData = { 'MeetingUserId': this.activeUser.Id };
                 await this.appService.liveClose(closeData);
             }
-            this.isClosedRequestRecieved = true;
             if (this.conusmaWorker != null) {
                 this.conusmaWorker.terminate();
             }
             for (let item of this.connections) {
                 if (!item.isProducer)
-                    item.mediaServer.closeConsumer(item.user);
+                    await item.mediaServer.closeConsumer(item.user);
                 else {
-                    item.mediaServer.closeProducer();
+                    await item.mediaServer.closeProducer();
                 }
                 item.stream.getTracks().forEach(track => track.stop());
             }
-            for (var i = 0; i < this.connections.length; i++) {
-                if (this.connections[i].mediaServer.socket && this.connections[i].mediaServer.socket.connected) {
-                    this.connections[i].mediaServer.socket.close();
-                }
-                this.removeItemOnce(this.connections, i);
+            this.connections = [];
+            for (let server of this.mediaServers) {
+               if(server.socket != null && server.socket.connected)
+               {
+                server.socket.close();
+               }
             }
+            this.mediaServers = [];
         } catch (error) {
             throw new ConusmaException("close", "cannot close, please check exception", error);
         }

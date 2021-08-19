@@ -14,7 +14,7 @@ export declare class UserModel {
     Photo: string;
     GooglePhoto: string;
     TimeZone: string;
-    UserType: string;
+    User_Type: number;
     LicenseFeaturesId: number;
     Id: string;
     AddedDate: string;

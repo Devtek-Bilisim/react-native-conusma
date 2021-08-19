@@ -1,7 +1,7 @@
 export declare class GuestUserModel {
     UserName: string;
     Token: string;
-    UserType: string;
+    User_Type: number;
     Id: string;
     AddedDate: string;
     ModifiedDate: string;

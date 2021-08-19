@@ -122,6 +122,7 @@ var MediaServer = /** @class */ (function () {
                     case 5:
                         user.MediaServerId = this.id;
                         this.appService.connectMeeting(user);
+                        console.log("created produce");
                         return [3 /*break*/, 7];
                     case 6:
                         error_1 = _a.sent();
@@ -451,27 +452,40 @@ var MediaServer = /** @class */ (function () {
     };
     MediaServer.prototype.closeConsumer = function (user) {
         return __awaiter(this, void 0, void 0, function () {
-            var index, _i, _a, item;
+            var index, _i, _a, item, error_6;
             return __generator(this, function (_b) {
-                try {
-                    index = 0;
-                    for (_i = 0, _a = this.consumerTransports; _i < _a.length; _i++) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 7, , 8]);
+                        index = 0;
+                        _i = 0, _a = this.consumerTransports;
+                        _b.label = 1;
+                    case 1:
+                        if (!(_i < _a.length)) return [3 /*break*/, 6];
                         item = _a[_i];
-                        if (item.MeetingUserId == user.Id) {
-                            if (item.transport) {
-                                item.transport.close();
-                            }
-                            break;
-                        }
+                        if (!(item.MeetingUserId == user.Id)) return [3 /*break*/, 4];
+                        if (!item.transport) return [3 /*break*/, 3];
+                        item.transport.close();
+                        return [4 /*yield*/, this.signal('removeConsumerTransport', { 'consumerTransportId': item.transportId }, this.socket)];
+                    case 2:
+                        _b.sent();
+                        _b.label = 3;
+                    case 3: return [3 /*break*/, 6];
+                    case 4:
                         index++;
-                    }
-                    ;
-                    this.removeItemOnce(this.consumerTransports, index);
+                        _b.label = 5;
+                    case 5:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 6:
+                        ;
+                        this.removeItemOnce(this.consumerTransports, index);
+                        return [3 /*break*/, 8];
+                    case 7:
+                        error_6 = _b.sent();
+                        throw new conusma_exception_1.ConusmaException("closeConsumer", "consumer cannot be closed, please check exception", error_6);
+                    case 8: return [2 /*return*/];
                 }
-                catch (error) {
-                    throw new conusma_exception_1.ConusmaException("closeConsumer", "consumer cannot be closed, please check exception", error);
-                }
-                return [2 /*return*/];
             });
         });
     };
@@ -483,24 +497,28 @@ var MediaServer = /** @class */ (function () {
     };
     MediaServer.prototype.closeProducer = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var error_6;
+            var error_7;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 3, , 4]);
-                        if (this.producerTransport)
-                            this.producerTransport.close();
+                        _a.trys.push([0, 5, , 6]);
+                        if (!this.producerTransport) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.signal('produceclose', { 'kind': 'video' }, this.socket)];
                     case 1:
                         _a.sent();
                         return [4 /*yield*/, this.signal('produceclose', { 'kind': 'audio' }, this.socket)];
                     case 2:
                         _a.sent();
-                        return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.signal('producetrasnportclose', {}, this.socket)];
                     case 3:
-                        error_6 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("closeProducer", "producer cannot be closed, please check exception ", error_6);
-                    case 4: return [2 /*return*/];
+                        _a.sent();
+                        this.producerTransport = null;
+                        _a.label = 4;
+                    case 4: return [3 /*break*/, 6];
+                    case 5:
+                        error_7 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("closeProducer", "producer cannot be closed, please check exception ", error_7);
+                    case 6: return [2 /*return*/];
                 }
             });
         });

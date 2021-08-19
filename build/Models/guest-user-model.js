@@ -5,7 +5,7 @@ var GuestUserModel = /** @class */ (function () {
     function GuestUserModel() {
         this.UserName = "";
         this.Token = "";
-        this.UserType = "Public";
+        this.User_Type = 0;
         this.Id = "";
         this.AddedDate = "";
         this.ModifiedDate = "";

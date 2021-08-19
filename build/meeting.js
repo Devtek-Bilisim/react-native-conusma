@@ -79,19 +79,19 @@ var Meeting = /** @class */ (function () {
     Meeting.prototype.close = function (sendCloseRequest) {
         if (sendCloseRequest === void 0) { sendCloseRequest = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var closeData, _i, _a, item, i, error_1;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var closeData, _i, _a, item, _b, _c, server, error_1;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
                     case 0:
-                        _b.trys.push([0, 3, , 4]);
+                        _d.trys.push([0, 10, , 11]);
+                        this.isClosedRequestRecieved = true;
                         if (!sendCloseRequest) return [3 /*break*/, 2];
                         closeData = { 'MeetingUserId': this.activeUser.Id };
                         return [4 /*yield*/, this.appService.liveClose(closeData)];
                     case 1:
-                        _b.sent();
-                        _b.label = 2;
+                        _d.sent();
+                        _d.label = 2;
                     case 2:
-                        this.isClosedRequestRecieved = true;
                         if (this.conusmaWorker != null) {
                             this.conusmaWorker.terminate();
                         }
@@ -108,13 +108,13 @@ var Meeting = /** @class */ (function () {
                             if (this.connections[i].mediaServer.socket && this.connections[i].mediaServer.socket.connected) {
                                 this.connections[i].mediaServer.socket.close();
                             }
-                            this.removeItemOnce(this.connections, i);
                         }
-                        return [3 /*break*/, 4];
-                    case 3:
-                        error_1 = _b.sent();
+                        this.mediaServers = [];
+                        return [3 /*break*/, 11];
+                    case 10:
+                        error_1 = _d.sent();
                         throw new conusma_exception_1.ConusmaException("close", "cannot close, please check exception", error_1);
-                    case 4: return [2 /*return*/];
+                    case 11: return [2 /*return*/];
                 }
             });
         });
