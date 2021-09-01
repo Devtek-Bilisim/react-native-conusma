@@ -54,10 +54,6 @@ export class Meeting {
     public async close(sendCloseRequest: boolean = false) {
         try {
             this.isClosedRequestRecieved = true;
-            if (sendCloseRequest) {
-                var closeData = { 'MeetingUserId': this.activeUser.Id };
-                await this.appService.liveClose(closeData);
-            }
             if (this.conusmaWorker != null) {
                 this.conusmaWorker.terminate();
             }
@@ -68,6 +64,7 @@ export class Meeting {
                     await item.mediaServer.closeProducer();
                 }
                 item.stream.getTracks().forEach(track => track.stop());
+                
             }
             this.connections = [];
             for (let server of this.mediaServers) {
@@ -77,6 +74,10 @@ export class Meeting {
                }
             }
             this.mediaServers = [];
+            if (sendCloseRequest) {
+                var closeData = { 'MeetingUserId': this.activeUser.Id };
+                await this.appService.liveClose(closeData);
+            }
         } catch (error) {
             throw new ConusmaException("close", "cannot close, please check exception", error);
         }
