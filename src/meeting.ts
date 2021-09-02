@@ -13,6 +13,7 @@ import { Connection } from "./connection";
 import { MeetingModel } from "./Models/meeting-model";
 import { MediaServerModel } from "./Models/media-server-model";
 import { Platform } from 'react-native';
+import { DeviceEventEmitter } from 'react-native';
 
 export class Meeting {
     public activeUser: MeetingUserModel;
@@ -24,13 +25,14 @@ export class Meeting {
     private appService: AppService;
 
     public isClosedRequestRecieved: boolean = false;
-
-
+    public speakerState = false;
+    private emiterheadphone:any = null;
     constructor(activeUser: MeetingUserModel, appService: AppService) {
         registerGlobals();
         this.appService = appService;
         this.activeUser = activeUser;
         this.conusmaWorker = new ConusmaWorker(this.appService, this.activeUser);
+        this.headphone();
     }
 
     public open() {
@@ -78,6 +80,11 @@ export class Meeting {
                }
             }
             this.mediaServers = [];
+            if(this.emiterheadphone != null)
+            {
+                this.emiterheadphone.remove();
+                this.emiterheadphone = null;
+            }
         } catch (error) {
             throw new ConusmaException("close", "cannot close, please check exception", error);
         }
@@ -219,12 +226,47 @@ export class Meeting {
         }
 
     }
-    public setSpeaker(enable: boolean) {
+    public setSpeaker(enable: boolean,bluetooth:boolean = false) {
         try {
-            InCallManager.setSpeakerphoneOn(enable);
-            if (Platform.OS === 'ios')
-                InCallManager.setForceSpeakerphoneOn(enable);
+            InCallManager.start({media: 'video'});
+            this.speakerState = enable;
+            if(enable)
+            {
+                InCallManager.chooseAudioRoute('SPEAKER_PHONE')
+                console.log("SPEAKER_PHONE");
+            }
+            else
+            {
+                if(bluetooth)
+                {
+                    InCallManager.chooseAudioRoute('BLUETOOTH');
+                    console.log("BLUETOOTH");
 
+                }
+                else
+                {
+                    InCallManager.chooseAudioRoute('EARPIECE');
+                    console.log("EARPIECE");
+
+                }
+            }
+
+
+        } catch (error) {
+            throw new ConusmaException("setSpeaker", "setSpeaker undefined error", error);
+        }
+    }
+    private async headphone() {
+        try {
+
+            var state = await InCallManager.getIsWiredHeadsetPluggedIn();
+            console.log(state);	
+            this.emiterheadphone = DeviceEventEmitter.addListener('WiredHeadset', (data:any) => {
+                if(data.isPlugged)
+                {
+                    this.setSpeaker(false);
+                }
+            });
         } catch (error) {
             throw new ConusmaException("setSpeaker", "setSpeaker undefined error", error);
         }

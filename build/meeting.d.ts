@@ -11,6 +11,8 @@ export declare class Meeting {
     connections: Connection[];
     private appService;
     isClosedRequestRecieved: boolean;
+    speakerState: boolean;
+    private emiterheadphone;
     constructor(activeUser: MeetingUserModel, appService: AppService);
     open(): void;
     close(sendCloseRequest?: boolean): Promise<void>;
@@ -24,7 +26,8 @@ export declare class Meeting {
     private waitWhoAreYou;
     getAllUsers(): Promise<MeetingUserModel[]>;
     getProducerUsers(): Promise<MeetingUserModel[]>;
-    setSpeaker(enable: boolean): void;
+    setSpeaker(enable: boolean, bluetooth?: boolean): void;
+    private headphone;
     produce(localStream: MediaStream): Promise<Connection>;
     closeProducer(): Promise<void>;
     private removeItemOnce;

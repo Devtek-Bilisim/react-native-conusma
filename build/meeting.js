@@ -53,10 +53,13 @@ var Meeting = /** @class */ (function () {
         this.mediaServers = new Array();
         this.connections = new Array();
         this.isClosedRequestRecieved = false;
+        this.speakerState = false;
+        this.emiterheadphone = null;
         react_native_webrtc_1.registerGlobals();
         this.appService = appService;
         this.activeUser = activeUser;
         this.conusmaWorker = new conusma_worker_1.ConusmaWorker(this.appService, this.activeUser);
+        this.headphone();
     }
     Meeting.prototype.open = function () {
         try {
@@ -124,6 +127,10 @@ var Meeting = /** @class */ (function () {
                             }
                         }
                         this.mediaServers = [];
+                        if (this.emiterheadphone != null) {
+                            this.emiterheadphone.remove();
+                            this.emiterheadphone = null;
+                        }
                         return [3 /*break*/, 11];
                     case 10:
                         error_1 = _d.sent();
@@ -350,15 +357,55 @@ var Meeting = /** @class */ (function () {
             });
         });
     };
-    Meeting.prototype.setSpeaker = function (enable) {
+    Meeting.prototype.setSpeaker = function (enable, bluetooth) {
+        if (bluetooth === void 0) { bluetooth = false; }
         try {
-            react_native_incall_manager_1.default.setSpeakerphoneOn(enable);
-            if (react_native_1.Platform.OS === 'ios')
-                react_native_incall_manager_1.default.setForceSpeakerphoneOn(enable);
+            react_native_incall_manager_1.default.start({ media: 'video' });
+            this.speakerState = enable;
+            if (enable) {
+                react_native_incall_manager_1.default.chooseAudioRoute('SPEAKER_PHONE');
+                console.log("SPEAKER_PHONE");
+            }
+            else {
+                if (bluetooth) {
+                    react_native_incall_manager_1.default.chooseAudioRoute('BLUETOOTH');
+                    console.log("BLUETOOTH");
+                }
+                else {
+                    react_native_incall_manager_1.default.chooseAudioRoute('EARPIECE');
+                    console.log("EARPIECE");
+                }
+            }
         }
         catch (error) {
             throw new conusma_exception_1.ConusmaException("setSpeaker", "setSpeaker undefined error", error);
         }
+    };
+    Meeting.prototype.headphone = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var state, error_6;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, react_native_incall_manager_1.default.getIsWiredHeadsetPluggedIn()];
+                    case 1:
+                        state = _a.sent();
+                        console.log(state);
+                        this.emiterheadphone = react_native_1.DeviceEventEmitter.addListener('WiredHeadset', function (data) {
+                            if (data.isPlugged) {
+                                _this.setSpeaker(false);
+                            }
+                        });
+                        return [3 /*break*/, 3];
+                    case 2:
+                        error_6 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("setSpeaker", "setSpeaker undefined error", error_6);
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
     };
     Meeting.prototype.produce = function (localStream) {
         return __awaiter(this, void 0, void 0, function () {
@@ -379,7 +426,7 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.closeProducer = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var myConenctionUser, index, error_6;
+            var myConenctionUser, index, error_7;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -403,8 +450,8 @@ var Meeting = /** @class */ (function () {
                     case 3: throw new conusma_exception_1.ConusmaException("closeProducer", "producer connection not found");
                     case 4: return [3 /*break*/, 6];
                     case 5:
-                        error_6 = _a.sent();
-                        throw new conusma_exception_1.ConusmaException("closeProducer", " please check detail exception", error_6);
+                        error_7 = _a.sent();
+                        throw new conusma_exception_1.ConusmaException("closeProducer", " please check detail exception", error_7);
                     case 6: return [2 /*return*/];
                 }
             });
