@@ -78,43 +78,36 @@ var Meeting = /** @class */ (function () {
     Meeting.prototype.close = function (sendCloseRequest) {
         if (sendCloseRequest === void 0) { sendCloseRequest = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var closeData, _i, _a, item, _b, _c, server, error_1;
+            var _i, _a, item, _b, _c, server, closeData, error_1;
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:
                         _d.trys.push([0, 10, , 11]);
                         this.isClosedRequestRecieved = true;
-                        if (!sendCloseRequest) return [3 /*break*/, 2];
-                        closeData = { 'MeetingUserId': this.activeUser.Id };
-                        return [4 /*yield*/, this.appService.liveClose(closeData)];
-                    case 1:
-                        _d.sent();
-                        _d.label = 2;
-                    case 2:
                         if (this.conusmaWorker != null) {
                             this.conusmaWorker.terminate();
                         }
                         _i = 0, _a = this.connections;
-                        _d.label = 3;
-                    case 3:
-                        if (!(_i < _a.length)) return [3 /*break*/, 9];
+                        _d.label = 1;
+                    case 1:
+                        if (!(_i < _a.length)) return [3 /*break*/, 7];
                         item = _a[_i];
-                        if (!!item.isProducer) return [3 /*break*/, 5];
+                        if (!!item.isProducer) return [3 /*break*/, 3];
                         return [4 /*yield*/, item.mediaServer.closeConsumer(item.user)];
+                    case 2:
+                        _d.sent();
+                        return [3 /*break*/, 5];
+                    case 3: return [4 /*yield*/, item.mediaServer.closeProducer()];
                     case 4:
                         _d.sent();
-                        return [3 /*break*/, 7];
-                    case 5: return [4 /*yield*/, item.mediaServer.closeProducer()];
-                    case 6:
-                        _d.sent();
-                        _d.label = 7;
-                    case 7:
+                        _d.label = 5;
+                    case 5:
                         item.stream.getTracks().forEach(function (track) { return track.stop(); });
-                        _d.label = 8;
-                    case 8:
+                        _d.label = 6;
+                    case 6:
                         _i++;
-                        return [3 /*break*/, 3];
-                    case 9:
+                        return [3 /*break*/, 1];
+                    case 7:
                         this.connections = [];
                         for (_b = 0, _c = this.mediaServers; _b < _c.length; _b++) {
                             server = _c[_b];
@@ -123,7 +116,13 @@ var Meeting = /** @class */ (function () {
                             }
                         }
                         this.mediaServers = [];
-                        return [3 /*break*/, 11];
+                        if (!sendCloseRequest) return [3 /*break*/, 9];
+                        closeData = { 'MeetingUserId': this.activeUser.Id };
+                        return [4 /*yield*/, this.appService.liveClose(closeData)];
+                    case 8:
+                        _d.sent();
+                        _d.label = 9;
+                    case 9: return [3 /*break*/, 11];
                     case 10:
                         error_1 = _d.sent();
                         throw new conusma_exception_1.ConusmaException("close", "cannot close, please check exception", error_1);
