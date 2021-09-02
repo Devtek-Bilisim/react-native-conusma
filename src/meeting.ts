@@ -12,7 +12,6 @@ import { MediaServer } from "./media-server";
 import { Connection } from "./connection";
 import { MeetingModel } from "./Models/meeting-model";
 import { MediaServerModel } from "./Models/media-server-model";
-import { Platform } from 'react-native';
 import { DeviceEventEmitter } from 'react-native';
 
 export class Meeting {
@@ -57,10 +56,6 @@ export class Meeting {
     public async close(sendCloseRequest: boolean = false) {
         try {
             this.isClosedRequestRecieved = true;
-            if (sendCloseRequest) {
-                var closeData = { 'MeetingUserId': this.activeUser.Id };
-                await this.appService.liveClose(closeData);
-            }
             if (this.conusmaWorker != null) {
                 this.conusmaWorker.terminate();
             }
@@ -71,6 +66,7 @@ export class Meeting {
                     await item.mediaServer.closeProducer();
                 }
                 item.stream.getTracks().forEach(track => track.stop());
+                
             }
             this.connections = [];
             for (let server of this.mediaServers) {
@@ -84,6 +80,10 @@ export class Meeting {
             {
                 this.emiterheadphone.remove();
                 this.emiterheadphone = null;
+            }
+            if (sendCloseRequest) {
+                var closeData = { 'MeetingUserId': this.activeUser.Id };
+                await this.appService.liveClose(closeData);
             }
         } catch (error) {
             throw new ConusmaException("close", "cannot close, please check exception", error);
@@ -259,8 +259,6 @@ export class Meeting {
     private async headphone() {
         try {
 
-            var state = await InCallManager.getIsWiredHeadsetPluggedIn();
-            console.log(state);	
             this.emiterheadphone = DeviceEventEmitter.addListener('WiredHeadset', (data:any) => {
                 if(data.isPlugged)
                 {
@@ -268,7 +266,7 @@ export class Meeting {
                 }
             });
         } catch (error) {
-            throw new ConusmaException("setSpeaker", "setSpeaker undefined error", error);
+            throw new ConusmaException("headphone", "headphone undefined error", error);
         }
     }
 
