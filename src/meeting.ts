@@ -245,9 +245,8 @@ export class Meeting {
                 }
                 else
                 {
-                    InCallManager.chooseAudioRoute('EARPIECE');
-                    console.log("EARPIECE");
-
+                    InCallManager.chooseAudioRoute('WIRED_HEADSET');
+                    console.log("WIRED_HEADSET");
                 }
             }
 

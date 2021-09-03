@@ -371,8 +371,8 @@ var Meeting = /** @class */ (function () {
                     console.log("BLUETOOTH");
                 }
                 else {
-                    react_native_incall_manager_1.default.chooseAudioRoute('EARPIECE');
-                    console.log("EARPIECE");
+                    react_native_incall_manager_1.default.chooseAudioRoute('WIRED_HEADSET');
+                    console.log("WIRED_HEADSET");
                 }
             }
         }
