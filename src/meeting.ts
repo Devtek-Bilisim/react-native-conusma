@@ -13,6 +13,8 @@ import { Connection } from "./connection";
 import { MeetingModel } from "./Models/meeting-model";
 import { MediaServerModel } from "./Models/media-server-model";
 import { DeviceEventEmitter } from 'react-native';
+import { SpeakerEnum } from "./Enums/speaker-enum";
+import { ActiveSpeakers } from "./Components/active-speakers";
 
 export class Meeting {
     public activeUser: MeetingUserModel;
@@ -25,7 +27,8 @@ export class Meeting {
 
     public isClosedRequestRecieved: boolean = false;
     public speakerState = false;
-    private emiterheadphone:any = null;
+    private emiterheadphone: any = null;
+    public activeSpeakers: ActiveSpeakers = new ActiveSpeakers();
     constructor(activeUser: MeetingUserModel, appService: AppService) {
         registerGlobals();
         this.appService = appService;
@@ -66,18 +69,16 @@ export class Meeting {
                     await item.mediaServer.closeProducer();
                 }
                 item.stream.getTracks().forEach(track => track.stop());
-                
+
             }
             this.connections = [];
             for (let server of this.mediaServers) {
-               if(server.socket != null && server.socket.connected)
-               {
-                server.socket.close();
-               }
+                if (server.socket != null && server.socket.connected) {
+                    server.socket.close();
+                }
             }
             this.mediaServers = [];
-            if(this.emiterheadphone != null)
-            {
+            if (this.emiterheadphone != null) {
                 this.emiterheadphone.remove();
                 this.emiterheadphone = null;
             }
@@ -226,55 +227,81 @@ export class Meeting {
         }
 
     }
-    public setSpeaker(enable: boolean,bluetooth:boolean = false,headSet = false) {
+    public setSpeaker(enable: boolean) {
         try {
-            InCallManager.start({media: 'video'});
+            InCallManager.start({ media: 'video' });
             this.speakerState = enable;
-            if(enable)
-            {
+            if (enable) {
                 InCallManager.chooseAudioRoute('SPEAKER_PHONE')
                 console.log("SPEAKER_PHONE");
             }
-            else
-            {
-                if(bluetooth)
-                {
-                    InCallManager.chooseAudioRoute('BLUETOOTH');
-                    console.log("BLUETOOTH");
-
-                }
-                else if(headSet)
-                {
+            else {
+                if (this.activeSpeakers.WIRED_HEADSET) {
                     InCallManager.chooseAudioRoute('WIRED_HEADSET');
                     console.log("WIRED_HEADSET");
                 }
-                else
-                {
+                else if (this.activeSpeakers.BLUETOOTH) {
+                    InCallManager.chooseAudioRoute('BLUETOOTH');
+                    console.log("BLUETOOTH");
+                }
+                else {
                     InCallManager.chooseAudioRoute('EARPIECE');
                     console.log("EARPIECE");
                 }
             }
 
-
         } catch (error) {
             throw new ConusmaException("setSpeaker", "setSpeaker undefined error", error);
         }
     }
-    private async headphone() {
+    public selectSpeaker(speaker: SpeakerEnum) {
         try {
+            InCallManager.start({ media: 'video' });
+            if (speaker == SpeakerEnum.BLUETOOTH) {
+                InCallManager.chooseAudioRoute('BLUETOOTH');
+                this.speakerState = false;
+            }
+            else if (speaker == SpeakerEnum.EARPIECE) {
+                InCallManager.chooseAudioRoute('EARPIECE');
+                this.speakerState = false;
+            }
+            else if (speaker == SpeakerEnum.SPEAKER_PHONE) {
+                InCallManager.chooseAudioRoute('SPEAKER_PHONE');
+                this.speakerState = true;
+            }
+            else if (speaker == SpeakerEnum.WIRED_HEADSET) {
+                InCallManager.chooseAudioRoute('WIRED_HEADSET');
+                this.speakerState = false;
+            }
+        } catch (error) {
+            throw new ConusmaException("selectSpeaker", "selectSpeaker undefined error", error);
+        }
 
-            this.emiterheadphone = DeviceEventEmitter.addListener('WiredHeadset', (data:any) => {
-                if(data.isPlugged)
-                {
-                    this.setSpeaker(false,false,true);
+    }
+    private headphone() {
+        try {
+            DeviceEventEmitter.addListener('onAudioDeviceChanged', (data: any) => {
+                let listDevice: string[] = data.availableAudioDeviceList;
+                if (listDevice.includes("BLUETOOTH")) {
+                    if (!this.activeSpeakers.BLUETOOTH) {
+                        this.activeSpeakers.BLUETOOTH = true;
+                        this.setSpeaker(false);
+                    }
+                    this.activeSpeakers.BLUETOOTH = true;
                 }
-                
-            });
-            DeviceEventEmitter.addListener('onAudioDeviceChanged', (data:any) => {               
-                 console.log("----onAudioDeviceEvent");
-                console.log(data);
-               console.log("onAudioDeviceEvent");
-                
+                else {
+                    this.activeSpeakers.BLUETOOTH = false;
+                }
+                if (listDevice.includes("WIRED_HEADSET")) {
+                    if (!this.activeSpeakers.WIRED_HEADSET) {
+                        this.activeSpeakers.WIRED_HEADSET = true;
+                        this.setSpeaker(false);
+                    }
+                    this.activeSpeakers.WIRED_HEADSET = true;
+                }
+                else {
+                    this.activeSpeakers.WIRED_HEADSET = false;
+                }
             });
         } catch (error) {
             throw new ConusmaException("headphone", "headphone undefined error", error);
@@ -301,13 +328,12 @@ export class Meeting {
                 var index = this.connections.findIndex(us => us.user.Id == this.activeUser.Id);
                 this.removeItemOnce(this.connections, index);
             }
-            else
-            {
-                throw new ConusmaException("closeProducer","producer connection not found");
+            else {
+                throw new ConusmaException("closeProducer", "producer connection not found");
 
             }
         } catch (error) {
-            throw new ConusmaException("closeProducer"," please check detail exception",error);
+            throw new ConusmaException("closeProducer", " please check detail exception", error);
         }
     }
 

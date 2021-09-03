@@ -48,6 +48,8 @@ var react_native_incall_manager_1 = __importDefault(require("react-native-incall
 var media_server_1 = require("./media-server");
 var connection_1 = require("./connection");
 var react_native_1 = require("react-native");
+var speaker_enum_1 = require("./Enums/speaker-enum");
+var active_speakers_1 = require("./Components/active-speakers");
 var Meeting = /** @class */ (function () {
     function Meeting(activeUser, appService) {
         this.mediaServers = new Array();
@@ -55,6 +57,7 @@ var Meeting = /** @class */ (function () {
         this.isClosedRequestRecieved = false;
         this.speakerState = false;
         this.emiterheadphone = null;
+        this.activeSpeakers = new active_speakers_1.ActiveSpeakers();
         react_native_webrtc_1.registerGlobals();
         this.appService = appService;
         this.activeUser = activeUser;
@@ -356,9 +359,7 @@ var Meeting = /** @class */ (function () {
             });
         });
     };
-    Meeting.prototype.setSpeaker = function (enable, bluetooth, headSet) {
-        if (bluetooth === void 0) { bluetooth = false; }
-        if (headSet === void 0) { headSet = false; }
+    Meeting.prototype.setSpeaker = function (enable) {
         try {
             react_native_incall_manager_1.default.start({ media: 'video' });
             this.speakerState = enable;
@@ -367,13 +368,13 @@ var Meeting = /** @class */ (function () {
                 console.log("SPEAKER_PHONE");
             }
             else {
-                if (bluetooth) {
-                    react_native_incall_manager_1.default.chooseAudioRoute('BLUETOOTH');
-                    console.log("BLUETOOTH");
-                }
-                else if (headSet) {
+                if (this.activeSpeakers.WIRED_HEADSET) {
                     react_native_incall_manager_1.default.chooseAudioRoute('WIRED_HEADSET');
                     console.log("WIRED_HEADSET");
+                }
+                else if (this.activeSpeakers.BLUETOOTH) {
+                    react_native_incall_manager_1.default.chooseAudioRoute('BLUETOOTH');
+                    console.log("BLUETOOTH");
                 }
                 else {
                     react_native_incall_manager_1.default.chooseAudioRoute('EARPIECE');
@@ -385,28 +386,60 @@ var Meeting = /** @class */ (function () {
             throw new conusma_exception_1.ConusmaException("setSpeaker", "setSpeaker undefined error", error);
         }
     };
+    Meeting.prototype.selectSpeaker = function (speaker) {
+        try {
+            react_native_incall_manager_1.default.start({ media: 'video' });
+            if (speaker == speaker_enum_1.SpeakerEnum.BLUETOOTH) {
+                react_native_incall_manager_1.default.chooseAudioRoute('BLUETOOTH');
+                this.speakerState = false;
+            }
+            else if (speaker == speaker_enum_1.SpeakerEnum.EARPIECE) {
+                react_native_incall_manager_1.default.chooseAudioRoute('EARPIECE');
+                this.speakerState = false;
+            }
+            else if (speaker == speaker_enum_1.SpeakerEnum.SPEAKER_PHONE) {
+                react_native_incall_manager_1.default.chooseAudioRoute('SPEAKER_PHONE');
+                this.speakerState = true;
+            }
+            else if (speaker == speaker_enum_1.SpeakerEnum.WIRED_HEADSET) {
+                react_native_incall_manager_1.default.chooseAudioRoute('WIRED_HEADSET');
+                this.speakerState = false;
+            }
+        }
+        catch (error) {
+            throw new conusma_exception_1.ConusmaException("selectSpeaker", "selectSpeaker undefined error", error);
+        }
+    };
     Meeting.prototype.headphone = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_a) {
-                try {
-                    this.emiterheadphone = react_native_1.DeviceEventEmitter.addListener('WiredHeadset', function (data) {
-                        if (data.isPlugged) {
-                            _this.setSpeaker(false, false, true);
-                        }
-                    });
-                    react_native_1.DeviceEventEmitter.addListener('onAudioDeviceChanged', function (data) {
-                        console.log("----onAudioDeviceEvent");
-                        console.log(data);
-                        console.log("onAudioDeviceEvent");
-                    });
+        var _this = this;
+        try {
+            react_native_1.DeviceEventEmitter.addListener('onAudioDeviceChanged', function (data) {
+                var listDevice = data.availableAudioDeviceList;
+                if (listDevice.includes("BLUETOOTH")) {
+                    if (!_this.activeSpeakers.BLUETOOTH) {
+                        _this.activeSpeakers.BLUETOOTH = true;
+                        _this.setSpeaker(false);
+                    }
+                    _this.activeSpeakers.BLUETOOTH = true;
                 }
-                catch (error) {
-                    throw new conusma_exception_1.ConusmaException("headphone", "headphone undefined error", error);
+                else {
+                    _this.activeSpeakers.BLUETOOTH = false;
                 }
-                return [2 /*return*/];
+                if (listDevice.includes("WIRED_HEADSET")) {
+                    if (!_this.activeSpeakers.WIRED_HEADSET) {
+                        _this.activeSpeakers.WIRED_HEADSET = true;
+                        _this.setSpeaker(false);
+                    }
+                    _this.activeSpeakers.WIRED_HEADSET = true;
+                }
+                else {
+                    _this.activeSpeakers.WIRED_HEADSET = false;
+                }
             });
-        });
+        }
+        catch (error) {
+            throw new conusma_exception_1.ConusmaException("headphone", "headphone undefined error", error);
+        }
     };
     Meeting.prototype.produce = function (localStream) {
         return __awaiter(this, void 0, void 0, function () {

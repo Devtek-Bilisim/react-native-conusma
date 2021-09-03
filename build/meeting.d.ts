@@ -4,6 +4,8 @@ import { ConusmaWorker } from "./conusma-worker";
 import { MediaServer } from "./media-server";
 import { Connection } from "./connection";
 import { MeetingModel } from "./Models/meeting-model";
+import { SpeakerEnum } from "./Enums/speaker-enum";
+import { ActiveSpeakers } from "./Components/active-speakers";
 export declare class Meeting {
     activeUser: MeetingUserModel;
     conusmaWorker: ConusmaWorker;
@@ -13,6 +15,7 @@ export declare class Meeting {
     isClosedRequestRecieved: boolean;
     speakerState: boolean;
     private emiterheadphone;
+    activeSpeakers: ActiveSpeakers;
     constructor(activeUser: MeetingUserModel, appService: AppService);
     open(): void;
     close(sendCloseRequest?: boolean): Promise<void>;
@@ -26,7 +29,8 @@ export declare class Meeting {
     private waitWhoAreYou;
     getAllUsers(): Promise<MeetingUserModel[]>;
     getProducerUsers(): Promise<MeetingUserModel[]>;
-    setSpeaker(enable: boolean, bluetooth?: boolean, headSet?: boolean): void;
+    setSpeaker(enable: boolean): void;
+    selectSpeaker(speaker: SpeakerEnum): void;
     private headphone;
     produce(localStream: MediaStream): Promise<Connection>;
     closeProducer(): Promise<void>;
