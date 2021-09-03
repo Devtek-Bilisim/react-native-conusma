@@ -26,7 +26,7 @@ export declare class Meeting {
     private waitWhoAreYou;
     getAllUsers(): Promise<MeetingUserModel[]>;
     getProducerUsers(): Promise<MeetingUserModel[]>;
-    setSpeaker(enable: boolean, bluetooth?: boolean): void;
+    setSpeaker(enable: boolean, bluetooth?: boolean, headSet?: boolean): void;
     private headphone;
     produce(localStream: MediaStream): Promise<Connection>;
     closeProducer(): Promise<void>;

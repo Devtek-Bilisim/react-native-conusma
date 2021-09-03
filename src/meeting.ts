@@ -226,7 +226,7 @@ export class Meeting {
         }
 
     }
-    public setSpeaker(enable: boolean,bluetooth:boolean = false) {
+    public setSpeaker(enable: boolean,bluetooth:boolean = false,headSet = false) {
         try {
             InCallManager.start({media: 'video'});
             this.speakerState = enable;
@@ -243,10 +243,15 @@ export class Meeting {
                     console.log("BLUETOOTH");
 
                 }
-                else
+                else if(headSet)
                 {
                     InCallManager.chooseAudioRoute('WIRED_HEADSET');
                     console.log("WIRED_HEADSET");
+                }
+                else
+                {
+                    InCallManager.chooseAudioRoute('EARPIECE');
+                    console.log("EARPIECE");
                 }
             }
 
@@ -261,8 +266,15 @@ export class Meeting {
             this.emiterheadphone = DeviceEventEmitter.addListener('WiredHeadset', (data:any) => {
                 if(data.isPlugged)
                 {
-                    this.setSpeaker(false);
+                    this.setSpeaker(false,false,true);
                 }
+                
+            });
+            DeviceEventEmitter.addListener('onAudioDeviceChanged', (data:any) => {               
+                 console.log("----onAudioDeviceEvent");
+                console.log(data);
+               console.log("onAudioDeviceEvent");
+                
             });
         } catch (error) {
             throw new ConusmaException("headphone", "headphone undefined error", error);

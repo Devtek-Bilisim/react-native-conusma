@@ -356,8 +356,9 @@ var Meeting = /** @class */ (function () {
             });
         });
     };
-    Meeting.prototype.setSpeaker = function (enable, bluetooth) {
+    Meeting.prototype.setSpeaker = function (enable, bluetooth, headSet) {
         if (bluetooth === void 0) { bluetooth = false; }
+        if (headSet === void 0) { headSet = false; }
         try {
             react_native_incall_manager_1.default.start({ media: 'video' });
             this.speakerState = enable;
@@ -370,9 +371,13 @@ var Meeting = /** @class */ (function () {
                     react_native_incall_manager_1.default.chooseAudioRoute('BLUETOOTH');
                     console.log("BLUETOOTH");
                 }
-                else {
+                else if (headSet) {
                     react_native_incall_manager_1.default.chooseAudioRoute('WIRED_HEADSET');
                     console.log("WIRED_HEADSET");
+                }
+                else {
+                    react_native_incall_manager_1.default.chooseAudioRoute('EARPIECE');
+                    console.log("EARPIECE");
                 }
             }
         }
@@ -387,8 +392,13 @@ var Meeting = /** @class */ (function () {
                 try {
                     this.emiterheadphone = react_native_1.DeviceEventEmitter.addListener('WiredHeadset', function (data) {
                         if (data.isPlugged) {
-                            _this.setSpeaker(false);
+                            _this.setSpeaker(false, false, true);
                         }
+                    });
+                    react_native_1.DeviceEventEmitter.addListener('onAudioDeviceChanged', function (data) {
+                        console.log("----onAudioDeviceEvent");
+                        console.log(data);
+                        console.log("onAudioDeviceEvent");
                     });
                 }
                 catch (error) {
