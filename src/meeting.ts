@@ -312,6 +312,7 @@ export class Meeting {
         var connection = await this.createConnectionForProducer();
         connection.stream = localStream;
         await connection.mediaServer.produce(this.activeUser, localStream);
+        connection.transport = connection.mediaServer.producerTransport;
         return connection;
     }
 
@@ -346,7 +347,8 @@ export class Meeting {
 
     public async consume(user: MeetingUserModel) {
         var connection = await this.createConnectionForConsumer(user);
-        connection.stream = await connection.mediaServer.consume(user);
+        connection.transport = await connection.mediaServer.consume(user);
+        connection.stream = connection.transport.RemoteStream;
         return connection;
     }
     public async closeConsumer(connection: Connection) {

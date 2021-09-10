@@ -5,6 +5,7 @@ import DeviceInfo from 'react-native-device-info';
 export class Connection {
     user:MeetingUserModel;
     mediaServer:MediaServer;
+    transport:any;
     stream:MediaStream;
     isProducer:boolean = false;
 

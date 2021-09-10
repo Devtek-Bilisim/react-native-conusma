@@ -144,9 +144,8 @@ export class MediaServer {
         try {
             var result = await this.createConsumerTransport(this, producerUser);
             this.consumerTransports.push(result);
-            return <MediaStream>result.RemoteStream;
+            return result;
         } catch (error) {
-
             throw new ConusmaException("consume", producerUser.Id + "The stream of the user is currently not captured. User connection information is out of date.", error);
         }
     }
@@ -184,7 +183,7 @@ export class MediaServer {
         }
     }
 
-    private async addConsumer(consumerTransport: any, kind: string) {
+    public async addConsumer(consumerTransport: any, kind: string) {
         if (consumerTransport != null) {
             if (kind == "video") {
                 consumerTransport.videoConsumer = await this.consumeTransport(consumerTransport, "video");
@@ -198,7 +197,7 @@ export class MediaServer {
             }
         }
     }
-    private async resumeConsumer(consumerTransport: any, kind: string) {
+    public async resumeConsumer(consumerTransport: any, kind: string) {
         this.signal('resume', { consumerTransportId: consumerTransport.transportId, kind: kind }, consumerTransport.MediaServer.socket);
     }
 
@@ -227,7 +226,7 @@ export class MediaServer {
     }
 
       
-    private async pauseConsumer(consumerTransport: any, kind: string) {
+    public async pauseConsumer(consumerTransport: any, kind: string) {
         try {
             if (consumerTransport != null && consumerTransport.videoConsumer != null) {
                 if (kind == 'video') {
