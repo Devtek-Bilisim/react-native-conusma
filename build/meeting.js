@@ -453,6 +453,7 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, connection.mediaServer.produce(this.activeUser, localStream)];
                     case 2:
                         _a.sent();
+                        connection.transport = connection.mediaServer.producerTransport;
                         return [2 /*return*/, connection];
                 }
             });
@@ -508,7 +509,8 @@ var Meeting = /** @class */ (function () {
                         _a = connection;
                         return [4 /*yield*/, connection.mediaServer.consume(user)];
                     case 2:
-                        _a.stream = _b.sent();
+                        _a.transport = _b.sent();
+                        connection.stream = connection.transport.RemoteStream;
                         return [2 /*return*/, connection];
                 }
             });

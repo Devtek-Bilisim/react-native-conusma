@@ -278,7 +278,7 @@ var MediaServer = /** @class */ (function () {
                     case 1:
                         result = _a.sent();
                         this.consumerTransports.push(result);
-                        return [2 /*return*/, result.RemoteStream];
+                        return [2 /*return*/, result];
                     case 2:
                         error_4 = _a.sent();
                         throw new conusma_exception_1.ConusmaException("consume", producerUser.Id + "The stream of the user is currently not captured. User connection information is out of date.", error_4);

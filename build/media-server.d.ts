@@ -15,12 +15,12 @@ export declare class MediaServer {
     private createProducerTransport;
     private createProducer;
     private signal;
-    consume(producerUser: MeetingUserModel): Promise<MediaStream>;
+    consume(producerUser: MeetingUserModel): Promise<any>;
     private createConsumerTransport;
-    private addConsumer;
-    private resumeConsumer;
+    addConsumer(consumerTransport: any, kind: string): Promise<void>;
+    resumeConsumer(consumerTransport: any, kind: string): Promise<void>;
     private consumeTransport;
-    private pauseConsumer;
+    pauseConsumer(consumerTransport: any, kind: string): Promise<void>;
     closeConsumer(user: MeetingUserModel): Promise<void>;
     private removeItemOnce;
     closeProducer(): Promise<void>;

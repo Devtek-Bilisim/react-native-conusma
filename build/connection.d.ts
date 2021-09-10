@@ -3,6 +3,7 @@ import { MediaServer } from "./media-server";
 export declare class Connection {
     user: MeetingUserModel;
     mediaServer: MediaServer;
+    transport: any;
     stream: MediaStream;
     isProducer: boolean;
     private cameraCrashCounter;
