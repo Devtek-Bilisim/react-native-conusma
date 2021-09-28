@@ -100,7 +100,7 @@ var MediaServer = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 7, , 8]);
+                        _a.trys.push([0, 6, , 7]);
                         return [4 /*yield*/, this.createProducerTransport()];
                     case 1:
                         _a.sent();
@@ -121,15 +121,12 @@ var MediaServer = /** @class */ (function () {
                         _a.label = 5;
                     case 5:
                         user.MediaServerId = this.id;
-                        return [4 /*yield*/, this.appService.connectMeeting(user)];
-                    case 6:
-                        _a.sent();
                         console.log("created produce");
-                        return [3 /*break*/, 8];
-                    case 7:
+                        return [3 /*break*/, 7];
+                    case 6:
                         error_1 = _a.sent();
                         throw new conusma_exception_1.ConusmaException("produce", "can not send stream, please check exception", error_1);
-                    case 8: return [2 /*return*/];
+                    case 7: return [2 /*return*/];
                 }
             });
         });
