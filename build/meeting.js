@@ -454,6 +454,9 @@ var Meeting = /** @class */ (function () {
                     case 2:
                         _a.sent();
                         connection.transport = connection.mediaServer.producerTransport;
+                        return [4 /*yield*/, this.appService.updateMeetingUser(this.activeUser)];
+                    case 3:
+                        _a.sent();
                         return [2 /*return*/, connection];
                 }
             });

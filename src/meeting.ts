@@ -313,6 +313,7 @@ export class Meeting {
         connection.stream = localStream;
         await connection.mediaServer.produce(this.activeUser, localStream);
         connection.transport = connection.mediaServer.producerTransport;
+        await this.appService.updateMeetingUser(this.activeUser);
         return connection;
     }
 
