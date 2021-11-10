@@ -4,6 +4,7 @@ import { ConusmaException } from './Exceptions/conusma-exception';
 import { GuestUser } from './guest-user';
 import DeviceInfo from 'react-native-device-info';
 import { User } from './user';
+import { DelayTimerList } from './Timer/delay-timer-list';
 
 export default class Conusma {
 
@@ -27,6 +28,13 @@ export default class Conusma {
       var user: GuestUser = new GuestUser(this.appService);
       await user.create();
       return user;
+    } catch (error) {
+      throw new ConusmaException("createGuestUser","GuestUser cannot be created.", error);
+    }
+  }
+  public async getTimerLog() {
+    try {
+      return DelayTimerList.getLog();
     } catch (error) {
       throw new ConusmaException("createGuestUser","GuestUser cannot be created.", error);
     }

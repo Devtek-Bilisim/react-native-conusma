@@ -44,6 +44,7 @@ var conusma_exception_1 = require("./Exceptions/conusma-exception");
 var guest_user_1 = require("./guest-user");
 var react_native_device_info_1 = __importDefault(require("react-native-device-info"));
 var user_1 = require("./user");
+var delay_timer_list_1 = require("./Timer/delay-timer-list");
 var Conusma = /** @class */ (function () {
     function Conusma(appId, parameters) {
         var deviceId = react_native_device_info_1.default.getUniqueId();
@@ -86,6 +87,19 @@ var Conusma = /** @class */ (function () {
                         throw new conusma_exception_1.ConusmaException("createGuestUser", "GuestUser cannot be created.", error_2);
                     case 3: return [2 /*return*/];
                 }
+            });
+        });
+    };
+    Conusma.prototype.getTimerLog = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                try {
+                    return [2 /*return*/, delay_timer_list_1.DelayTimerList.getLog()];
+                }
+                catch (error) {
+                    throw new conusma_exception_1.ConusmaException("createGuestUser", "GuestUser cannot be created.", error);
+                }
+                return [2 /*return*/];
             });
         });
     };

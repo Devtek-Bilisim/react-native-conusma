@@ -15,6 +15,7 @@ import { MediaServerModel } from "./Models/media-server-model";
 import { DeviceEventEmitter } from 'react-native';
 import { SpeakerEnum } from "./Enums/speaker-enum";
 import { ActiveSpeakers } from "./Components/active-speakers";
+import { DelayTimerList } from "./Timer/delay-timer-list";
 
 export class Meeting {
     public activeUser: MeetingUserModel;
@@ -39,6 +40,7 @@ export class Meeting {
 
     public open() {
         try {
+            DelayTimerList.startTime("meetingOpen");
             this.isClosedRequestRecieved = false;
             this.conusmaWorker.start();
             this.conusmaWorker.meetingWorkerEvent.on('meetingUsers', () => {
@@ -50,6 +52,7 @@ export class Meeting {
             this.conusmaWorker.meetingWorkerEvent.on('meetingUpdate', () => {
                 console.log("Meeting updated.");
             });
+            DelayTimerList.endTime("meetingOpen");
         } catch (error) {
             throw new ConusmaException("open", "cannot open, please check exception", error);
 
@@ -58,6 +61,7 @@ export class Meeting {
 
     public async close(sendCloseRequest: boolean = false) {
         try {
+            DelayTimerList.startTime("meetingClose");
             this.isClosedRequestRecieved = true;
             if (this.conusmaWorker != null) {
                 this.conusmaWorker.terminate();
@@ -86,6 +90,7 @@ export class Meeting {
                 var closeData = { 'MeetingUserId': this.activeUser.Id };
                 await this.appService.liveClose(closeData);
             }
+            DelayTimerList.endTime("meetingClose");
         } catch (error) {
             throw new ConusmaException("close", "cannot close, please check exception", error);
         }
@@ -145,6 +150,7 @@ export class Meeting {
         } catch (error) {
             throw new ConusmaException("enableAudioVideo", "can not read stream , please check exception ", error);
         }
+        DelayTimerList.startTime("enableAudioVideo");
         const isFrontCamera = true;
         const devices = await mediaDevices.enumerateDevices();
         const facing = isFrontCamera ? 'front' : 'environment';
@@ -165,11 +171,14 @@ export class Meeting {
             },
         };
         const newStream: MediaStream = await mediaDevices.getUserMedia(constraints);
+        DelayTimerList.endTime("enableAudioVideo");
         return newStream;
     }
     public async connectMeeting() {
         try {
+            DelayTimerList.startTime("connectMeeting");
             await this.appService.connectMeeting(this.activeUser);
+            DelayTimerList.endTime("connectMeeting");
             console.log("User connected to the meeting.");
         } catch (error) {
             throw new ConusmaException("connectMeeting", "can not connect meeting , please check exception", error);
@@ -229,6 +238,7 @@ export class Meeting {
     }
     public setSpeaker(enable: boolean) {
         try {
+            DelayTimerList.startTime("setSpeaker");
             InCallManager.start({ media: 'video' });
             this.speakerState = enable;
             if (enable) {
@@ -249,6 +259,7 @@ export class Meeting {
                     console.log("EARPIECE");
                 }
             }
+            DelayTimerList.endTime("setSpeaker");
 
         } catch (error) {
             throw new ConusmaException("setSpeaker", "setSpeaker undefined error", error);
@@ -309,11 +320,13 @@ export class Meeting {
     }
 
     public async produce(localStream: MediaStream) {
+        DelayTimerList.startTime("produce");
         var connection = await this.createConnectionForProducer();
         connection.stream = localStream;
         await connection.mediaServer.produce(this.activeUser, localStream);
         connection.transport = connection.mediaServer.producerTransport;
         await this.appService.updateMeetingUser(this.activeUser);
+        DelayTimerList.endTime("produce");
         return connection;
     }
 
@@ -347,9 +360,12 @@ export class Meeting {
     }
 
     public async consume(user: MeetingUserModel) {
+        DelayTimerList.startTime("consume "+user.Id);
         var connection = await this.createConnectionForConsumer(user);
         connection.transport = await connection.mediaServer.consume(user);
         connection.stream = connection.transport.RemoteStream;
+        DelayTimerList.endTime("consume "+user.Id);
+
         return connection;
     }
     public async closeConsumer(connection: Connection) {

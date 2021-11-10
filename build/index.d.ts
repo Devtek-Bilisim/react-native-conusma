@@ -7,4 +7,5 @@ export default class Conusma {
     });
     createUser(): Promise<User>;
     createGuestUser(): Promise<GuestUser>;
+    getTimerLog(): Promise<any[]>;
 }

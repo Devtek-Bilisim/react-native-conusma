@@ -40,6 +40,7 @@ exports.User = void 0;
 var conusma_exception_1 = require("./Exceptions/conusma-exception");
 var meeting_1 = require("./meeting");
 var user_model_1 = require("./Models/user-model");
+var delay_timer_list_1 = require("./Timer/delay-timer-list");
 var User = /** @class */ (function () {
     function User(_appService) {
         this.userInfo = new user_model_1.UserModel();
@@ -50,11 +51,14 @@ var User = /** @class */ (function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.appService.createUserWithDeviceId()];
+                    case 0:
+                        delay_timer_list_1.DelayTimerList.startTime("User create");
+                        return [4 /*yield*/, this.appService.createUserWithDeviceId()];
                     case 1:
                         result = _a.sent();
                         this.userInfo = result;
                         this.appService.setJwtToken(this.userInfo.Token);
+                        delay_timer_list_1.DelayTimerList.endTime("User create");
                         return [2 /*return*/];
                 }
             });
@@ -105,10 +109,12 @@ var User = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
+                        delay_timer_list_1.DelayTimerList.startTime("User getProfileMeeting");
                         return [4 /*yield*/, this.appService.getMeetings()];
                     case 1:
                         meetings = _a.sent();
                         profileMeeting = meetings.find(function (us) { return us.ProfileMeeting; });
+                        delay_timer_list_1.DelayTimerList.endTime("User getProfileMeeting");
                         return [2 /*return*/, profileMeeting];
                     case 2:
                         error_3 = _a.sent();
@@ -126,11 +132,13 @@ var User = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
+                        delay_timer_list_1.DelayTimerList.startTime("User joinMeeting");
                         return [4 /*yield*/, this.appService.joinMeeting(meeting.MeetingId, meeting.Password, meetingName)];
                     case 1:
                         result = _a.sent();
                         meetingUser = result;
                         activeMeeting = new meeting_1.Meeting(meetingUser, this.appService);
+                        delay_timer_list_1.DelayTimerList.endTime("User joinMeeting");
                         return [2 /*return*/, activeMeeting];
                     case 2:
                         error_4 = _a.sent();

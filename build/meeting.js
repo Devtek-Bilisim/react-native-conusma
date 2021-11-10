@@ -50,6 +50,7 @@ var connection_1 = require("./connection");
 var react_native_1 = require("react-native");
 var speaker_enum_1 = require("./Enums/speaker-enum");
 var active_speakers_1 = require("./Components/active-speakers");
+var delay_timer_list_1 = require("./Timer/delay-timer-list");
 var Meeting = /** @class */ (function () {
     function Meeting(activeUser, appService) {
         this.mediaServers = new Array();
@@ -66,6 +67,7 @@ var Meeting = /** @class */ (function () {
     }
     Meeting.prototype.open = function () {
         try {
+            delay_timer_list_1.DelayTimerList.startTime("meetingOpen");
             this.isClosedRequestRecieved = false;
             this.conusmaWorker.start();
             this.conusmaWorker.meetingWorkerEvent.on('meetingUsers', function () {
@@ -77,6 +79,7 @@ var Meeting = /** @class */ (function () {
             this.conusmaWorker.meetingWorkerEvent.on('meetingUpdate', function () {
                 console.log("Meeting updated.");
             });
+            delay_timer_list_1.DelayTimerList.endTime("meetingOpen");
         }
         catch (error) {
             throw new conusma_exception_1.ConusmaException("open", "cannot open, please check exception", error);
@@ -90,6 +93,7 @@ var Meeting = /** @class */ (function () {
                 switch (_d.label) {
                     case 0:
                         _d.trys.push([0, 10, , 11]);
+                        delay_timer_list_1.DelayTimerList.startTime("meetingClose");
                         this.isClosedRequestRecieved = true;
                         if (this.conusmaWorker != null) {
                             this.conusmaWorker.terminate();
@@ -133,7 +137,9 @@ var Meeting = /** @class */ (function () {
                     case 8:
                         _d.sent();
                         _d.label = 9;
-                    case 9: return [3 /*break*/, 11];
+                    case 9:
+                        delay_timer_list_1.DelayTimerList.endTime("meetingClose");
+                        return [3 /*break*/, 11];
                     case 10:
                         error_1 = _d.sent();
                         throw new conusma_exception_1.ConusmaException("close", "cannot close, please check exception", error_1);
@@ -238,6 +244,7 @@ var Meeting = /** @class */ (function () {
                         catch (error) {
                             throw new conusma_exception_1.ConusmaException("enableAudioVideo", "can not read stream , please check exception ", error);
                         }
+                        delay_timer_list_1.DelayTimerList.startTime("enableAudioVideo");
                         isFrontCamera = true;
                         return [4 /*yield*/, react_native_webrtc_1.mediaDevices.enumerateDevices()];
                     case 1:
@@ -260,6 +267,7 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, react_native_webrtc_1.mediaDevices.getUserMedia(constraints)];
                     case 2:
                         newStream = _a.sent();
+                        delay_timer_list_1.DelayTimerList.endTime("enableAudioVideo");
                         return [2 /*return*/, newStream];
                 }
             });
@@ -272,9 +280,11 @@ var Meeting = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
+                        delay_timer_list_1.DelayTimerList.startTime("connectMeeting");
                         return [4 /*yield*/, this.appService.connectMeeting(this.activeUser)];
                     case 1:
                         _a.sent();
+                        delay_timer_list_1.DelayTimerList.endTime("connectMeeting");
                         console.log("User connected to the meeting.");
                         return [3 /*break*/, 3];
                     case 2:
@@ -361,6 +371,7 @@ var Meeting = /** @class */ (function () {
     };
     Meeting.prototype.setSpeaker = function (enable) {
         try {
+            delay_timer_list_1.DelayTimerList.startTime("setSpeaker");
             react_native_incall_manager_1.default.start({ media: 'video' });
             this.speakerState = enable;
             if (enable) {
@@ -381,6 +392,7 @@ var Meeting = /** @class */ (function () {
                     console.log("EARPIECE");
                 }
             }
+            delay_timer_list_1.DelayTimerList.endTime("setSpeaker");
         }
         catch (error) {
             throw new conusma_exception_1.ConusmaException("setSpeaker", "setSpeaker undefined error", error);
@@ -446,7 +458,9 @@ var Meeting = /** @class */ (function () {
             var connection;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.createConnectionForProducer()];
+                    case 0:
+                        delay_timer_list_1.DelayTimerList.startTime("produce");
+                        return [4 /*yield*/, this.createConnectionForProducer()];
                     case 1:
                         connection = _a.sent();
                         connection.stream = localStream;
@@ -457,6 +471,7 @@ var Meeting = /** @class */ (function () {
                         return [4 /*yield*/, this.appService.updateMeetingUser(this.activeUser)];
                     case 3:
                         _a.sent();
+                        delay_timer_list_1.DelayTimerList.endTime("produce");
                         return [2 /*return*/, connection];
                 }
             });
@@ -506,7 +521,9 @@ var Meeting = /** @class */ (function () {
             var connection, _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0: return [4 /*yield*/, this.createConnectionForConsumer(user)];
+                    case 0:
+                        delay_timer_list_1.DelayTimerList.startTime("consume " + user.Id);
+                        return [4 /*yield*/, this.createConnectionForConsumer(user)];
                     case 1:
                         connection = _b.sent();
                         _a = connection;
@@ -514,6 +531,7 @@ var Meeting = /** @class */ (function () {
                     case 2:
                         _a.transport = _b.sent();
                         connection.stream = connection.transport.RemoteStream;
+                        delay_timer_list_1.DelayTimerList.endTime("consume " + user.Id);
                         return [2 /*return*/, connection];
                 }
             });

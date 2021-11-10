@@ -44,6 +44,7 @@ var conusma_exception_1 = require("./Exceptions/conusma-exception");
 var guest_user_model_1 = require("./Models/guest-user-model");
 var async_storage_1 = __importDefault(require("@react-native-async-storage/async-storage"));
 var meeting_1 = require("./meeting");
+var delay_timer_list_1 = require("./Timer/delay-timer-list");
 var GuestUser = /** @class */ (function () {
     function GuestUser(_appService) {
         this.userInfo = new guest_user_model_1.GuestUserModel();
@@ -54,7 +55,9 @@ var GuestUser = /** @class */ (function () {
             var token, result, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, async_storage_1.default.getItem('conusmaGuestToken')];
+                    case 0:
+                        delay_timer_list_1.DelayTimerList.startTime("GuestUser create");
+                        return [4 /*yield*/, async_storage_1.default.getItem('conusmaGuestToken')];
                     case 1:
                         token = _a.sent();
                         if (!(token != undefined && token != null)) return [3 /*break*/, 4];
@@ -76,7 +79,9 @@ var GuestUser = /** @class */ (function () {
                     case 6:
                         _a.sent();
                         _a.label = 7;
-                    case 7: return [2 /*return*/];
+                    case 7:
+                        delay_timer_list_1.DelayTimerList.endTime("GuestUser create");
+                        return [2 /*return*/];
                 }
             });
         });
@@ -89,6 +94,7 @@ var GuestUser = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
+                        delay_timer_list_1.DelayTimerList.startTime("GuestUser joinMeetingByInviteCode");
                         return [4 /*yield*/, this.appService.controlInviteCode(inviteCode)];
                     case 1:
                         resultcode = _a.sent();
@@ -98,6 +104,7 @@ var GuestUser = /** @class */ (function () {
                         result = _a.sent();
                         meetingUser = result;
                         activeMeeting = new meeting_1.Meeting(meetingUser, this.appService);
+                        delay_timer_list_1.DelayTimerList.endTime("GuestUser joinMeetingByInviteCode");
                         return [2 /*return*/, activeMeeting];
                     case 3:
                         error_1 = _a.sent();
